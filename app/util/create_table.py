@@ -1,5 +1,5 @@
 from typing import Tuple
-from ..db import PgDatabase
+from db import PgDatabase
 
 create_functions: list[str] = [
     """

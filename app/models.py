@@ -3,7 +3,7 @@ from typing import Any
 from pydantic import BaseModel
 from abc import ABC
 
-from app.util.tables import Tables
+from util.tables import Tables
 
 
 class Model(BaseModel, ABC):

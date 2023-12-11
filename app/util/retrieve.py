@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from app.util.tables import params_to_where_clause
-from ..db import PgDatabase
+from util.tables import params_to_where_clause
+from db import PgDatabase
 
 
 def get_from_table(table_name: str, where_clasue: str) -> Tuple[bool, str, list[dict] | None]:

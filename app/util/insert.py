@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from app.models import Model
-from ..db import PgDatabase
+from models import Model
+from db import PgDatabase
 
 # insert data into any table
 def insert_data_into_table(table_name: str, data: dict) -> Tuple[bool, str]:

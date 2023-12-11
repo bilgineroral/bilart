@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from app.models import *
-from app.util.delete import delete
+from models import *
+from util.delete import delete
 
-from app.util.tables import Tables
-from app.util.update import update
-from .util.create_table import create_tables as util_create_tables
-from .util.retrieve import *
-from .util.insert import *
+from util.tables import Tables
+from util.update import update
+from util.create_table import create_tables as util_create_tables
+from util.retrieve import *
+from util.insert import *
 
 
 app = FastAPI()

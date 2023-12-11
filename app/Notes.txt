@@ -80,7 +80,7 @@ Does every char denote a different privilege or something? I can't see how this 
 9. This is too a typo I guess (we're searching for bids in Tag table):
 
 
-@app.get("/bids/")
+@get("/bids/")
 def get_bids(
     bid_id: int | None = None,
     price: str | None = None,

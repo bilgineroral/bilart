@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from ..db import PgDatabase
+from db import PgDatabase
 
 # insert data into any table
 def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:

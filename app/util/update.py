@@ -1,8 +1,8 @@
 from typing import Tuple
 
-from app.models import Model
+from models import Model
 
-from ..db import PgDatabase
+from db import PgDatabase
 
 # insert data into any table
 
