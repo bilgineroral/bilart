@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from fastapi import HTTPException
+
 from models import Model
 from db import PgDatabase
 
@@ -17,8 +19,7 @@ def insert_data_into_table(table_name: str, data: dict) -> Tuple[bool, str]:
             
             return True, "Data inserted successfully"
     except Exception as e:
-        print(e)
-        return False, str(e)
+        raise HTTPException(status_code=500, detail=str(e.with_traceback))
 
 
 def insert(model: Model):

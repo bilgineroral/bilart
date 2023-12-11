@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from fastapi import HTTPException
+
 from models import Model
 
 from db import PgDatabase
@@ -19,8 +21,7 @@ def update_data_in_table(table_name: str, data: dict, **kwargs) -> Tuple[bool, s
             db.connection.commit()
             return True, f"{updated_rows} row(s) updated successfully"
         except Exception as e:
-            print(e)
-            return False, str(e)
+            raise HTTPException(status_code=500, detail=str(e.with_traceback))
 
 
 def update(table: str, model: Model, **kwargs):

@@ -1,4 +1,6 @@
 from typing import Tuple
+
+from fastapi import HTTPException
 from db import PgDatabase
 
 create_functions: list[str] = [
@@ -161,5 +163,4 @@ def create_tables() -> Tuple[bool, str]:
             db.connection.commit()
             return True, "Tables have been created successfully..."
         except Exception as e:
-            print("ere")
-            return False, str(e)
+            raise HTTPException(status_code=500, detail=str(e.with_traceback))

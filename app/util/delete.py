@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from fastapi import HTTPException
+
 from db import PgDatabase
 
 # insert data into any table
@@ -13,8 +15,7 @@ def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
             db.connection.commit()
             return True, f"{deleted_rows} row(s) deleted successfully"
         except Exception as e:
-            print(e)
-            return False, str(e)
+            raise HTTPException(status_code=500, detail=str(e.with_traceback))
 
 
 def delete(table: str, **kwargs):
