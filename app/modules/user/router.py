@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_user_id(
     user_id: int,
 ):
     success, _, message, items = retrieve(
-        table=Tables.User.value,
+        table=UserModel.get_table_name(),
         single=True,
         user_id=user_id,
     )
@@ -29,7 +28,7 @@ def get_user_username(
     username: str,
 ):
     success, _, message, items = retrieve(
-        table=Tables.User.value,
+        table=UserModel.get_table_name(),
         single=True,
         username=username,
     )
@@ -49,7 +48,7 @@ def get_users(
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
-        table=Tables.User.value,
+        table=UserModel.get_table_name(),
         single=False,
         username=username,
         first_name=first_name,
@@ -74,7 +73,7 @@ def create_new_user(request_data: UserModel):
 @router.delete("/{user_id}")
 def delete_user(user_id: int):
     success, message = delete(
-        table=Tables.User.value,
+        table=UserModel.get_table_name(),
         user_id=user_id
     )
     return {"message": message, "success": success}
@@ -83,7 +82,7 @@ def delete_user(user_id: int):
 @router.put("/{user_id}")
 def update_user(user_id: int, request_data: UserModel):
     success, message = update(
-        table=Tables.User.value,
+        table=UserModel.get_table_name(),
         model=request_data,
         user_id=user_id
     )

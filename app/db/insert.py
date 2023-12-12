@@ -8,7 +8,7 @@ from db.db import PgDatabase
 # insert data into any table
 def insert_data_into_table(table_name: str, data: dict) -> Tuple[bool, str]:
     try:
-        query = f"insert into {table_name} ({', '.join(data.keys())}) values ({', '.join(['%s' for _ in data.values()])})"
+        query = f"""INSERT INTO {table_name} ({', '.join(data.keys())}) VALUES ({', '.join([f"'{v}'" for v in data.values()])})"""
         print(query)
         with PgDatabase() as db:
             # Execute the SQL query with the data values
@@ -18,8 +18,11 @@ def insert_data_into_table(table_name: str, data: dict) -> Tuple[bool, str]:
             db.connection.commit()
             
             return True, "Data inserted successfully"
+    except HTTPException as e:
+            raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e.with_traceback))
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 def insert(model: Model):

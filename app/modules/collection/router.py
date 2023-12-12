@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_collection(
     collection_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=CollectionModel.get_table_name(),
         single=True,
         collection_id=collection_id
     )
@@ -30,7 +29,7 @@ def get_collections(
     collector_id: int | None = None,
 ):
     success, count, message, items = retrieve(
-        table=Tables.Collection.value,
+        table=CollectionModel.get_table_name(),
         single=False,
         search__name=search__name,
         name=name,
@@ -49,7 +48,7 @@ def create_new_collection(request_data: CollectionModel):
 @router.delete("/{collection_id}")
 def delete_collections(collection_id: int):
     success, message = delete(
-        table=Tables.Collection.value,
+        table=CollectionModel.get_table_name(),
         collection_id=collection_id
     )
     return {"message": message, "success": success}
@@ -58,7 +57,7 @@ def delete_collections(collection_id: int):
 @router.put("/{collection_id}")
 def update_collections(collection_id: int, request_data: CollectionModel):
     success, message = update(
-        table=Tables.Collection.value,
+        table=CollectionModel.get_table_name(),
         model=request_data,
         collection_id=collection_id
     )

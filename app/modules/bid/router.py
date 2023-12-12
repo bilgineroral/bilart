@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_bid(
     bid_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=BidModel.get_table_name(),
         single=True,
         bid_id=bid_id
     )
@@ -35,7 +34,7 @@ def get_bids(
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
-        table=Tables.Tag.value,
+        table=BidModel.get_table_name(),
         single=False,
         bid_id=bid_id,
         price=price,
@@ -58,7 +57,7 @@ def create_new_bid(request_data: BidModel):
 @router.delete("/{bid_id}")
 def delete_bid(bid_id: int):
     success, message = delete(
-        table=Tables.Bid.value,
+        table=BidModel.get_table_name(),
         bid_id=bid_id
     )
     return {"message": message, "success": success}
@@ -67,7 +66,7 @@ def delete_bid(bid_id: int):
 @router.put("/{bid_id}")
 def update_bid(bid_id: int, request_data: BidModel):
     success, message = update(
-        table=Tables.Bid.value,
+        table=BidModel.get_table_name(),
         model=request_data,
         bid_id=bid_id
     )

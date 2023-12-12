@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_tag(
     name: str
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=TagModel.get_table_name(),
         single=True,
         name=name
     )
@@ -29,7 +28,7 @@ def get_tags(
     search__name: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=Tables.Tag.value,
+        table=TagModel.get_table_name(),
         single=False,
         search__name=search__name
     )
@@ -46,7 +45,7 @@ def create_new_tag(request_data: TagModel):
 @router.delete("/{name}")
 def delete_tags(name: str):
     success, message = delete(
-        table=Tables.Tag.value,
+        table=TagModel.get_table_name(),
         name=name
     )
     return {"message": message, "success": success}
@@ -55,7 +54,7 @@ def delete_tags(name: str):
 @router.put("/{name}")
 def update_tags(name: str, request_data: TagModel):
     success, message = update(
-        table=Tables.Tag.value,
+        table=TagModel.get_table_name(),
         model=request_data,
         name=name
     )

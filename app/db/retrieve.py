@@ -18,12 +18,16 @@ def get_from_table(table_name: str, where_clasue: str, single: bool = False) -> 
                 if count > 1:
                     raise HTTPException(status_code=400, detail=f"More than one object returned:{count}")
                 elif count == 0:
+                    print("here")
                     raise HTTPException(status_code=404, detail=f"Object not found")
             columns: list[str] = [desc[0] for desc in db.cursor.description]
             return True, count, "Data retrieved successfully", [dict(zip(columns, row)) for row in data]
+        except HTTPException as e:
+            raise e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e.with_traceback))
+            print(e)
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def retrieve(table: str, single: bool = False, **kwargs):
-    return get_from_table(table, params_to_where_clause(**kwargs))
+    return get_from_table(table, params_to_where_clause(**kwargs), single=single)

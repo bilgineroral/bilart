@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_artist(
     artist_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=ArtistModel.get_table_name(),
         single=True,
         artist_id=artist_id
     )
@@ -29,7 +28,7 @@ def get_artists(
     search__bio: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=Tables.Artist.value,
+        table=ArtistModel.get_table_name(),
         single=False,
         link=link,
         search__bio=search__bio
@@ -47,7 +46,7 @@ def create_new_artist(request_data: ArtistModel):
 @router.delete("/{artist_id}")
 def delete_artists(artist_id: int):
     success, message = delete(
-        table=Tables.Artist.value,
+        table=ArtistModel.get_table_name(),
         artist_id=artist_id
     )
     return {"message": message, "success": success}
@@ -56,7 +55,7 @@ def delete_artists(artist_id: int):
 @router.put("/{artist_id}")
 def update_artists(artist_id: int, request_data: ArtistModel):
     success, message = update(
-        table=Tables.Artist.value,
+        table=ArtistModel.get_table_name(),
         model=request_data,
         artist_id=artist_id
     )

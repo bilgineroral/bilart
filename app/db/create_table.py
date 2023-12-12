@@ -15,4 +15,4 @@ def create_tables() -> Tuple[bool, str]:
             return True, "Tables have been created successfully..."
         except Exception as e:
             print(e)
-            raise HTTPException(status_code=500, detail=str(e.with_traceback))
+            raise HTTPException(status_code=500, detail=str(e))

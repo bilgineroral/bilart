@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_admin(
     admin_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=AdminModel.get_table_name(),
         single=True,
         admin_id=admin_id
     )
@@ -28,7 +27,7 @@ def get_admins(
     privledges: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=AdminModel.get_table_name(),
         single=False,
         privledges=privledges
     )
@@ -45,7 +44,7 @@ def create_new_admin(request_data: AdminModel):
 @router.delete("/{admin_id}")
 def delete_admin(admin_id: int):
     success, message = delete(
-        table=Tables.Admin.value,
+        table=AdminModel.get_table_name(),
         admin_id=admin_id
     )
     return {"message": message, "success": success}
@@ -54,7 +53,7 @@ def delete_admin(admin_id: int):
 @router.put("/{admin_id}")
 def update_admin(admin_id: int, request_data: AdminModel):
     success, message = update(
-        table=Tables.Admin.value,
+        table=AdminModel.get_table_name(),
         model=request_data,
         admin_id=admin_id
     )

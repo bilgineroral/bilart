@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_auction(
     auction_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=AuctionModel.get_table_name(),
         single=True,
         auction_id=auction_id
     )
@@ -35,7 +34,7 @@ def get_auctions(
     art_id: int | None = None,
 ):
     success, count, message, items = retrieve(
-        table=Tables.Auction.value,
+        table=AuctionModel.get_table_name(),
         single=False,
         start_time=start_time,
         end_time=end_time,
@@ -58,7 +57,7 @@ def create_new_auction(request_data: AuctionModel):
 @router.delete("/{auction_id}")
 def delete_auction(auction_id: int):
     success, message = delete(
-        table=Tables.Auction.value,
+        table=AuctionModel.get_table_name(),
         auction_id=auction_id
     )
     return {"message": message, "success": success}
@@ -67,7 +66,7 @@ def delete_auction(auction_id: int):
 @router.put("/{auction_id}")
 def update_auction(auction_id: int, request_data: AuctionModel):
     success, message = update(
-        table=Tables.Auction.value,
+        table=AuctionModel.get_table_name(),
         model=request_data,
         auction_id=auction_id
     )

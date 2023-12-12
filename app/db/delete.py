@@ -1,12 +1,14 @@
 from typing import Tuple
 
 from fastapi import HTTPException
+from db.tables import params_to_where_clause
 
 from db.db import PgDatabase
 
 # insert data into any table
 def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
-    query = f"""DELETE FROM {table_name} WHERE {" and ".join([f'{k} = %s' for k, v in kwargs.items() if v is not None])};"""
+    print(kwargs)
+    query = f"""DELETE FROM {table_name} WHERE {params_to_where_clause(**kwargs)};"""
     print(query)
     with PgDatabase() as db:
         try:
@@ -16,8 +18,11 @@ def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
                 raise HTTPException(status_code=404, detail="Not found")
             db.connection.commit()
             return True, f"{deleted_rows} row(s) deleted successfully"
+        except HTTPException as e:
+            raise e
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e.with_traceback))
+            print(e)
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def delete(table: str, **kwargs):

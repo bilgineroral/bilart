@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from db.tables import Tables
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
@@ -16,7 +15,7 @@ def get_rating(
     rating_id: int
 ):
     success, _, message, items = retrieve(
-        table=Tables.Collector.value,
+        table=RatingModel.get_table_name(),
         single=True,
         rating_id=rating_id
     )
@@ -33,7 +32,7 @@ def get_ratings(
     collector_id: int | None = None
 ):
     success, count, message, items = retrieve(
-        table=Tables.Rating.value,
+        table=RatingModel.get_table_name(),
         single=False,
         score=score,
         gt__score=gt__score,
@@ -55,7 +54,7 @@ def create_new_rating(request_data: RatingModel):
 @router.delete("/{rating_id}")
 def delete_ratings(rating_id: int):
     success, message = delete(
-        table=Tables.Rating.value,
+        table=RatingModel.get_table_name(),
         rating_id=rating_id
     )
     return {"message": message, "success": success}
@@ -64,7 +63,7 @@ def delete_ratings(rating_id: int):
 @router.put("/{rating_id}")
 def update_ratings(rating_id: int, request_data: RatingModel):
     success, message = update(
-        table=Tables.Rating.value,
+        table=RatingModel.get_table_name(),
         model=request_data,
         rating_id=rating_id
     )
