@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from util.create_table import create_tables as util_create_tables
-from routers.routers import routers
+from db.create_table import create_tables as util_create_tables
+from modules.modules import routers
 
 
 app = FastAPI()

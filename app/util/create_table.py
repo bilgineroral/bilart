@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from fastapi import HTTPException
-from db import PgDatabase
+from db.db import PgDatabase
 
 create_functions: list[str] = [
     """
