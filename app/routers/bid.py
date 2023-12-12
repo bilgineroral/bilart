@@ -27,6 +27,8 @@ def get_bid(
 def get_bids(
     bid_id: int | None = None,
     price: str | None = None,
+    gt__price: str | None = None,
+    lt__price: str | None = None, 
     auction_id: int | None = None,
     collector_id: int | None = None,
     payment_done: bool | None = None,
@@ -37,6 +39,8 @@ def get_bids(
         single=False,
         bid_id=bid_id,
         price=price,
+        gt__price=gt__price,
+        lt__price=lt__price,
         auction_id=auction_id,
         collector_id=collector_id,
         payment_done=payment_done,

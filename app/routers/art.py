@@ -25,7 +25,6 @@ def get_art(
 
 @router.get("/")
 def get_arts(
-    art_id: int | None = None,
     content: str | None = None,
     initial_price: str | None = None,
     collection_id: int | None = None,
@@ -35,7 +34,6 @@ def get_arts(
     success, count, message, items = retrieve(
         table=Tables.Art.value,
         single=False,
-        art_id=art_id,
         conent=content,
         initial_price=initial_price,
         collection_id=collection_id,

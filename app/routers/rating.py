@@ -25,18 +25,20 @@ def get_rating(
 
 @router.get("/")
 def get_ratings(
-    rating_id: int | None = None,
     score: int | None = None,
-    comment: str | None = None,
+    gt__score: int | None = None,
+    lt__score: int | None = None,
+    search__comment: str | None = None,
     art_id: int | None = None,
     collector_id: int | None = None
 ):
     success, count, message, items = retrieve(
         table=Tables.Rating.value,
         single=False,
-        rating_id=rating_id,
         score=score,
-        comment=comment,
+        gt__score=gt__score,
+        lt__score=lt__score,
+        search__comment=search__comment,
         art_id=art_id,
         collector_id=collector_id
     )

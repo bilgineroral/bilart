@@ -38,22 +38,28 @@ def get_user_username(
 
 @router.get("/")
 def get_users(
-    user_id: int | None = None,
     username: str | None = None,
     first_name: str | None = None,
     last_name: str | None = None,
     email: str | None = None,
+    search__username: str | None = None,
+    search__first_name: str | None = None,
+    search__last_name: str | None = None,
+    search__email: str | None = None,
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
         table=Tables.User.value,
         single=False,
-        user_id=user_id,
         username=username,
         first_name=first_name,
         last_name=last_name,
         email=email,
-        created_at=created_at
+        created_at=created_at,
+        search__first_name=search__first_name,
+        search__email=search__email,
+        search__last_name=search__last_name,
+        search__username=search__username
     )
 
     return {"data": items, "success": success, "message": message, "count": count}

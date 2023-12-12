@@ -25,18 +25,24 @@ def get_auction(
 
 @router.get("/")
 def get_auctions(
-    auction_id: int | None = None,
     start_time: str | None = None,
     end_time: str | None = None,
+    gt__start_time: str | None = None,
+    gt__end_time: str | None = None,
+    lt__start_time: str | None = None,
+    lt__end_time: str | None = None,
     active: bool | None = None,
     art_id: int | None = None,
 ):
     success, count, message, items = retrieve(
         table=Tables.Auction.value,
         single=False,
-        auction_id=auction_id,
         start_time=start_time,
         end_time=end_time,
+        gt__end_time=gt__end_time,
+        gt__start_time=gt__start_time,
+        lt__end_time=lt__end_time,
+        lt__start_time=lt__start_time,
         active=active,
         art_id=art_id
     )

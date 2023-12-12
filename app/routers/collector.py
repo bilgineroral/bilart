@@ -26,22 +26,11 @@ def get_collector(
 
 @router.get("/")
 def get_collectors(
-    collector_id: int | None = None,
-    username: str | None = None,
-    first_name: str | None = None,
-    last_name: str | None = None,
-    email: str | None = None,
-    created_at: str | None = None
+
 ):
     success, count, message, items = retrieve(
         table=Tables.Collector.value,
         single=False,
-        collector_id=collector_id,
-        username=username,
-        first_name=first_name,
-        last_name=last_name,
-        email=email,
-        created_at=created_at
     )
 
     return {"data": items, "success": success, "message": message, "count": count}

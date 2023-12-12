@@ -12,7 +12,7 @@ from models import TagModel
 router = APIRouter(prefix="/tags", tags=['tags'])
 
 @router.get("/{name}")
-def get_admin(
+def get_tag(
     name: str
 ):
     success, _, message, items = retrieve(
@@ -26,12 +26,12 @@ def get_admin(
 
 @router.get("/")
 def get_tags(
-    name: str | None = None,
+    search__name: str | None = None,
 ):
     success, count, message, items = retrieve(
         table=Tables.Tag.value,
         single=False,
-        name=name
+        search__name=search__name
     )
 
     return {"data": items, "success": success, "message": message, "count": count}

@@ -25,16 +25,16 @@ def get_collection(
 
 @router.get("/")
 def get_collections(
-    collection_id: int | None = None,
     name: str | None = None,
+    search__name: str | None = None,
     collector_id: int | None = None,
 ):
     success, count, message, items = retrieve(
         table=Tables.Collection.value,
         single=False,
+        search__name=search__name,
         name=name,
         collector_id=collector_id,
-        collection_id=collection_id,
     )
 
     return {"data": items, "success": success, "message": message, "count": count}

@@ -25,26 +25,14 @@ def get_artist(
 
 @router.get("/")
 def get_artists(
-    artist_id: int | None = None,
-    username: str | None = None,
-    first_name: str | None = None,
-    last_name: str | None = None,
-    email: str | None = None,
     link: str | None = None,
-    bio: str | None = None,
-    created_at: str | None = None
+    search__bio: str | None = None,
 ):
     success, count, message, items = retrieve(
         table=Tables.Artist.value,
         single=False,
-        artist_id=artist_id,
-        username=username,
-        first_name=first_name,
-        last_name=last_name,
         link=link,
-        bio=bio,
-        email=email,
-        created_at=created_at
+        search__bio=search__bio
     )
 
     return {"data": items, "success": success, "message": message, "count": count}
