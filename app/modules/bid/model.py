@@ -22,7 +22,7 @@ class BidModel(Model):
                 auction_id INT NOT NULL,
                 collector_id INT NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-                payment_done BOOLEAN NOT NULL DEFAULT False
+                payment_done BOOLEAN NOT NULL DEFAULT False,
                 CONSTRAINT fk_auction
                     FOREIGN KEY(auction_id)
                         REFERENCES {AuctionModel.get_table_name()}(auction_id)

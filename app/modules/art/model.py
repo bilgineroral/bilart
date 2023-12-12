@@ -20,7 +20,7 @@ class ArtModel(Model):
                 post_id INT NOT NULL,
                 CONSTRAINT fk_post
                     FOREIGN KEY(post_id)
-                        REFERENCES {PostModel.get_table_name()}(artist_id)
+                        REFERENCES {PostModel.get_table_name()}(post_id)
                         ON DELETE CASCADE
             );
             """
