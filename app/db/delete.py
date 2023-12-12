@@ -12,6 +12,8 @@ def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
         try:
             db.cursor.execute(query, [v for v in kwargs.values() if v is not None])
             deleted_rows = db.cursor.rowcount
+            if deleted_rows == 0:
+                raise HTTPException(status_code=404, detail="Not found")
             db.connection.commit()
             return True, f"{deleted_rows} row(s) deleted successfully"
         except Exception as e:
