@@ -6,6 +6,7 @@ from db.model import Model
 from modules.post.model import PostModel
 
 class ArtModel(Model):
+    price: float
     content: str
     post_id: int
 
@@ -19,6 +20,7 @@ class ArtModel(Model):
             CREATE TABLE {ArtModel.get_table_name()} (
                 {ArtModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(255),
+                price DECIMAL NOT NULL,
                 {PostModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_post
                     FOREIGN KEY({PostModel.get_identifier()})

@@ -51,8 +51,8 @@ def get_auctions(
 
 @router.post("/")
 def create_new_auction(request_data: AuctionModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 
 @router.delete("/{auction_id}")
 def delete_auction(auction_id: int):
@@ -65,9 +65,10 @@ def delete_auction(auction_id: int):
 
 @router.put("/{auction_id}")
 def update_auction(auction_id: int, request_data: AuctionModel):
-    success, message = update(
+    success, message, data = update(
         table=AuctionModel.get_table_name(),
-        model=request_data,
+        model=request_data.to_dict(),
+        identifier=AuctionModel.get_identifier(),
         auction_id=auction_id
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": data}

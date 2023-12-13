@@ -47,8 +47,8 @@ def get_ratings(
 
 @router.post("/")
 def create_new_rating(request_data: RatingModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 
 
 @router.delete("/{rating_id}")
@@ -62,9 +62,10 @@ def delete_ratings(rating_id: int):
 
 @router.put("/{rating_id}")
 def update_ratings(rating_id: int, request_data: RatingModel):
-    success, message = update(
+    success, message, data = update(
         table=RatingModel.get_table_name(),
-        model=request_data,
-        rating_id=rating_id
+        model=request_data.to_dict(),
+        identifier=RatingModel.get_identifier(),
+        rating_id=rating_id,
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": data}

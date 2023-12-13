@@ -1,10 +1,12 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 from db.model import Model
 
 from modules.post.model import PostModel
 
 class TutorialModel(Model):
     media: str
+    post_id: int
 
     @staticmethod
     def get_table_name() -> str:
@@ -32,3 +34,10 @@ class TutorialModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 8
+    
+    
+class UpdateTutorial(BaseModel):
+    media: str | None
+    post_id: int | None
+    title: str | None
+    description: str | None
