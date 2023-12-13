@@ -38,12 +38,6 @@ export function DomainImage(props : DomainImageProps) {
         height={0}
         sizes="100vw"
         onLoadingComplete={() => setImgLoaded(true)}
-        sx={{
-          opacity: imgLoaded ? 1 : 0,
-          transitionDuration: "2000ms",
-          transitionProperty: "opacity",
-          transitionTimingFunction: "ease-out",
-        }}
       />
       {!imgLoaded &&
         <CircularProgress 
