@@ -142,8 +142,7 @@ export default function CreateArt() {
 export async function getStaticProps()  {
   return {
     props : {
-      navbar : true,
-      accountType : "artist"
+      navbar : true
     }
    }
 }

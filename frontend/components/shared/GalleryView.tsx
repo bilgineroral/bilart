@@ -15,7 +15,7 @@ import {styled} from "@mui/system";
 import CloseIcon from '@mui/icons-material/Close';
 
 interface CardView extends CardProps {
-
+    cards : React.ReactNode[]
 }
 
 export function GalleryView( props: CardView ) {
@@ -23,12 +23,12 @@ export function GalleryView( props: CardView ) {
     return(
         <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
 
-            {Array.from(Array(250)).map((_, index) => (
-                <Grid item xs={1} sm={2} md={3} key={index}>
-                <Card {...props}>card</Card>
+            {props.cards?.map((element, index) => (
+                <Grid item xs={1} sm={2} md={4} key={index}>
+                    {element}
                 </Grid>
             ))}
-
+            
         </Grid>
 
     )

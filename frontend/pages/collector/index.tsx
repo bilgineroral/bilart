@@ -12,17 +12,22 @@ import {
 } from "@mui/material";
 
 import {GalleryView} from "@/components/shared";
+import {AddCollectionButton, CollectionCard} from "@/components/collector"
 
 
 export default function CollecterPage() {
 
   return (
     <>
-      <GalleryView/>
+      <GalleryView
+        cards={[<CollectionCard />,<CollectionCard />,<CollectionCard />,<CollectionCard />,<AddCollectionButton/>]}
+      >
+      </GalleryView>
     </>
   )
 }
 
+<<<<<<< HEAD:frontend/pages/collector/index.tsx
 export async function getStaticProps()  {
   return {
     props : {
@@ -31,3 +36,12 @@ export async function getStaticProps()  {
     }
   }
 }
+=======
+export async function getStaticProps() {
+  return {
+    props : {
+      navbar : true
+    }
+  }
+}
+>>>>>>> 431c37d0623ce99b905032c9a3ffca72d4d7d8b5:frontend/pages/collector/home.tsx

@@ -172,9 +172,7 @@ export default function RegisterPage() {
         />
 
         <DomainImageUpload 
-          imageBlob={imageBlob}
-          imageSrc={imageSrc}
-          onImageSelect={onImageSelect}
+          onImageFinal={(imgSrc)=> {}}
         />
 
         <div>

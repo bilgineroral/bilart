@@ -20,8 +20,7 @@ export default function ArtistProfilePage() {
 export async function getStaticProps()  {
   return {
     props : {
-      navbar : true,
-      accountType : "artist"
+      navbar : true
     }
   }
 }

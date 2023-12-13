@@ -15,7 +15,7 @@ def get_collection(
     collection_id: int
 ):
     success, _, message, items = retrieve(
-        tables=CollectionModel.get_table_name(),
+        tables=[CollectionModel],
         single=True,
         collection_id=collection_id
     )
@@ -29,7 +29,7 @@ def get_collections(
     collector_id: int | None = None,
 ):
     success, count, message, items = retrieve(
-        tables=CollectionModel.get_table_name(),
+        tables=[CollectionModel],
         single=False,
         search__name=search__name,
         name=name,
