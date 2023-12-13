@@ -74,7 +74,7 @@ async def create_new_art( title: str = Form(...),
     
     success, message, post = insert(
         PostModel(
-            artist_id=user['user_id'], 
+            artist_id=user['artist_id'], 
             description=description, 
             title=title
         )
