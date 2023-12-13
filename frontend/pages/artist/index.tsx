@@ -1,8 +1,17 @@
+import { ArtCard, CreateArtButton } from "@/components/artist";
+import { GalleryView } from "@/components/shared/GalleryView";
 import * as React from "react";
+
 
 export default function ArtistHomePage() {
   return (
-    <h1>Artist Home</h1>
+    <>
+      <CreateArtButton/>
+      <GalleryView
+        cards={[<ArtCard />,<ArtCard />,<ArtCard />,<ArtCard />]}
+      >
+      </GalleryView>
+    </>
   )
 }
 
