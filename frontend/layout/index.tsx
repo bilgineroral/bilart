@@ -31,7 +31,6 @@ import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 import type { AccountType } from "@/store/accounttype";
 
 export interface LayoutProps {
-  type: AccountType;
   show: boolean | undefined;
   children : React.ReactNode
 }
@@ -77,7 +76,7 @@ export default function Layout(props : LayoutProps) {
           <Grid item xs={8} />
           <Grid item xs={1}>
             <div style={{display : "flex", justifyContent : "right", width: "100%"}}>
-              <Link href={props.type === "artist" ?  "/artist/create" : "/collector/create"}>
+              <Link href={accountType === "artist" ?  "/artist/create" : "/collector/create"}>
                 <IconButton
                   size="small"  
                 >
@@ -113,7 +112,7 @@ export default function Layout(props : LayoutProps) {
           </Grid>
           <Grid item xs={2}>
             <div style={{display : "flex", alignItems : "center"}}>
-              <Link href={props.type === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
+              <Link href={accountType === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
                 <Button 
                   color="secondary" 
                   variant="contained" 

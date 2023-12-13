@@ -19,6 +19,7 @@ class ArtistModel(Model):
                 artist_id SERIAL PRIMARY KEY,
                 bio VARCHAR(500),
                 link VARCHAR(255),
+                price INT,
                 {UserModel.get_identifier()} INT UNIQUE NOT NULL,
                 FOREIGN KEY ({UserModel.get_identifier()}) 
                     REFERENCES {UserModel.get_table_name()} ({UserModel.get_identifier()})

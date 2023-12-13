@@ -7,6 +7,9 @@ from db.retrieve import retrieve
 security = HTTPBasic()
 
 from modules.user.model import UserModel
+from modules.admin.model import AdminModel
+from modules.collector.model import CollectorModel
+from modules.artist.model import ArtistModel
 
 def get_current_user(
     credentials: HTTPBasicCredentials = Depends(security)
@@ -16,7 +19,7 @@ def get_current_user(
     
     try:
         _, _, _, users = retrieve(
-            tables=[UserModel],
+            tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
             single=True,
             username=username,
             password_hash=password
@@ -26,7 +29,7 @@ def get_current_user(
     except HTTPException as e:
         try:
             _, _, _, users = retrieve(
-                tables=[UserModel],
+                tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
                 single=True,
                 email=username,
                 password_hash=password
