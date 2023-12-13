@@ -23,8 +23,9 @@ body {
 }
 
 #__next {
-  position: absolute;
-  inset: 0;
+  height : 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 a {

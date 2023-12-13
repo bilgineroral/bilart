@@ -6,7 +6,7 @@ from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 from fastapi import File, Form, UploadFile
-from modules.art.model import ArtModel, CreateArt, UpdateArt
+from modules.art.model import ArtModel, CreateArt, UpdateArt, UpdateArt
 from modules.post.model import PostModel
 from modules.user.auth import get_current_user
 import os
@@ -104,10 +104,22 @@ def delete_art(art_id: int):
 
 
 @router.put("/{art_id}")
-def update_art(art_id: int, request_data: ArtModel):
-    success, message = update(
+def update_art(art_id: int, request_data: UpdateArt):
+    success, message, art = update(
         table=ArtModel.get_table_name(),
-        model=request_data,
+        model={
+            'content': request_data.content,
+        },
         art_id=art_id
     )
-    return {"message": message, "success": success}
+    
+    success, message, post = update(
+        table=PostModel.get_table_name(),
+        model={
+            'title': request_data.title,
+            'description': request_data.description
+        },
+        art_id=art_id
+    )
+    
+    return {"message": message, "success": success, "data": dict(post, **art)}

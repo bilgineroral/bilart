@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import * as React from "react";
+import { useAtom } from "jotai";
 
 import {
   Stack, 
@@ -16,6 +17,7 @@ import { useSnackbar } from "@/store/snackbar";
 
 import {FilledInputField, DomainImage, DomainDivider, DomainButton} from "@/components/shared";
 import { useRouter } from "next/router";
+import { accountTypeAtom } from "@/store/accounttype";
 
 const LoginStack = styled(Stack)(({theme}) => ({
   background : theme.palette.primary.main,
@@ -34,6 +36,9 @@ export default function LoginPage() {
 
   const router = useRouter();
   const theme = useTheme();
+
+  const [accountType, setAccountType] = useAtom(accountTypeAtom);
+
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword]  = React.useState<string>("");
   const [loggingIn, setLoggingIn] = React.useState<boolean>(false);
@@ -47,11 +52,13 @@ export default function LoginPage() {
   }, [])
 
   const handleCollectorLogin = async () => {
+    setAccountType("collector");
     router.replace("/");
   } 
 
   const handleArtistLogin = async () => {
-    router.replace("/");
+    setAccountType("artist");
+    router.replace("/artist/profile");
   }
 
   return (

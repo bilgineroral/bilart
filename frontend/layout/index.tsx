@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Link from "next/link";
 import * as React from "react";
 
 import { useAtom } from "jotai";
@@ -7,23 +7,42 @@ import {
   Snackbar,
   Alert,
   AppBar,
-  Typography,
   Grid,
+  IconButton,
+  Badge,
+  Button,
   useTheme
 } from "@mui/material";
+import {styled} from "@mui/system";
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PersonIcon from '@mui/icons-material/Person';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import {
   snackbarAtom,
   snackbarMessage,
   snackbarSeverity
 } from "@/store/snackbar";
-import Searchbar from "@/components/layout/Searchbar";
 
+import { DomainImage } from "@/components/shared";
+import { useNoticationCount } from "@/store/notificationcount";
+import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 
-interface LayoutProps {
+import type { AccountType } from "@/store/accounttype";
+
+export interface LayoutProps {
+  type: AccountType;
+  show: boolean | undefined;
   children : React.ReactNode
 }
 
+const PageContainer = styled("div")(({theme}) => ({
+  backgroundColor : theme.palette.background.default,
+  flexGrow : 1,
+  position : "relative",
+  overflowY: "scroll",
+  padding: "2rem"
+}))
 
 export default function Layout(props : LayoutProps) {
 
@@ -33,37 +52,87 @@ export default function Layout(props : LayoutProps) {
   const [severity, __] = useAtom(snackbarSeverity);
   const [message, ___] = useAtom(snackbarMessage);
 
+
+  const [notificationCount] = useNoticationCount(2500);
+  const [accountType] = useAtom(accountTypeAtom);
+  const toggleAccountType = useToggleAccountType();
+
   return (
-    <div
-      style={{
-        width : "100%",
-        height : "100%",
-        backgroundColor : theme.palette.background.default
-      }}
-    >
+    <>
       <Snackbar open={snackbarStatus} autoHideDuration={6000} onClose={() => setSnackbarStatus(false)}>
         <Alert onClose={() => setSnackbarStatus(false)} severity={severity} sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
-      {/* <AppBar position="static" color="secondary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
+      {
+        props.show &&
+      <AppBar position="static" color="primary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
         <Grid container sx={{width : "100%"}}>
-          <Grid item xs={1} sx={{height : 40}}>
-          <Image
-            alt="campus connect logo"
-            src="/app-logo.png"
-            width={0}
-            height={0}
-            sizes="100vw"
-            style={{ width: '100%', height: '100%' }} // optional
+          <Grid item xs={1} sx={{height : 35}}>
+          <DomainImage 
+            alt="bil art"
+            src="/app-logo.svg"
           />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={8} />
+          <Grid item xs={1}>
+            <div style={{display : "flex", justifyContent : "right", width: "100%"}}>
+              <Link href={props.type === "artist" ?  "/artist/create" : "/collector/create"}>
+                <IconButton
+                  size="small"  
+                >
+                  <AddCircleOutlineIcon 
+                    style={{
+                      fill: "#fff"
+                    }}
+                  />
+                </IconButton>
+              </Link>
+              
+              <IconButton
+                size="small"  
+              >
+                <Badge badgeContent={notificationCount} color="secondary">
+                  <NotificationsIcon  
+                    style={{
+                      fill: "#fff"
+                    }}
+                  />
+                </Badge>
+              </IconButton>
+              <IconButton
+                size="small"  
+              >
+                <PersonIcon 
+                  style={{
+                    fill: "#fff"
+                  }}
+                />
+              </IconButton>
+            </div>
+          </Grid>
+          <Grid item xs={2}>
+            <div style={{display : "flex", alignItems : "center"}}>
+              <Link href={props.type === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
+                <Button 
+                  color="secondary" 
+                  variant="contained" 
+                  size="small"
+                  onClick={toggleAccountType}
+                  fullWidth={true}
+                >
+                  Switch To {accountType === "artist" ? "collector" : "artist"}
+                </Button>
+              </Link>
+            </div>
           </Grid>
         </Grid>
-      </AppBar> */}
+      </AppBar> 
+    } 
+    <PageContainer>
       {props.children}
-    </div>
+    </PageContainer>
+    </>
   )
 
 }
