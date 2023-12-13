@@ -1,26 +1,15 @@
-import Link from "next/link";
-
+import { ArtCardOfCollector, CollectionsButton } from "@/components/collector";
 import * as React from "react";
 
-import {
-  Stack, 
-  useTheme,
-  Button,
-  ButtonGroup,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
-
 import {GalleryView} from "@/components/shared";
-import {AddCollectionButton, CollectionCard} from "@/components/collector"
 
 
 export default function CollecterPage() {
-
   return (
     <>
+      <CollectionsButton/>
       <GalleryView
-        cards={[<CollectionCard />,<CollectionCard />,<CollectionCard />,<CollectionCard />,<AddCollectionButton/>]}
+        cards={[<ArtCardOfCollector />,<ArtCardOfCollector />,<ArtCardOfCollector />,<ArtCardOfCollector />]}
       >
       </GalleryView>
     </>

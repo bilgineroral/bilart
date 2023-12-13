@@ -16,6 +16,17 @@ var mediaStyle = {
     width: '25vw',
     height: '20vw'
 }
+  
+var addButtonStyle = {
+    margin: "1vw",
+    background : "#937200",
+    color: "#D9CB53",
+    fontFamily: "Josefin Slab",
+    fontWeight: "Bold",
+    display: 'block',
+    width: '12vw',
+    height: '3vw'
+}
 
 var viewButtonStyle = {
     margin: "1vw",
@@ -34,12 +45,13 @@ var shareButtonStyle = {
     color: "white",
     fontStyle: "italic",
     fontFamily: "Josefin Slab",
+    fontWeight: "Italic",
     display: 'block',
     width: '12vw',
     height: '3vw'
 }
 
-export function ArtCard() {
+export function ArtCardOfCollector() {
   return (
     <div style={{margin: '15%'}}>
         <Card style={cardStyle}>
@@ -52,6 +64,7 @@ export function ArtCard() {
             <CardActions>
                 <Button style={shareButtonStyle}>Share Art</Button>
                 <Button style={viewButtonStyle}>View Art</Button>
+                <Button style={addButtonStyle}>Add to Collection</Button>
             </CardActions>
         </Card>
     </div>

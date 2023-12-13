@@ -2,11 +2,13 @@ import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
+
 var style = {
   background : "#28B5A4",
-  color: "white",
+  color: "#263C34",
   fontFamily: "Josefin Slab",
   fontWeight: "Bold",
+  fontSize: "3vw",
   display: 'block',
   width: '25vw',
   height: '25vw'
