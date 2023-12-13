@@ -51,8 +51,8 @@ def get_bids(
 
 @router.post("/")
 def create_new_bid(request_data: BidModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 
 @router.delete("/{bid_id}")
 def delete_bid(bid_id: int):
@@ -65,9 +65,10 @@ def delete_bid(bid_id: int):
 
 @router.put("/{bid_id}")
 def update_bid(bid_id: int, request_data: BidModel):
-    success, message = update(
+    success, message, data = update(
         table=BidModel.get_table_name(),
-        model=request_data,
+        model=request_data.to_dict(),
+        identifier=BidModel.get_identifier(),
         bid_id=bid_id
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": data}

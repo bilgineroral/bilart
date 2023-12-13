@@ -15,6 +15,7 @@ class NotificationModel(Model):
                 {NotificationModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(256) NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+                read BOOLEAN NOT NULL DEFAULT False,
                 {UserModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_user
                     FOREIGN KEY({UserModel.get_identifier()})

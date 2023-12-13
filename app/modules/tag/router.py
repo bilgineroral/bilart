@@ -38,24 +38,25 @@ def get_tags(
 
 @router.post("/")
 def create_new_tag(request_data: TagModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 
 
 @router.delete("/{name}")
 def delete_tags(name: str):
     success, message = delete(
         table=TagModel.get_table_name(),
-        name=name
+        tag_name=name
     )
     return {"message": message, "success": success}
 
 
 @router.put("/{name}")
 def update_tags(name: str, request_data: TagModel):
-    success, message = update(
+    success, message, data = update(
         table=TagModel.get_table_name(),
-        model=request_data,
-        name=name
+        model=request_data.to_dict(),
+        tag_name=name,
+        identifier=TagModel.get_identifier()
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": data}

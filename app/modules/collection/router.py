@@ -71,8 +71,8 @@ def get_collections(
 
 @router.post("/")
 def create_new_collection(request_data: CollectionModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 
 
 @router.delete("/{collection_id}")
@@ -86,9 +86,10 @@ def delete_collections(collection_id: int):
 
 @router.put("/{collection_id}")
 def update_collections(collection_id: int, request_data: CollectionModel):
-    success, message = update(
+    success, message, data = update(
         table=CollectionModel.get_table_name(),
-        model=request_data,
+        model=request_data.to_dict(),
+        identifier=CollectionModel.get_identifier(),
         collection_id=collection_id
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": data}

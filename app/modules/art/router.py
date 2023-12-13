@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from db.delete import delete
 from db.update import update
@@ -74,14 +74,17 @@ async def create_new_art( title: str = Form(...),
     
     success, message, post = insert(
         PostModel(
-            artist_id=user['user_id'], 
+            artist_id=user['artist_id'], 
             description=description, 
             title=title
         )
     )
 
-    file_mgr = FileManager(FILEPATH + "post_images/")
+    file_mgr = FileManager(f"{FILEPATH}post_images/")
     content = await file_mgr.save(image)
+    
+    if content is None:
+        raise HTTPException(status_code=500, detail="Image upload failed")
 
     success, message, art = insert(
         ArtModel(
@@ -110,6 +113,7 @@ def update_art(art_id: int, request_data: UpdateArt):
         model={
             'content': request_data.content,
         },
+        identifier=ArtModel.get_identifier(),
         art_id=art_id
     )
     
@@ -119,6 +123,7 @@ def update_art(art_id: int, request_data: UpdateArt):
             'title': request_data.title,
             'description': request_data.description
         },
+        identifier=PostModel.get_identifier(),
         art_id=art_id
     )
     
