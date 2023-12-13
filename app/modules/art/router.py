@@ -58,7 +58,7 @@ def get_arts(
 def create_new_art(request_data: CreateArt, user: dict[str, Any] = Depends(get_current_user)):
     success, message, post = insert(
         PostModel(
-            artist_id=user['user_id'], 
+            artist_id=user['artist_id'], 
             description=request_data.description, 
             title=request_data.title
         )
@@ -85,11 +85,21 @@ def delete_art(art_id: int):
 
 @router.put("/{art_id}")
 def update_art(art_id: int, request_data: UpdateArt):
-    success, message = update(
+    success, message, art = update(
         table=ArtModel.get_table_name(),
         model={
             'content': request_data.content,
         },
         art_id=art_id
     )
-    return {"message": message, "success": success}
+    
+    success, message, post = update(
+        table=PostModel.get_table_name(),
+        model={
+            'title': request_data.title,
+            'description': request_data.description
+        },
+        art_id=art_id
+    )
+    
+    return {"message": message, "success": success, "data": dict(post, **art)}

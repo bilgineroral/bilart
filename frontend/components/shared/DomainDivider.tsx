@@ -4,11 +4,15 @@ import {
   useTheme
 } from "@mui/material";
 
-export function DomainDivider() {
+interface DomainDividerProps {
+  color? : string
+}
+
+export function DomainDivider(props : DomainDividerProps) {
 
   const theme = useTheme();
 
   return (
-    <div style={{width : "100%", height : "1px", backgroundColor : theme.palette.background.default}} />
+    <div style={{width : "100%", height : "1px", backgroundColor : props.color || theme.palette.background.default}} />
   )
 }

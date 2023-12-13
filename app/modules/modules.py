@@ -1,4 +1,5 @@
 from typing import Type
+from db.trigger import TriggerProtocal
 from db.model import ModelProtocal
 
 from modules.admin.model import AdminModel
@@ -19,6 +20,7 @@ from modules.tag__post.model import TagPostModel
 from modules.tutorial.model import TutorialModel
 from modules.user.model import UserModel
 
+from modules.user.trigger import UserTrigger
 
 models: list[Type[ModelProtocal]] = [
     AdminModel,
@@ -38,6 +40,10 @@ models: list[Type[ModelProtocal]] = [
     TagPostModel,
     TutorialModel,
     UserModel
+]
+
+trigger_functions: list[str] = [
+    UserTrigger.create_trigger()
 ]
 
 models.sort(key=lambda x: x.get_create_order())

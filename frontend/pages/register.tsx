@@ -54,6 +54,20 @@ export default function RegisterPage() {
 
   const snackbar = useSnackbar();
 
+  const [imageBlob, setImageBlob] =  React.useState<Blob | null>(null);
+  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
+
+  const onImageSelect = React.useCallback((filelist : FileList | null) => {
+    if (filelist) {
+      setImageBlob(filelist[0]);
+      setImageSrc(URL.createObjectURL(filelist[0]));
+    } else {
+      setImageBlob(null);
+      setImageSrc(null);
+    }
+  }, []);
+
+
   React.useEffect(() => {
     setUsername("");
     setPassword("");
@@ -157,7 +171,9 @@ export default function RegisterPage() {
           labelColor={theme.palette.secondary.main}
         />
 
-        <DomainImageUpload />
+        <DomainImageUpload 
+          onImageFinal={(imgSrc)=> {}}
+        />
 
         <div>
           <DomainButton 

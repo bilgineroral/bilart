@@ -2,16 +2,19 @@ from typing import Tuple
 
 from fastapi import HTTPException
 from db.db import PgDatabase
-from modules.modules import create_functions
+from modules.modules import create_functions, trigger_functions
 
 
 def create_tables() -> Tuple[bool, str]:
     commands = "\n".join(create_functions)
-    print(commands)
+    triggers = "\n".join(trigger_functions)
     
     with PgDatabase() as db:
         try:
-            db.cursor.execute(commands)
+            print(commands)
+            db.cursor.execute(commands)  
+            print(triggers)
+            db.cursor.execute(triggers)
             db.connection.commit()
             return True, "Tables have been created successfully..."
         except Exception as e:

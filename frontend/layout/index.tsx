@@ -1,3 +1,4 @@
+import Link from "next/link";
 import * as React from "react";
 
 import { useAtom } from "jotai";
@@ -15,6 +16,7 @@ import {
 import {styled} from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonIcon from '@mui/icons-material/Person';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 import {
   snackbarAtom,
@@ -26,7 +28,10 @@ import { DomainImage } from "@/components/shared";
 import { useNoticationCount } from "@/store/notificationcount";
 import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 
-interface LayoutProps {
+import type { AccountType } from "@/store/accounttype";
+
+export interface LayoutProps {
+  type: AccountType;
   show: boolean | undefined;
   children : React.ReactNode
 }
@@ -36,6 +41,7 @@ const PageContainer = styled("div")(({theme}) => ({
   flexGrow : 1,
   position : "relative",
   overflowY: "scroll",
+  padding: "2rem"
 }))
 
 export default function Layout(props : LayoutProps) {
@@ -71,6 +77,18 @@ export default function Layout(props : LayoutProps) {
           <Grid item xs={8} />
           <Grid item xs={1}>
             <div style={{display : "flex", justifyContent : "right", width: "100%"}}>
+              <Link href={props.type === "artist" ?  "/artist/create" : "/collector/create"}>
+                <IconButton
+                  size="small"  
+                >
+                  <AddCircleOutlineIcon 
+                    style={{
+                      fill: "#fff"
+                    }}
+                  />
+                </IconButton>
+              </Link>
+              
               <IconButton
                 size="small"  
               >
@@ -95,15 +113,17 @@ export default function Layout(props : LayoutProps) {
           </Grid>
           <Grid item xs={2}>
             <div style={{display : "flex", alignItems : "center"}}>
-              <Button 
-                color="secondary" 
-                variant="contained" 
-                size="small"
-                onClick={toggleAccountType}
-                fullWidth={true}
-              >
-                Switch To {accountType}
-              </Button>
+              <Link href={props.type === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
+                <Button 
+                  color="secondary" 
+                  variant="contained" 
+                  size="small"
+                  onClick={toggleAccountType}
+                  fullWidth={true}
+                >
+                  Switch To {accountType === "artist" ? "collector" : "artist"}
+                </Button>
+              </Link>
             </div>
           </Grid>
         </Grid>
