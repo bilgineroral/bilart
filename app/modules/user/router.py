@@ -1,4 +1,4 @@
-from typing import Annotated, Any
+from typing import Any
 from fastapi import APIRouter, Depends
 
 from db.delete import delete
@@ -8,6 +8,9 @@ from db.insert import insert
 
 from modules.user.model import UserModel
 from modules.user.auth import get_current_user
+from modules.admin.model import AdminModel
+from modules.collector.model import CollectorModel
+from modules.artist.model import ArtistModel
 
 
 router = APIRouter(prefix="/users", tags=['users'])
@@ -30,9 +33,9 @@ def delete_user(user: dict[str, Any] = Depends(get_current_user)):
 
 @router.put("/me")
 def update_user(request_data: UserModel, user: dict[str, Any] = Depends(get_current_user)):
-    success, message = update(
+    success, message, user = update(
         table=UserModel.get_table_name(),
-        model=request_data,
+        model=request_data.to_dict(),
         user_id=user['user_id']
     )
     return {"message": message, "success": success}
@@ -42,7 +45,7 @@ def get_user_id(
     user_id: int,
 ):
     success, _, message, items = retrieve(
-        tables=[UserModel],
+        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
         single=True,
         user_id=user_id,
     )
@@ -55,7 +58,7 @@ def get_user_username(
     username: str,
 ):
     success, _, message, items = retrieve(
-        tables=[UserModel],
+        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
         single=True,
         username=username,
     )
@@ -76,7 +79,7 @@ def get_users(
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
-        tables=[UserModel],
+        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
         single=False,
         username=username,
         first_name=first_name,
