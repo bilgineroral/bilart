@@ -1,7 +1,7 @@
 import React from "react";
 import {atom, useAtom} from "jotai";
 
-type AccountType = "artist" | "collector"
+export type AccountType = "artist" | "collector"
 
 
 export const accountTypeAtom = atom<AccountType>("artist");
