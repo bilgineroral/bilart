@@ -6,6 +6,9 @@ from modules.post.model import PostModel
 
 
 class TagPostModel(Model):
+    post_id: int
+    tag_name: str
+    
     @staticmethod
     def get_table_name() -> str:
         return "Tag__Post"
