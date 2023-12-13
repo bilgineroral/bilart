@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from typing import Annotated, Any
+from fastapi import APIRouter, Depends
 
 from db.delete import delete
 from db.update import update
@@ -6,9 +7,35 @@ from db.retrieve import retrieve
 from db.insert import insert
 
 from modules.user.model import UserModel
+from modules.user.auth import get_current_user
 
 
 router = APIRouter(prefix="/users", tags=['users'])
+
+
+@router.get("/me")
+def get_me(
+    user: dict[str, Any] = Depends(get_current_user)
+):
+    return user
+
+@router.delete("/me")
+def delete_user(user: dict[str, Any] = Depends(get_current_user)):
+    success, message = delete(
+        table=UserModel.get_table_name(),
+        user_id=user['user_id']
+    )
+    return {"message": message, "success": success}
+
+
+@router.put("/me")
+def update_user(request_data: UserModel, user: dict[str, Any] = Depends(get_current_user)):
+    success, message = update(
+        table=UserModel.get_table_name(),
+        model=request_data,
+        user_id=user['user_id']
+    )
+    return {"message": message, "success": success}
 
 @router.get("/{user_id}")
 def get_user_id(
@@ -34,6 +61,7 @@ def get_user_username(
     )
 
     return {"data": items[0], "success": success, "message": message}
+
 
 @router.get("/")
 def get_users(
@@ -64,26 +92,8 @@ def get_users(
     return {"data": items, "success": success, "message": message, "count": count}
 
 
-@router.post("/")
+@router.post("/register")
 def create_new_user(request_data: UserModel):
     success, message = insert(request_data)
     return {"message": message, "success": success}
 
-
-@router.delete("/{user_id}")
-def delete_user(user_id: int):
-    success, message = delete(
-        table=UserModel.get_table_name(),
-        user_id=user_id
-    )
-    return {"message": message, "success": success}
-
-
-@router.put("/{user_id}")
-def update_user(user_id: int, request_data: UserModel):
-    success, message = update(
-        table=UserModel.get_table_name(),
-        model=request_data,
-        user_id=user_id
-    )
-    return {"message": message, "success": success}

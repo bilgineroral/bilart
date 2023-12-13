@@ -16,6 +16,7 @@ def params_to_where_clause(**kwargs):
         else:
             params.append(f"{k} = '{v}'")
     
-    params.append(f'({" OR ".join(search_params)})')
+    if search_params:
+        params.append(f'({" OR ".join(search_params)})')
     
     return " AND ".join(params)

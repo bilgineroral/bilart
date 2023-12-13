@@ -8,7 +8,7 @@ from db.db import PgDatabase
 
 
 def update_data_in_table(table_name: str, data: dict, **kwargs) -> Tuple[bool, str]:
-    query = f"""UPDATE {table_name} SET {", ".join([f'{k} = {v}' for k, v in data.items() if v is not None])} 
+    query = f"""UPDATE {table_name} SET {", ".join([f"{k} = '{v}'" for k, v in data.items() if v is not None])} 
         WHERE {params_to_where_clause(**kwargs)};"""
     print(query)
     with PgDatabase() as db:
