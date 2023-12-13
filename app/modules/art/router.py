@@ -5,10 +5,21 @@ from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
-
-from modules.art.model import ArtModel, CreateArt
+from fastapi import File, Form, UploadFile
+from modules.art.model import ArtModel, CreateArt, UpdateArt
 from modules.post.model import PostModel
 from modules.user.auth import get_current_user
+import os
+import dotenv
+from pathlib import Path
+from file_manager import FileManager
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(BASE_DIR / ".env")
+
+FILEPATH = os.getenv("FILEPATH")
+
 
 
 router = APIRouter(prefix="/arts", tags=['arts'])
@@ -55,15 +66,32 @@ def get_arts(
 
 
 @router.post("/")
-def create_new_art(request_data: CreateArt, user: dict[str, Any] = Depends(get_current_user)):
-    success, message = insert(
+async def create_new_art( title: str = Form(...),
+                    description: str = Form(...),
+                    price: int = Form(...),
+                    image: UploadFile = File(...),
+                    user: dict[str, Any] = Depends(get_current_user)):
+    
+    success, message, post = insert(
         PostModel(
             artist_id=user['user_id'], 
-            description=request_data.description, 
-            title=request_data.title
+            description=description, 
+            title=title
         )
     )
-    return {"message": message, "success": success}
+
+    file_mgr = FileManager(FILEPATH + "/post_images")
+    content = await file_mgr.save(image)
+
+    success, message, art = insert(
+        ArtModel(
+            price=price,
+            content=content,
+            post_id=post['post_id']
+        )
+    )
+    
+    return {"message": message, "success": success, "data": dict(post, **art)}
 
 
 @router.delete("/{art_id}")

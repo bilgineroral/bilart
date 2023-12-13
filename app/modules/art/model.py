@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from fastapi import Form, File, UploadFile
 
 from db.model import Model
 from modules.post.model import PostModel
@@ -44,4 +45,9 @@ class CreateArt(BaseModel):
     content: str
     title: str
     description: str
-    content: str
+
+
+class UpdateArt(BaseModel):
+    content: str | None
+    title: str | None
+    description: str | None
