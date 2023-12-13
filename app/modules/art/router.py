@@ -68,7 +68,7 @@ def get_arts(
 @router.post("/")
 async def create_new_art( title: str = Form(...),
                     description: str = Form(...),
-                    price: int = Form(...),
+                    price: float = Form(...),
                     image: UploadFile = File(...),
                     user: dict[str, Any] = Depends(get_current_user)):
     
