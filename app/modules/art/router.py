@@ -6,7 +6,7 @@ from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 
-from modules.art.model import ArtModel, CreateArt
+from modules.art.model import ArtModel, CreateArt, UpdateArt
 from modules.post.model import PostModel
 from modules.user.auth import get_current_user
 
@@ -56,14 +56,22 @@ def get_arts(
 
 @router.post("/")
 def create_new_art(request_data: CreateArt, user: dict[str, Any] = Depends(get_current_user)):
-    success, message = insert(
+    success, message, post = insert(
         PostModel(
             artist_id=user['user_id'], 
             description=request_data.description, 
             title=request_data.title
         )
     )
-    return {"message": message, "success": success}
+    
+    success, message, art = insert(
+        ArtModel(
+            content=request_data.content,
+            post_id=post['post_id']
+        )
+    )
+    
+    return {"message": message, "success": success, "data": dict(post, **art)}
 
 
 @router.delete("/{art_id}")
@@ -76,10 +84,12 @@ def delete_art(art_id: int):
 
 
 @router.put("/{art_id}")
-def update_art(art_id: int, request_data: ArtModel):
+def update_art(art_id: int, request_data: UpdateArt):
     success, message = update(
         table=ArtModel.get_table_name(),
-        model=request_data,
+        model={
+            'content': request_data.content,
+        },
         art_id=art_id
     )
     return {"message": message, "success": success}
