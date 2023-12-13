@@ -17,14 +17,14 @@ class AuctionModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {AuctionModel.get_table_name()} (
-                auction_id SERIAL PRIMARY KEY,
+                {AuctionModel.get_identifier()} SERIAL PRIMARY KEY,
                 start_time TIMESTAMPTZ NOT NULL,
                 end_time TIMESTAMPTZ NOT NULL,
                 active BOOLEAN NOT NULL DEFAULT True,
-                art_id INT NOT NULL,
+                {ArtModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_art
-                    FOREIGN KEY(art_id)
-                        REFERENCES {ArtModel.get_table_name()}(art_id)
+                    FOREIGN KEY({ArtModel.get_identifier()})
+                        REFERENCES {ArtModel.get_table_name()}({ArtModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -37,3 +37,7 @@ class AuctionModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 12
+    
+    @staticmethod
+    def get_identifier() -> str:
+        return "auction_id"

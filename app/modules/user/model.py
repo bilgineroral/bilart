@@ -26,7 +26,7 @@ class UserModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {UserModel.get_table_name()} (
-                user_id SERIAL PRIMARY KEY,
+                {UserModel.get_identifier()} SERIAL PRIMARY KEY,
                 username VARCHAR(255) NOT NULL,
                 first_name VARCHAR(255),
                 last_name VARCHAR(255),
@@ -46,3 +46,7 @@ class UserModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 0
+    
+    @staticmethod
+    def get_identifier() -> str:
+        return "user_id"

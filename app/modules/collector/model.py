@@ -16,9 +16,9 @@ class CollectorModel(Model):
         return f"""
             CREATE TABLE {CollectorModel.get_table_name()} (
                 collector_id SERIAL PRIMARY KEY,
-                user_id INT UNIQUE NOT NULL,
+                {UserModel.get_identifier()} INT UNIQUE NOT NULL,
                 rank INT NOT NULL DEFAULT 0,
-                FOREIGN KEY (user_id) REFERENCES {UserModel.get_table_name()} (user_id)
+                FOREIGN KEY ({UserModel.get_identifier()}) REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})
             );
             """
     
@@ -30,3 +30,7 @@ class CollectorModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 1
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "collector_id"

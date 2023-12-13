@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from db.model import Model
 from modules.auction.model import AuctionModel
+from modules.collector.model import CollectorModel
 
 class BidModel(Model):
     price: str
@@ -17,15 +18,19 @@ class BidModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {BidModel.get_table_name()} (
-                bid_id SERIAL PRIMARY KEY,
+                {BidModel.get_identifier()} SERIAL PRIMARY KEY,
                 price DECIMAL NOT NULL,
-                auction_id INT NOT NULL,
-                collector_id INT NOT NULL,
+                {AuctionModel.get_identifier()} INT NOT NULL,
+                {CollectorModel.get_identifier()} INT NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
                 payment_done BOOLEAN NOT NULL DEFAULT False,
                 CONSTRAINT fk_auction
-                    FOREIGN KEY(auction_id)
-                        REFERENCES {AuctionModel.get_table_name()}(auction_id)
+                    FOREIGN KEY({AuctionModel.get_identifier()})
+                        REFERENCES {AuctionModel.get_table_name()}({AuctionModel.get_identifier()})
+                        ON DELETE CASCADE,
+                CONSTRAINT fk_collector
+                    FOREIGN KEY({CollectorModel.get_identifier()})
+                        REFERENCES {CollectorModel.get_table_name()}({CollectorModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -38,3 +43,7 @@ class BidModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 13
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "bid_id"

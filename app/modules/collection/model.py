@@ -17,11 +17,11 @@ class CollectionModel(Model):
             CREATE TABLE {CollectionModel.get_table_name()} (
                 collection_id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
-                collector_id INT NOT NULL,
+                {CollectorModel.get_identifier()} INT NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
                 CONSTRAINT fk_collector
-                    FOREIGN KEY(collector_id)
-                        REFERENCES {CollectorModel.get_table_name()}(collector_id)
+                    FOREIGN KEY({CollectorModel.get_identifier()})
+                        REFERENCES {CollectorModel.get_table_name()}({CollectorModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -34,3 +34,7 @@ class CollectionModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 4
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "collection_id"

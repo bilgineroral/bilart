@@ -16,17 +16,17 @@ class FavoriteModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {FavoriteModel.get_table_name()}(
-                collector_id INT,
-                post_id INT,
+                {CollectorModel.get_identifier()} INT NOT NULL,
+                {PostModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_collector
-                    FOREIGN KEY(collector_id)
-                        REFERENCES {CollectorModel.get_table_name()}(collector_id)
+                    FOREIGN KEY({CollectorModel.get_identifier()})
+                        REFERENCES {CollectorModel.get_table_name()}({CollectorModel.get_identifier()})
                         ON DELETE CASCADE,
-                CONSTRAINT post_id
-                    FOREIGN KEY(post_id)
-                        REFERENCES {PostModel.get_table_name()}(post_id)
+                CONSTRAINT {PostModel.get_identifier()}
+                    FOREIGN KEY({PostModel.get_identifier()})
+                        REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
                         ON DELETE CASCADE,
-                CONSTRAINT collector_post_pk PRIMARY KEY(collector_id, post_id)
+                CONSTRAINT favorite_pk PRIMARY KEY({CollectorModel.get_identifier()}, {PostModel.get_identifier()})
             );
             """
     
@@ -39,3 +39,8 @@ class FavoriteModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 14
+    
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "favorite_pk"

@@ -16,17 +16,17 @@ class ArtCollectionModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {ArtCollectionModel.get_table_name()}(
-                art_id INT,
-                collection_id INT,
+                {ArtModel.get_identifier()} INT NOT NULL,
+                {CollectionModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_art
-                    FOREIGN KEY(art_id)
-                        REFERENCES {ArtModel.get_table_name()}(art_id)
+                    FOREIGN KEY({ArtModel.get_identifier()})
+                        REFERENCES {ArtModel.get_table_name()}({ArtModel.get_identifier()})
                         ON DELETE CASCADE,
                 CONSTRAINT fk_collection
-                    FOREIGN KEY(collection_id)
-                        REFERENCES {CollectionModel.get_table_name()}(collection_id)
+                    FOREIGN KEY({CollectionModel.get_identifier()})
+                        REFERENCES {CollectionModel.get_table_name()}({CollectionModel.get_identifier()})
                         ON DELETE CASCADE,
-                CONSTRAINT collection_art_pk PRIMARY KEY(collection_id, art_id)
+                CONSTRAINT collection_art_pk PRIMARY KEY({CollectionModel.get_identifier()}, {ArtModel.get_identifier()})
             );
             """
     
@@ -38,3 +38,7 @@ class ArtCollectionModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 7
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "collection_art_pk"
