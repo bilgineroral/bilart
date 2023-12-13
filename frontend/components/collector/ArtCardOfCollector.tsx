@@ -28,6 +28,17 @@ var addButtonStyle = {
     height: '3vw'
 }
 
+var viewButtonStyle = {
+    margin: "1vw",
+    background : "#91E3DE",
+    color: "white",
+    fontFamily: "Josefin Slab",
+    fontWeight: "Bold",
+    display: 'block',
+    width: '12vw',
+    height: '3vw'
+}
+
 var shareButtonStyle = {
     margin: "1vw",
     background : "#91E3DE",
@@ -52,6 +63,7 @@ export function ArtCardOfCollector() {
             />
             <CardActions>
                 <Button style={shareButtonStyle}>Share Art</Button>
+                <Button style={viewButtonStyle}>View Art</Button>
                 <Button style={addButtonStyle}>Add to Collection</Button>
             </CardActions>
         </Card>
