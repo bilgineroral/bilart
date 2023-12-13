@@ -44,4 +44,9 @@ class CreateArt(BaseModel):
     content: str
     title: str
     description: str
-    content: str
+
+
+class UpdateArt(BaseModel):
+    content: str | None
+    title: str | None
+    description: str | None

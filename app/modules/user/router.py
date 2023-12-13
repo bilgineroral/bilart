@@ -94,6 +94,6 @@ def get_users(
 
 @router.post("/register")
 def create_new_user(request_data: UserModel):
-    success, message = insert(request_data)
-    return {"message": message, "success": success}
+    success, message, data = insert(request_data)
+    return {"message": message, "success": success, "data": data}
 

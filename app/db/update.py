@@ -27,5 +27,5 @@ def update_data_in_table(table_name: str, data: dict, **kwargs) -> Tuple[bool, s
             raise HTTPException(status_code=500, detail=str(e))
 
 
-def update(table: str, model: Model, **kwargs):
-    return update_data_in_table(table, model.to_dict(), **kwargs)
+def update(table: str, model: dict, **kwargs):
+    return update_data_in_table(table, model, **kwargs)

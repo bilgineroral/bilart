@@ -51,7 +51,7 @@ export default function LoginPage() {
   } 
 
   const handleArtistLogin = async () => {
-    router.replace("/");
+    router.replace("/artist/profile");
   }
 
   return (
