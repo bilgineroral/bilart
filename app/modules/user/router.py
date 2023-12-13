@@ -6,7 +6,7 @@ from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 
-from modules.user.model import UserModel
+from modules.user.model import UserModel, UpdateUser
 from modules.user.auth import get_current_user
 from modules.admin.model import AdminModel
 from modules.collector.model import CollectorModel
@@ -32,13 +32,40 @@ def delete_user(user: dict[str, Any] = Depends(get_current_user)):
 
 
 @router.put("/me")
-def update_user(request_data: UserModel, user: dict[str, Any] = Depends(get_current_user)):
-    success, message, user = update(
+def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_current_user)):
+    success, message, updated_user = update(
         table=UserModel.get_table_name(),
-        model=request_data.to_dict(),
+        model={
+            'username': request_data.username,
+            'first_name': request_data.first_name,
+            'last_name': request_data.last_name,
+            'email': request_data.email,
+            'phone': request_data.phone,
+            'password_hash': request_data.password
+        },
+        identifier= UserModel.get_identifier(),
         user_id=user['user_id']
     )
-    return {"message": message, "success": success}
+    
+    success, message, artist = update(
+        table=ArtistModel.get_table_name(),
+        model={
+            'bio': request_data.bio,
+            'link': request_data.link
+        },
+        identifier=ArtistModel.get_identifier(),
+        user_id=user['artist_id']
+    )
+    
+    success, message, admin = update(
+        table=AdminModel.get_table_name(),
+        model={
+            'privledge': request_data.privledge
+        },
+        identifier=AdminModel.get_identifier(),
+        user_id=user['admin_id']
+    )
+    return {"message": message, "success": success, "data": dict(updated_user, **artist, **admin)}
 
 @router.get("/{user_id}")
 def get_user_id(

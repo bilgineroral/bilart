@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from db.model import Model
 
@@ -50,3 +51,16 @@ class UserModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "user_id"
+    
+
+class UpdateUser(BaseModel):
+    username: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
+    email: str | None = None
+    password: str | None = None
+    phone: str | None = None
+    bio: str | None = None
+    link: str | None = None
+    privledge: str | None = None
+    

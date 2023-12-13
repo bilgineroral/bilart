@@ -80,7 +80,7 @@ async def create_new_art( title: str = Form(...),
         )
     )
 
-    file_mgr = FileManager(FILEPATH + "/post_images")
+    file_mgr = FileManager(FILEPATH + "post_images/")
     content = await file_mgr.save(image)
 
     success, message, art = insert(
