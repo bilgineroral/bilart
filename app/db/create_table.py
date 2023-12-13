@@ -2,6 +2,12 @@ from typing import Tuple
 
 from fastapi import HTTPException
 from db.db import PgDatabase
+from modules.modules import create_functions
+from modules.art.model import ArtModel
+from modules.art__collection.model import ArtCollectionModel
+from modules.collection.model import CollectionModel
+from modules.post.model import PostModel
+from modules.tag__post.model import TagPostModel
 from modules.modules import create_functions, trigger_functions
 
 
@@ -15,6 +21,7 @@ def create_tables() -> Tuple[bool, str]:
             db.cursor.execute(commands)  
             print(triggers)
             db.cursor.execute(triggers)
+            
             db.connection.commit()
             return True, "Tables have been created successfully..."
         except Exception as e:

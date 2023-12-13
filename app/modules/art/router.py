@@ -5,10 +5,21 @@ from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
-
-from modules.art.model import ArtModel, CreateArt, UpdateArt
+from fastapi import File, Form, UploadFile
+from modules.art.model import ArtModel, CreateArt, UpdateArt, UpdateArt
 from modules.post.model import PostModel
 from modules.user.auth import get_current_user
+import os
+import dotenv
+from pathlib import Path
+from file_manager import FileManager
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+dotenv.load_dotenv(BASE_DIR / ".env")
+
+FILEPATH = os.getenv("FILEPATH")
+
 
 
 router = APIRouter(prefix="/arts", tags=['arts'])
@@ -55,18 +66,27 @@ def get_arts(
 
 
 @router.post("/")
-def create_new_art(request_data: CreateArt, user: dict[str, Any] = Depends(get_current_user)):
+async def create_new_art( title: str = Form(...),
+                    description: str = Form(...),
+                    price: int = Form(...),
+                    image: UploadFile = File(...),
+                    user: dict[str, Any] = Depends(get_current_user)):
+    
     success, message, post = insert(
         PostModel(
-            artist_id=user['artist_id'], 
-            description=request_data.description, 
-            title=request_data.title
+            artist_id=user['user_id'], 
+            description=description, 
+            title=title
         )
     )
-    
+
+    file_mgr = FileManager(FILEPATH + "/post_images")
+    content = await file_mgr.save(image)
+
     success, message, art = insert(
         ArtModel(
-            content=request_data.content,
+            price=price,
+            content=content,
             post_id=post['post_id']
         )
     )
