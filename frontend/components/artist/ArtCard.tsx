@@ -1,59 +1,41 @@
+import Link from "next/link";
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import CardMedia from '@mui/material/CardMedia';
+import { CardContent, Typography } from '@mui/material';
 
-var cardStyle = {
-    background : "#28B5A4",
-    display: 'block',
-    width: '25vw',
-    height: '25vw'
+import LinkIcon from '@mui/icons-material/Link';
+
+interface ArtCardProps {
+  title: string;
+  content: string; 
+  description: string; 
+  artId: number;
 }
 
-var mediaStyle = {
-    display: 'block',
-    width: '25vw',
-    height: '20vw'
-}
-
-var viewButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "white",
-    fontFamily: "Josefin Slab",
-    fontWeight: "Bold",
-    display: 'block',
-    width: '12vw',
-    height: '3vw'
-}
-
-var shareButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "white",
-    fontStyle: "italic",
-    fontFamily: "Josefin Slab",
-    display: 'block',
-    width: '12vw',
-    height: '3vw'
-}
-
-export function ArtCard() {
+export function ArtCard({title, content, description, artId} : ArtCardProps) {
   return (
-    <div style={{margin: '15%'}}>
-        <Card style={cardStyle}>
-            <CardMedia
-                component="img"
-                alt="Image"
-                style={mediaStyle}
-                image='/app-logo.svg'
-            />
-            <CardActions>
-                <Button style={shareButtonStyle}>Share Art</Button>
-                <Button style={viewButtonStyle}>View Art</Button>
-            </CardActions>
-        </Card>
-    </div>
+    <Card sx={{ width: "100%" }}>
+      <CardMedia
+        sx={{ width: "100%", aspectRatio: "1/1" }}
+        image={`http://localhost:8000/${content}`}
+        title="art"
+      />
+      <CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {description}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Link href={`/art/${artId}`}>
+          <Button size="small" startIcon={<LinkIcon />}>Open</Button>       
+        </Link>
+      </CardActions>
+    </Card>
   );
 }

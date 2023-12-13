@@ -18,6 +18,9 @@ import { useSnackbar } from "@/store/snackbar";
 import {FilledInputField, DomainImage, DomainDivider, DomainButton} from "@/components/shared";
 import { useRouter } from "next/router";
 import { accountTypeAtom } from "@/store/accounttype";
+import { userAtom } from "@/store/user";
+import { Co2Sharp } from "@mui/icons-material";
+import { flushSync } from "react-dom";
 
 const LoginStack = styled(Stack)(({theme}) => ({
   background : theme.palette.primary.main,
@@ -37,6 +40,8 @@ export default function LoginPage() {
   const router = useRouter();
   const theme = useTheme();
 
+  const[_, setUser] = useAtom(userAtom);
+
   const [accountType, setAccountType] = useAtom(accountTypeAtom);
 
   const [username, setUsername] = React.useState<string>("");
@@ -52,13 +57,40 @@ export default function LoginPage() {
   }, [])
 
   const handleCollectorLogin = async () => {
-    setAccountType("collector");
-    router.replace("/");
+      // setUser({
+      //   username: username,
+      //   password: password
+      // });
+      // setAccountType("collector");
+      // router.replace("/");  
   } 
 
   const handleArtistLogin = async () => {
-    setAccountType("artist");
-    router.replace("/artist/profile");
+      flushSync(() => setLoggingIn(true));
+      try {
+        const auth = Buffer.from(`${username}:${password}`).toString('base64');
+        const res = await fetch(`http://localhost:8000/users/me`, {
+          method : 'GET',
+          headers: {
+            "Authorization" : `Basic ${auth}`
+          }
+        })
+        const data = await res.json();
+        console.log(data);
+        if ("user_id" in data) {
+          setUser(data);
+          localStorage.setItem('bilart-me', JSON.stringify(data));
+          setAccountType("artist");   
+          router.replace("/artist");    
+        } else {
+          snackbar("error", "unauthorized");
+        }
+      } catch (err) {
+        snackbar("error", "an error occured");
+      } finally {
+        setLoggingIn(false);
+      }
+      
   }
 
   return (

@@ -13,10 +13,10 @@ interface CardView extends CardProps {
 export function GalleryView( props: CardView ) {
 
     return(
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+        <Grid container gap={3} justifyContent="space-between">
 
             {props.cards?.map((element, index) => (
-                <Grid item xs={1} sm={2} md={4} key={index}>
+                <Grid item xs={3} key={index}>
                     {element}
                 </Grid>
             ))}
