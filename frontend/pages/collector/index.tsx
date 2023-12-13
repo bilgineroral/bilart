@@ -22,3 +22,12 @@ export default function CollecterPage() {
     </>
   )
 }
+
+export async function getStaticProps()  {
+  return {
+    props : {
+      navbar : true,
+      accountType : "collector"
+    }
+  }
+}

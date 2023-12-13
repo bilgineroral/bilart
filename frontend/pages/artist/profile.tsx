@@ -1,3 +1,4 @@
+import { LayoutProps } from "@/layout";
 import * as React from "react";
 
 export default function ArtistProfilePage() {
@@ -16,10 +17,11 @@ export default function ArtistProfilePage() {
 }
 
 
-export async function getStaticProps() {
+export async function getStaticProps()  {
   return {
     props : {
-      navbar : true
+      navbar : true,
+      accountType : "artist"
     }
   }
 }
