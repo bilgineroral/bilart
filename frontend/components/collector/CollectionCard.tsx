@@ -33,6 +33,7 @@ var deleteButtonStyle = {
     margin: "1vw",
     background : "#91E3DE",
     color: "red",
+    fontStyle: "italic",
     fontFamily: "Josefin Slab",
     fontWeight: "Italic",
     display: 'block',
