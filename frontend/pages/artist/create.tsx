@@ -33,18 +33,9 @@ export default function CreateArt() {
 
   const [tags, setTags] = React.useState(["tag one", "tag two", "tag three"]);
 
-  const [imageBlob, setImageBlob] =  React.useState<Blob | null>(null);
-  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
-
-  const onImageSelect = React.useCallback((filelist : FileList | null) => {
-    if (filelist) {
-      setImageBlob(filelist[0]);
-      setImageSrc(URL.createObjectURL(filelist[0]));
-    } else {
-      setImageBlob(null);
-      setImageSrc(null);
-    }
-  }, []);
+  const handleImageFinal = (imgSrc : string) => {
+    console.log(imgSrc);
+  }
 
   const handleOnSave = React.useCallback(() => {
     console.log("saving");
@@ -140,9 +131,7 @@ export default function CreateArt() {
           Select Image For your art piece
         </Button>
         <DomainImageUpload 
-          imageBlob={imageBlob}
-          imageSrc={imageSrc}
-          onImageSelect={onImageSelect}
+          onImageFinal={handleImageFinal}
           justifyContent="left"
         />
       </FieldsBox>
