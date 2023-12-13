@@ -27,16 +27,6 @@ export default function CollecterPage() {
   )
 }
 
-<<<<<<< HEAD:frontend/pages/collector/index.tsx
-export async function getStaticProps()  {
-  return {
-    props : {
-      navbar : true,
-      accountType : "collector"
-    }
-  }
-}
-=======
 export async function getStaticProps() {
   return {
     props : {
@@ -44,4 +34,3 @@ export async function getStaticProps() {
     }
   }
 }
->>>>>>> 431c37d0623ce99b905032c9a3ffca72d4d7d8b5:frontend/pages/collector/home.tsx
