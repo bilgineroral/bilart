@@ -1,6 +1,8 @@
 import {useRouter} from "next/router";
 import * as React from "react";
 
+import {useAtom} from "jotai";
+
 import {
   Stack,
   TextField,
@@ -25,21 +27,52 @@ const FieldsBox = styled(Box)(({theme}) => ({
 })) as typeof Box;
 
 import { ActionButtonProps, DomainDivider, DomainImageUpload, PostActionsBar } from "@/components/shared";
+import { userAtom } from "@/store/user";
 
 export default function CreateArt() {
 
   const router = useRouter();
   const {edit} = router.query;
 
+
   const [tags, setTags] = React.useState(["tag one", "tag two", "tag three"]);
 
-  const handleImageFinal = (imgSrc : string) => {
-    console.log(imgSrc);
+  const [imgBlob, setImgBlob] = React.useState<Blob | null>(null);  
+  const handleImageFinal = (imgSrc : string, imgBlob : Blob) => {
+    console.log(imgBlob);
+    setImgBlob(imgBlob);
   }
 
-  const handleOnSave = React.useCallback(() => {
-    console.log("saving");
-  }, []);
+  const handleOnSave = async () => {
+    console.log("sending");
+    
+    if (imgBlob) {
+      console.log("sending");
+      try {
+        // @ts-ignore
+        const user = JSON.parse(localStorage.getItem('bilart-me'));
+        const auth = Buffer.from(`${user?.username}:${user?.password_hash}`).toString('base64');
+        const formData = new FormData();
+        formData.append("image", imgBlob);
+        formData.append("title", "name");
+        formData.append("description", "desssss");
+        formData.append("price", "2");
+        const res = await fetch("http://localhost:8000/arts", {
+          method : "POST",
+          headers: {
+            "Authorization": `Basic ${auth}`
+          },
+          body: formData
+        })
+        const data  = await res.json();
+        console.log(data)
+        router.replace("/artist");
+      }catch (err) {
+        console.log(err);
+      }
+      
+    }
+  };
 
   const handleOnCancel = React.useCallback(() => {
     router.replace("/artist");

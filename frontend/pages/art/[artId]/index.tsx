@@ -13,12 +13,43 @@ import {
   Paper
 } from "@mui/material";
 
+import type { Art } from "@/pages/artist";
+
 import { PostActionsBar, DomainDivider, DomainImage } from "@/components/shared";
+import { User } from "@/store/user";
+import { useSnackbar } from "@/store/snackbar";
 
 export default function ArtPage() {
 
   const router = useRouter()
   const {query} = router;
+  const artId = query.artId;
+
+  const snackbar = useSnackbar();
+  const [artInfo, setArtInfo] = React.useState<Art | null>(null);
+
+  React.useEffect(() => {
+    const fetchArtInfo = async () => {
+      try {
+        // @ts-ignore
+        const user = JSON.parse(localStorage.getItem('bilart-me')) as User;
+        const auth = Buffer.from(`${user.username}:${user.password_hash}`).toString('base64');
+        const res = await fetch(`http://localhost:8000/arts/${artId}`);
+        const data = await res.json()  
+        console.log(data);
+        if ("data" in data) {
+          setArtInfo(data.data);
+        } else {
+          snackbar("error", "failed to fetched");
+        }
+      } catch (err) {
+        console.log(err);
+        snackbar("error", "failed to fetched");
+      }
+    }
+
+    fetchArtInfo();
+  },[])
 
   const theme = useTheme();
   const [tags, setTags] = React.useState(["tag", "tag"]);
@@ -73,7 +104,7 @@ export default function ArtPage() {
           >
             <DomainImage 
               alt="art piece image"
-              src="/app-logo.svg"
+              src={`http://localhost:8000/${artInfo?.content}`}
             />  
           </Box>          
         </Grid>
@@ -81,7 +112,7 @@ export default function ArtPage() {
             <Stack direction="column" gap={1} sx={{position : "relative", height: "100%"}}>
               <div style={{display :"flex", justifyContent: "space-between"}}>
                 <Typography variant="h4" color="#fff">
-                  {title}
+                  {artInfo?.title}
                 </Typography> 
                 <div>
                   {

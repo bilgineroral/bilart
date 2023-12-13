@@ -64,7 +64,7 @@ const CropContainer = styled("div")(({theme}) => ({
 }))
 
 export interface DomainImageUploadProps extends DropBoxStyleProps {
-  onImageFinal: (imgSrc : string) => void;
+  onImageFinal: (imgSrc : string, imgBlob : Blob) => void;
   justifyContent? : string;
 }
 
@@ -118,8 +118,10 @@ export function DomainImageUpload (props : DomainImageUploadProps) {
   }
 
   React.useEffect(() => {
-
-  }, []);
+    if (imgBlob && croppedImgUrl && !cropping) {
+      props.onImageFinal(croppedImgUrl, imgBlob);      
+    }
+  }, [imgBlob, croppedImgUrl, cropping]);
 
 
   return (

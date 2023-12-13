@@ -49,23 +49,11 @@ export default function RegisterPage() {
   const [password, setPassword]  = React.useState<string>("");
 
   const [phonenumber, setPhonenumber] = React.useState<string>("");
+  const [email, setEmail] = React.useState<string>("");
 
   const [registering, setRegistering] = React.useState<boolean>(false);
 
   const snackbar = useSnackbar();
-
-  const [imageBlob, setImageBlob] =  React.useState<Blob | null>(null);
-  const [imageSrc, setImageSrc] = React.useState<string | null>(null);
-
-  const onImageSelect = React.useCallback((filelist : FileList | null) => {
-    if (filelist) {
-      setImageBlob(filelist[0]);
-      setImageSrc(URL.createObjectURL(filelist[0]));
-    } else {
-      setImageBlob(null);
-      setImageSrc(null);
-    }
-  }, []);
 
 
   React.useEffect(() => {
@@ -75,7 +63,29 @@ export default function RegisterPage() {
   }, [])
 
   const handleRegister = async () => {
-    router.replace("/");
+    try {
+      const res = await fetch(`http://localhost:8000/users/register`, {
+        method : "POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          email: email,
+          phone: phonenumber,
+          first_name: firstname,
+          last_name: lastname 
+        })
+      })
+      const data = await res.json();
+      console.log(data);
+      snackbar("success", "registered");
+      router.replace("/login");
+  
+    } catch(err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -163,6 +173,34 @@ export default function RegisterPage() {
           fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          multiline={false}
+          size="small"
+          background={theme.palette.primary.light}
+          hoverbackground={theme.palette.secondary.light}
+          focusedbackground={theme.palette.secondary.light}
+          labelColor={theme.palette.secondary.main}
+        />
+        <FilledInputField 
+          disabled={registering}
+          placeholder="Email"
+          label="Email"
+          fullWidth
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          multiline={false}
+          size="small"
+          background={theme.palette.primary.light}
+          hoverbackground={theme.palette.secondary.light}
+          focusedbackground={theme.palette.secondary.light}
+          labelColor={theme.palette.secondary.main}
+        />
+        <FilledInputField 
+          disabled={registering}
+          placeholder="Phone Number"
+          label="Phone Number"
+          fullWidth
+          value={phonenumber}
+          onChange={(e) => setPhonenumber(e.target.value)}
           multiline={false}
           size="small"
           background={theme.palette.primary.light}
