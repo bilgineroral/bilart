@@ -7,6 +7,7 @@ from modules.modules import create_functions
 
 def create_tables() -> Tuple[bool, str]:
     commands = "\n".join(create_functions)
+    print(commands)
     
     with PgDatabase() as db:
         try:

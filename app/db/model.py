@@ -6,6 +6,10 @@ from typing_extensions import Protocol
 
 class ModelProtocal(Protocol):
     @staticmethod
+    def get_identifier() -> str:
+        ...
+    
+    @staticmethod
     def get_table_name() -> str:
         ...
     
@@ -24,6 +28,10 @@ class ModelProtocal(Protocol):
 
 
 class Model(BaseModel, ABC):
+    @staticmethod
+    def get_identifier() -> str:
+        ...
+    
     @staticmethod
     def get_table_name() -> str:
         ...

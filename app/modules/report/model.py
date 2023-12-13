@@ -12,15 +12,15 @@ class ReportModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {ReportModel.get_table_name()} (
-                report_id SERIAL PRIMARY KEY,
+                {ReportModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(256) NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
                 entity_name VARCHAR(16) NOT NULL,
                 entity_id INT NOT NULL,
-                user_id INT NOT NULL,
+                {UserModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_user
-                    FOREIGN KEY(user_id)
-                        REFERENCES {UserModel.get_table_name()}(user_id)
+                    FOREIGN KEY({UserModel.get_identifier()})
+                        REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})
                         ON DELETE CASCADE
             );
         """
@@ -33,3 +33,7 @@ class ReportModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 16
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "report_id"

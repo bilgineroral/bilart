@@ -16,12 +16,12 @@ class ArtModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {ArtModel.get_table_name()} (
-                art_id SERIAL PRIMARY KEY,
+                {ArtModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(255),
-                post_id INT NOT NULL,
+                {PostModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_post
-                    FOREIGN KEY(post_id)
-                        REFERENCES {PostModel.get_table_name()}(post_id)
+                    FOREIGN KEY({PostModel.get_identifier()})
+                        REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -34,7 +34,14 @@ class ArtModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 6
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "art_id"
 
 
 class CreateArt(BaseModel):
-    ...
+    content: str
+    title: str
+    description: str
+    content: str

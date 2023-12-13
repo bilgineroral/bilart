@@ -1,5 +1,8 @@
 from fastapi import APIRouter
+
 from db.model import Model
+from modules.post.model import PostModel
+from modules.collector.model import CollectorModel
 
 class RatingModel(Model):
     score: int
@@ -15,18 +18,18 @@ class RatingModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {RatingModel.get_table_name()} (
-                rating_id SERIAL PRIMARY KEY,
+                {RatingModel.get_identifier()} SERIAL PRIMARY KEY,
                 score SMALLINT NOT NULL,
                 comment VARCHAR(500),
-                post_id int NOT NULL,
-                collector_id INT NOT NULL,
-                CONSTRAINT fk_art
-                    FOREIGN KEY(post_id)
-                        REFERENCES Post(post_id)
+                {PostModel.get_identifier()} int NOT NULL,
+                {CollectorModel.get_identifier()} INT NOT NULL,
+                CONSTRAINT fk_post
+                    FOREIGN KEY({PostModel.get_identifier()})
+                        REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
                         ON DELETE CASCADE,
                 CONSTRAINT fk_collector
-                    FOREIGN KEY(collector_id)
-                        REFERENCES Collector(collector_id)
+                    FOREIGN KEY({CollectorModel.get_identifier()})
+                        REFERENCES {CollectorModel.get_table_name()}({CollectorModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -39,3 +42,7 @@ class RatingModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 9
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "rating_id"

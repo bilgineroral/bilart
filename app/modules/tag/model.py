@@ -13,7 +13,7 @@ class TagModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {TagModel.get_table_name()} (
-                tag_name VARCHAR(255) PRIMARY KEY
+                {TagModel.get_identifier()} VARCHAR(255) PRIMARY KEY
             );
             """
     
@@ -25,3 +25,8 @@ class TagModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 10
+    
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "tag_name"

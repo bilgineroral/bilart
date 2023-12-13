@@ -1,12 +1,14 @@
-from fastapi import APIRouter
+from typing import Any
+from fastapi import APIRouter, Depends
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 
-from modules.art.model import ArtModel
+from modules.art.model import ArtModel, CreateArt
 from modules.post.model import PostModel
+from modules.user.auth import get_current_user
 
 
 router = APIRouter(prefix="/arts", tags=['arts'])
@@ -53,8 +55,14 @@ def get_arts(
 
 
 @router.post("/")
-def create_new_art(request_data: ArtModel):
-    success, message = insert(request_data)
+def create_new_art(request_data: CreateArt, user: dict[str, Any] = Depends(get_current_user)):
+    success, message = insert(
+        PostModel(
+            artist_id=user['user_id'], 
+            description=request_data.description, 
+            title=request_data.title
+        )
+    )
     return {"message": message, "success": success}
 
 

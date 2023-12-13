@@ -12,13 +12,13 @@ class NotificationModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {NotificationModel.get_table_name()} (
-                notification_id SERIAL PRIMARY KEY,
+                {NotificationModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(256) NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
-                user_id INT NOT NULL,
+                {UserModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT fk_user
-                    FOREIGN KEY(user_id)
-                        REFERENCES {UserModel.get_table_name()}(user_id)
+                    FOREIGN KEY({UserModel.get_identifier()})
+                        REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})
                         ON DELETE CASCADE
             );
         """
@@ -31,3 +31,7 @@ class NotificationModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 15
+    
+    @staticmethod
+    def get_identifier() -> str:
+        return "notification_id"

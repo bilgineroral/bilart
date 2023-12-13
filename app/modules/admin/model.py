@@ -15,10 +15,10 @@ class AdminModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {AdminModel.get_table_name()} (
-                admin_id SERIAL PRIMARY KEY,
+                {AdminModel.get_identifier()} SERIAL PRIMARY KEY,
                 privileges VARCHAR(1),
-                user_id INT UNIQUE NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES {UserModel.get_table_name()}(user_id)
+                {UserModel.get_identifier()} INT UNIQUE NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})
             );
             """
             
@@ -30,3 +30,7 @@ class AdminModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 3
+    
+    @staticmethod
+    def get_identifier() -> str:
+        return "admin_id"

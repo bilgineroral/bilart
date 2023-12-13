@@ -4,6 +4,10 @@ from db.model import Model
 from modules.artist.model import ArtistModel
 
 class PostModel(Model):
+    artist_id: int
+    description: str
+    title: str
+    
     @staticmethod
     def get_table_name() -> str:
         return "Post"
@@ -12,14 +16,14 @@ class PostModel(Model):
     def create_table() -> str:
         return f"""
         CREATE TABLE {PostModel.get_table_name()} (
-            post_id SERIAL PRIMARY KEY,
-            artist_id INT NOT NULL,
+            {PostModel.get_identifier()} SERIAL PRIMARY KEY,
+            {ArtistModel.get_identifier()} INT NOT NULL,
             created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
             title VARCHAR(128),
             description VARCHAR(256),
             CONSTRAINT fk_artist
-                    FOREIGN KEY(artist_id)
-                        REFERENCES {ArtistModel.get_table_name()}(artist_id)
+                    FOREIGN KEY({ArtistModel.get_identifier()})
+                        REFERENCES {ArtistModel.get_table_name()}({ArtistModel.get_identifier()})
                         ON DELETE CASCADE
         );
         """
@@ -32,3 +36,8 @@ class PostModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 5
+    
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "post_id"

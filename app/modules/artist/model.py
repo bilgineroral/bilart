@@ -19,8 +19,9 @@ class ArtistModel(Model):
                 artist_id SERIAL PRIMARY KEY,
                 bio VARCHAR(500),
                 link VARCHAR(255),
-                user_id INT UNIQUE NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES {UserModel.get_table_name()} (user_id)
+                {UserModel.get_identifier()} INT UNIQUE NOT NULL,
+                FOREIGN KEY ({UserModel.get_identifier()}) 
+                    REFERENCES {UserModel.get_table_name()} ({UserModel.get_identifier()})
             );
             """
     
@@ -32,3 +33,7 @@ class ArtistModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 2
+        
+    @staticmethod
+    def get_identifier() -> str:
+        return "artist_id"
