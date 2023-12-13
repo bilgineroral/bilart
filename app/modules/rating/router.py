@@ -15,7 +15,7 @@ def get_rating(
     rating_id: int
 ):
     success, _, message, items = retrieve(
-        table=RatingModel.get_table_name(),
+        tables=[RatingModel],
         single=True,
         rating_id=rating_id
     )
@@ -32,7 +32,7 @@ def get_ratings(
     collector_id: int | None = None
 ):
     success, count, message, items = retrieve(
-        table=RatingModel.get_table_name(),
+        tables=[RatingModel],
         single=False,
         score=score,
         gt__score=gt__score,

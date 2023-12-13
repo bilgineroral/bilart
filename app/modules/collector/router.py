@@ -15,7 +15,7 @@ def get_collector(
     collector_id: int
 ):
     success, count, message, items = retrieve(
-        table=CollectorModel.get_table_name(),
+        tables=[CollectorModel],
         single=True,
         collector_id=collector_id,
     )
@@ -28,7 +28,7 @@ def get_collectors(
 
 ):
     success, count, message, items = retrieve(
-        table=CollectorModel.get_table_name(),
+        tables=[CollectorModel],
         single=False,
     )
 

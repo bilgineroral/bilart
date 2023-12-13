@@ -6,39 +6,48 @@ from db.retrieve import retrieve
 from db.insert import insert
 
 from modules.art.model import ArtModel
+from modules.post.model import PostModel
 
 
 router = APIRouter(prefix="/arts", tags=['arts'])
+
 
 @router.get("/{art_id}")
 def get_art(
     art_id: int
 ):
     success, _, message, items = retrieve(
-        table=ArtModel.get_table_name(),
+        tables=[ArtModel, PostModel],
         single=True,
         art_id=art_id
     )
 
     return {"data": items[0], "success": success, "message": message}
 
+
 @router.get("/")
 def get_arts(
     content: str | None = None,
-    initial_price: str | None = None,
-    collection_id: int | None = None,
-    artist_id: int | None = None,
     created_at: str | None = None,
+    artist_id: int | None = None,
+    title: str | None = None,
+    description: str | None = None,
+    search__title: str | None = None,
+    search__description: str | None = None,
 ):
-    success, count, message, items = retrieve(
-        table=ArtModel.get_table_name(),
-        single=False,
-        conent=content,
-        initial_price=initial_price,
-        collection_id=collection_id,
-        artist_id=artist_id,
-        created_at=created_at
-    )
+    filters = {
+        "tables": [ArtModel, PostModel],
+        "single": False,
+        f"table__{ArtModel.get_table_name()}__content": content,
+        f"table__{PostModel.get_table_name()}__created_at": created_at,
+        f"table__{PostModel.get_table_name()}__artist_id": artist_id,
+        f"table__{PostModel.get_table_name()}__title": title,
+        f"table__{PostModel.get_table_name()}__search__title": search__title,
+        f"table__{PostModel.get_table_name()}__description": description,
+        f"table__{PostModel.get_table_name()}__search__description": search__description,
+    }
+
+    success, count, message, items = retrieve(**filters)
 
     return {"data": items, "success": success, "message": message, "count": count}
 

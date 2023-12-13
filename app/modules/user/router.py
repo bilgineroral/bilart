@@ -42,7 +42,7 @@ def get_user_id(
     user_id: int,
 ):
     success, _, message, items = retrieve(
-        table=UserModel.get_table_name(),
+        tables=[UserModel],
         single=True,
         user_id=user_id,
     )
@@ -55,7 +55,7 @@ def get_user_username(
     username: str,
 ):
     success, _, message, items = retrieve(
-        table=UserModel.get_table_name(),
+        tables=[UserModel],
         single=True,
         username=username,
     )
@@ -76,7 +76,7 @@ def get_users(
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
-        table=UserModel.get_table_name(),
+        tables=[UserModel],
         single=False,
         username=username,
         first_name=first_name,

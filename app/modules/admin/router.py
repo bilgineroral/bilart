@@ -15,7 +15,7 @@ def get_admin(
     admin_id: int
 ):
     success, _, message, items = retrieve(
-        table=AdminModel.get_table_name(),
+        tables=[AdminModel],
         single=True,
         admin_id=admin_id
     )
@@ -27,7 +27,7 @@ def get_admins(
     privledges: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=AdminModel.get_table_name(),
+        tables=[AdminModel],
         single=False,
         privledges=privledges
     )

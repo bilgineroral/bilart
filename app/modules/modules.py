@@ -1,3 +1,6 @@
+from typing import Type
+from db.model import ModelProtocal
+
 from modules.admin.model import AdminModel
 from modules.art.model import ArtModel
 from modules.art__collection.model import ArtCollectionModel
@@ -17,7 +20,7 @@ from modules.tutorial.model import TutorialModel
 from modules.user.model import UserModel
 
 
-models: list = [
+models: list[Type[ModelProtocal]] = [
     AdminModel,
     ArtModel,
     ArtCollectionModel,

@@ -15,7 +15,7 @@ def get_bid(
     bid_id: int
 ):
     success, _, message, items = retrieve(
-        table=BidModel.get_table_name(),
+        tables=[BidModel],
         single=True,
         bid_id=bid_id
     )
@@ -34,7 +34,7 @@ def get_bids(
     created_at: str | None = None
 ):
     success, count, message, items = retrieve(
-        table=BidModel.get_table_name(),
+        tables=[BidModel],
         single=False,
         bid_id=bid_id,
         price=price,

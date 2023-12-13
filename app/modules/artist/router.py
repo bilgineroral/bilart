@@ -15,7 +15,7 @@ def get_artist(
     artist_id: int
 ):
     success, _, message, items = retrieve(
-        table=ArtistModel.get_table_name(),
+        tables=ArtistModel.get_table_name(),
         single=True,
         artist_id=artist_id
     )
@@ -28,7 +28,7 @@ def get_artists(
     search__bio: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=ArtistModel.get_table_name(),
+        tables=ArtistModel.get_table_name(),
         single=False,
         link=link,
         search__bio=search__bio

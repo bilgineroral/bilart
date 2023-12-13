@@ -15,7 +15,7 @@ def get_auction(
     auction_id: int
 ):
     success, _, message, items = retrieve(
-        table=AuctionModel.get_table_name(),
+        tables=AuctionModel.get_table_name(),
         single=True,
         auction_id=auction_id
     )
@@ -34,7 +34,7 @@ def get_auctions(
     art_id: int | None = None,
 ):
     success, count, message, items = retrieve(
-        table=AuctionModel.get_table_name(),
+        tables=AuctionModel.get_table_name(),
         single=False,
         start_time=start_time,
         end_time=end_time,

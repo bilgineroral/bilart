@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from db.model import Model
+from pydantic import BaseModel
 
+from db.model import Model
 from modules.post.model import PostModel
 
 class ArtModel(Model):
@@ -33,4 +34,7 @@ class ArtModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 6
-    
+
+
+class CreateArt(BaseModel):
+    ...

@@ -16,7 +16,7 @@ def get_current_user(
     
     try:
         _, _, _, users = retrieve(
-            table=UserModel.get_table_name(),
+            tables=[UserModel],
             single=True,
             username=username,
             password_hash=password
@@ -26,7 +26,7 @@ def get_current_user(
     except HTTPException as e:
         try:
             _, _, _, users = retrieve(
-                table=UserModel.get_table_name(),
+                tables=[UserModel],
                 single=True,
                 email=username,
                 password_hash=password

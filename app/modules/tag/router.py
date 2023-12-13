@@ -15,7 +15,7 @@ def get_tag(
     name: str
 ):
     success, _, message, items = retrieve(
-        table=TagModel.get_table_name(),
+        tables=[TagModel],
         single=True,
         name=name
     )
@@ -28,7 +28,7 @@ def get_tags(
     search__name: str | None = None,
 ):
     success, count, message, items = retrieve(
-        table=TagModel.get_table_name(),
+        tables=[TagModel],
         single=False,
         search__name=search__name
     )
