@@ -99,25 +99,37 @@ def get_users(
     first_name: str | None = None,
     last_name: str | None = None,
     email: str | None = None,
+    bio: str | None = None,
+    link: str | None = None,
+    privledge: str | None = None,
+    rank: int | None = None,
     search__username: str | None = None,
     search__first_name: str | None = None,
     search__last_name: str | None = None,
     search__email: str | None = None,
+    search__bio: str | None = None,
     created_at: str | None = None
 ):
-    success, count, message, items = retrieve(
-        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
-        single=False,
-        username=username,
-        first_name=first_name,
-        last_name=last_name,
-        email=email,
-        created_at=created_at,
-        search__first_name=search__first_name,
-        search__email=search__email,
-        search__last_name=search__last_name,
-        search__username=search__username
-    )
+    filters = {
+        "tables":[UserModel, CollectorModel, ArtistModel, AdminModel],
+        "single":False,
+        f"table__{UserModel.get_table_name()}__username":username,
+        f"table__{UserModel.get_table_name()}__first_name":first_name,
+        f"table__{UserModel.get_table_name()}__last_name":last_name,
+        f"table__{UserModel.get_table_name()}__email":email,
+        f"table__{UserModel.get_table_name()}__created_at":created_at,
+        f"table__{UserModel.get_table_name()}__search__first_name":search__first_name,
+        f"table__{UserModel.get_table_name()}__search__email":search__email,
+        f"table__{UserModel.get_table_name()}__search__last_name":search__last_name,
+        f"table__{UserModel.get_table_name()}__search__username":search__username,
+        f"table__{ArtistModel.get_table_name()}__bio":bio,
+        f"table__{ArtistModel.get_table_name()}__link":link,
+        f"table__{ArtistModel.get_table_name()}__search__bio":search__bio,
+        f"table__{AdminModel.get_table_name()}__privledge":privledge,
+        f"table__{CollectorModel.get_table_name()}__rank":rank,
+    }
+    
+    success, count, message, items = retrieve(**filters)
 
     return {"data": items, "success": success, "message": message, "count": count}
 

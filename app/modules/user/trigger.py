@@ -27,13 +27,10 @@ class UserTrigger(Trigger):
             CREATE OR REPLACE FUNCTION create_user_related_rows()
             RETURNS TRIGGER AS $$
             BEGIN
-                -- Insert into Table A
                 INSERT INTO {AdminModel.get_table_name()} ({', '.join(admin.keys())}) VALUES ({', '.join([f"{value}" for value in admin.values()])});
 
-                -- Insert into Table B
                 INSERT INTO {CollectorModel.get_table_name()} ({', '.join(collector.keys())}) VALUES ({', '.join([f"{value}" for value in collector.values()])});
-
-                -- Insert into Table C
+                
                 INSERT INTO {ArtistModel.get_table_name()} ({', '.join(artist.keys())}) VALUES ({', '.join([f"{value}" for value in artist.values()])});
 
                 RETURN NEW;
