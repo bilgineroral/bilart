@@ -12,7 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <StoreProvider> 
       <MuiThemeProvider>
-        <Layout>
+        <Layout show={pageProps.navbar}>
           <Component  {...pageProps} />
         </Layout>
       </MuiThemeProvider> 
