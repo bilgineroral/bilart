@@ -27,7 +27,7 @@ var viewButtonStyle = {
 var deleteButtonStyle = {
     fontFamily: "Josefin Slab",
     fontWeight: "Italic",
-    color: "Burgundy",
+    color: "Red",
     display: 'block',
     width: '12vw',
     height: '3vw'
