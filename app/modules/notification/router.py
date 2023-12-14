@@ -16,7 +16,7 @@ def get_notifications(user: dict[str, Any] = Depends(get_current_user)):
     filters = {
         "tables": [NotificationModel],
         "single": False,
-        f"{UserModel.get_identifier()}": user[f'{UserModel.get_identifier()}']
+        UserModel.get_identifier(): user[UserModel.get_identifier()]
     }
 
     success, count, message, items = retrieve(**filters)
@@ -35,13 +35,15 @@ def read_notifications(user: dict[str, Any] = Depends(get_current_user)):
     success, count, message, items = retrieve(**filters)
     
     for item in items:
+        print("here")
         update(
             table=NotificationModel.get_table_name(),
             model={
                 'read': True
             },
             identifier=NotificationModel.get_identifier(),
-            user_id=item['user_id']
+            user_id=item['user_id'],
+            notification_id=item['notification_id']
         )
 
     return {"data": items, "success": success, "message": message, "count": count}

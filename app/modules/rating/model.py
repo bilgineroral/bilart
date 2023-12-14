@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from db.model import Model
 from modules.post.model import PostModel
@@ -7,7 +8,7 @@ from modules.collector.model import CollectorModel
 class RatingModel(Model):
     score: int
     comment: str
-    art_id: int
+    post_id: int
     collector_id: int
     
     @staticmethod
@@ -46,3 +47,14 @@ class RatingModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "rating_id"
+
+
+class CreateRating(BaseModel):
+    score: int
+    comment: str
+    post_id: int
+
+
+class UpdateRating(BaseModel):
+    score: int | None
+    comment: str | None

@@ -3,8 +3,9 @@ from typing import Any, Tuple
 from fastapi import HTTPException
 
 from db.tables import params_to_where_clause
-from db.model import Model
 from db.db import PgDatabase
+
+
 
 
 def update_data_in_table(table_name: str, data: dict, identifier: str, **kwargs) -> Tuple[bool, str, dict[str, Any]]:
@@ -29,7 +30,8 @@ def update_data_in_table(table_name: str, data: dict, identifier: str, **kwargs)
         except HTTPException as e:
             raise e
         except Exception as e:
-            print(e)
+            import traceback
+            traceback.print_exc()
             raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -1,14 +1,21 @@
-from fastapi import APIRouter
+from typing import Any
+from fastapi import APIRouter, Depends
+
+from modules.art.model import ArtModel
+from modules.post.model import PostModel
+from modules.auction.model import AuctionModel
+from modules.user.auth import get_current_user
 
 from db.delete import delete
 from db.update import update
-from db.retrieve import retrieve
+from db.retrieve import retrieve, get_from_table
 from db.insert import insert
 
-from modules.bid.model import BidModel
+from modules.bid.model import BidModel, CreateBid, Updatebid
 
 
 router = APIRouter(prefix="/bids", tags=['bids'])
+
 
 @router.get("/{bid_id}")
 def get_bid(
@@ -22,12 +29,13 @@ def get_bid(
 
     return {"data": items[0], "success": success, "message": message}
 
+
 @router.get("/")
 def get_bids(
     bid_id: int | None = None,
     price: str | None = None,
     gt__price: str | None = None,
-    lt__price: str | None = None, 
+    lt__price: str | None = None,
     auction_id: int | None = None,
     collector_id: int | None = None,
     payment_done: bool | None = None,
@@ -50,12 +58,25 @@ def get_bids(
 
 
 @router.post("/")
-def create_new_bid(request_data: BidModel):
-    success, message, data = insert(request_data)
+def create_new_bid(request_data: CreateBid, user: dict[str, Any] = Depends(get_current_user)):
+    success, message, data = insert(
+        BidModel(
+            collector_id=user['collector_id'],
+            auction_id=request_data.auction_id,
+            price=request_data.price
+        )
+    )
     return {"message": message, "success": success, "data": data}
 
+
 @router.delete("/{bid_id}")
-def delete_bid(bid_id: int):
+def delete_bid(bid_id: int, user: dict[str, Any] = Depends(get_current_user)):
+    retrieve(
+        tables=[BidModel],
+        single=True,
+        collector_id=user['collector_id']
+    )
+
     success, message = delete(
         table=BidModel.get_table_name(),
         bid_id=bid_id
@@ -63,11 +84,20 @@ def delete_bid(bid_id: int):
     return {"message": message, "success": success}
 
 
-@router.put("/{bid_id}")
-def update_bid(bid_id: int, request_data: BidModel):
+@router.post("/accept_payment/{bid_id}")
+def accept_payment(bid_id: int, user: dict[str, Any] = Depends(get_current_user)):
+    _, _, _, data = get_from_table("""
+        Bid B
+        INNER JOIN Auction AU ON B.auction_id = AU.auction_id
+        INNER JOIN Art A ON AU.art_id = A.art_id
+        INNER JOIN Post P ON A.post_id = P.post_id
+        """, f"B.bid_id = {bid_id} AND P.artist_id = {user['artist_id']}", order_by_clasue="", single=True)
+
     success, message, data = update(
         table=BidModel.get_table_name(),
-        model=request_data.to_dict(),
+        model={
+            'payment_done': True
+        },
         identifier=BidModel.get_identifier(),
         bid_id=bid_id
     )

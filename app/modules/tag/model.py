@@ -3,7 +3,7 @@ from db.model import Model
 
 
 class TagModel(Model):
-    name: str
+    tag_name: str
     
     @staticmethod
     def get_table_name() -> str:

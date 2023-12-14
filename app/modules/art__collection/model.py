@@ -10,7 +10,7 @@ class ArtCollectionModel(Model):
 
     @staticmethod
     def get_table_name() -> str:
-        return "Art__Collection"
+        return "Art_MM_Collection"
     
     @staticmethod
     def create_table() -> str:

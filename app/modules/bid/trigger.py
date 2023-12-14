@@ -14,6 +14,34 @@ class BidTrigger(Trigger):
     def create_trigger() -> str:
         return f"""
         -- Step 1: Create the Trigger Function
+        CREATE OR REPLACE FUNCTION check_bid_before_auction_end()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            auctionEndTime TIMESTAMPTZ;
+        BEGIN
+            -- Get the end_time of the auction
+            SELECT end_time INTO auctionEndTime
+            FROM Auction
+            WHERE auction_id = NEW.auction_id;
+
+            -- Check if the current time is after the auction's end_time
+            IF CURRENT_TIMESTAMP > auctionEndTime THEN
+                RAISE EXCEPTION 'Cannot create bid after the auction end time.';
+            END IF;
+
+            -- If the check passes, allow the bid
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        -- Step 2: Create the Trigger
+        CREATE TRIGGER bid_before_insert
+        BEFORE INSERT ON Bid
+        FOR EACH ROW
+        EXECUTE FUNCTION check_bid_before_auction_end();
+    
+    
+        -- Step 1: Create the Trigger Function
         CREATE OR REPLACE FUNCTION check_bid_price()
         RETURNS TRIGGER AS $$
         DECLARE
@@ -116,7 +144,7 @@ class BidTrigger(Trigger):
             -- Notify users who have favorited the art
             INSERT INTO {NotificationModel.get_table_name()}(content, {UserModel.get_identifier()})
             SELECT 'New bid made on "' || artTitle || '"',
-                (SELECT {UserModel.get_identifier()} FROM {CollectorModel.get_table_name()} WHERE {CollectorModel.get_identifier()} = F.{CollectorModel.get_identifier()})
+                (SELECT {UserModel.get_identifier()} FROM {CollectorModel.get_table_name()} WHERE {CollectorModel.get_identifier()} = {FavoriteModel.get_table_name()}.{CollectorModel.get_identifier()})
             FROM {FavoriteModel.get_table_name()}
             NATURAL JOIN {ArtModel.get_table_name()}
             NATURAL JOIN {AuctionModel.get_table_name()}

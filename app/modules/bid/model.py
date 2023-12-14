@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from db.model import Model
 from modules.auction.model import AuctionModel
@@ -47,3 +48,12 @@ class BidModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "bid_id"
+    
+
+class CreateBid(BaseModel):
+    price: str
+    auction_id: int
+    
+    
+class Updatebid(BaseModel):
+    payment_done: bool

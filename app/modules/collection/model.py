@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from db.model import Model
 from modules.collector.model import CollectorModel
@@ -38,3 +39,7 @@ class CollectionModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "collection_id"
+    
+
+class CreateCollection(BaseModel):
+    name: str

@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Any
+from fastapi import APIRouter, Depends, HTTPException
+from modules.user.auth import get_current_user
 
 from db.delete import delete
 from db.update import update
@@ -10,14 +12,15 @@ from modules.tag.model import TagModel
 
 router = APIRouter(prefix="/tags", tags=['tags'])
 
+
 @router.get("/{name}")
 def get_tag(
-    name: str
+    tag_name: str
 ):
     success, _, message, items = retrieve(
         tables=[TagModel],
         single=True,
-        name=name
+        tag_name=tag_name
     )
 
     return {"data": items[0], "success": success, "message": message}
@@ -25,25 +28,31 @@ def get_tag(
 
 @router.get("/")
 def get_tags(
-    search__name: str | None = None,
+    search__tag_name: str | None = None,
 ):
     success, count, message, items = retrieve(
         tables=[TagModel],
         single=False,
-        search__name=search__name
+        search__tag_name=search__tag_name
     )
 
     return {"data": items, "success": success, "message": message, "count": count}
 
 
 @router.post("/")
-def create_new_tag(request_data: TagModel):
+def create_new_tag(request_data: TagModel,
+                   user: dict[str, Any] = Depends(get_current_user)):
+    if user['privileges'] == 'N':
+        raise HTTPException(status_code=401, detail="Not authorized")
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
 
 
 @router.delete("/{name}")
-def delete_tags(name: str):
+def delete_tags(name: str,
+                user: dict[str, Any] = Depends(get_current_user)):
+    if user['privileges'] == 'N':
+        raise HTTPException(status_code=401, detail="Not authorized")
     success, message = delete(
         table=TagModel.get_table_name(),
         tag_name=name
@@ -52,7 +61,10 @@ def delete_tags(name: str):
 
 
 @router.put("/{name}")
-def update_tags(name: str, request_data: TagModel):
+def update_tags(name: str, request_data: TagModel,
+                user: dict[str, Any] = Depends(get_current_user)):
+    if user['privileges'] == 'N':
+        raise HTTPException(status_code=401, detail="Not authorized")
     success, message, data = update(
         table=TagModel.get_table_name(),
         model=request_data.to_dict(),

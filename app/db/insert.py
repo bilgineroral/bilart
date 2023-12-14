@@ -6,19 +6,23 @@ from db.model import Model
 from db.db import PgDatabase
 
 # insert data into any table
-def insert_data_into_table(table_name: str, data: dict, identifier: str) -> Tuple[bool, str, dict[str, Any]]:
+def insert_data_into_table(table_name: str, data: dict, identifier: str, return_row: bool = True) -> Tuple[bool, str, dict[str, Any] | None]:
     try:
         query = f"""INSERT INTO {table_name} ({', '.join(data.keys())}) 
-            VALUES ({', '.join([f"'{v}'" for v in data.values()])}) RETURNING {identifier}"""
+            VALUES ({', '.join([f"'{v}'" for v in data.values()])}) {f"RETURNING {identifier}" if return_row else ""}"""
         print(query)
         with PgDatabase() as db:
             # Execute the SQL query with the data values
             db.cursor.execute(query, list(data.values()))
-            id = db.cursor.fetchone()[0]
             # Commit the transaction
             db.connection.commit()
             
-            select_query = f"SELECT * FROM {table_name} WHERE {identifier} = {id}"
+            if not return_row:
+                return True, "Data inserted successfully", None
+            
+            id = db.cursor.fetchone()[0]
+            
+            select_query = f"SELECT * FROM {table_name} WHERE {identifier} = '{id}'"
             db.cursor.execute(select_query)
             
             row = db.cursor.fetchone()
@@ -32,5 +36,5 @@ def insert_data_into_table(table_name: str, data: dict, identifier: str) -> Tupl
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def insert(model: Model) -> Tuple[bool, str, dict[str, Any]]:
-    return insert_data_into_table(model.get_table_name(), model.to_dict(), model.get_identifier())
+def insert(model: Model, return_row: bool = True) -> Tuple[bool, str, dict[str, Any] | None]:
+    return insert_data_into_table(model.get_table_name(), model.to_dict(), model.get_identifier(), return_row)

@@ -1,11 +1,15 @@
-from fastapi import APIRouter
+from typing import Any
+from fastapi import APIRouter, Depends
+from modules.post.model import PostModel
+from modules.art.model import ArtModel
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 
-from modules.auction.model import AuctionModel
+from modules.auction.model import AuctionModel, UpdateAuction
+from modules.user.auth import get_current_user
 
 
 router = APIRouter(prefix="/auctions", tags=['auctions'])
@@ -50,12 +54,30 @@ def get_auctions(
 
 
 @router.post("/")
-def create_new_auction(request_data: AuctionModel):
+def create_new_auction(request_data: AuctionModel, user: dict[str, Any] = Depends(get_current_user)):
+    filters = {
+        'tables': [PostModel, ArtModel],
+        'single': True,
+        f'table__{ArtModel.get_table_name()}__art_id':  request_data.art_id,
+        f'table__{PostModel.get_table_name()}__artist_id': user['artist_id'],
+    }
+    
+    retrieve(**filters)
+    
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
 
 @router.delete("/{auction_id}")
-def delete_auction(auction_id: int):
+def delete_auction(auction_id: int, user: dict[str, Any] = Depends(get_current_user)):
+    filters = {
+        'tables': [PostModel, ArtModel, AuctionModel],
+        'single': True,
+        f'table__{PostModel.get_identifier()}__artist_id': user['artist_id'],
+        f'table__{AuctionModel.get_identifier()}__auction_id': auction_id,
+    }
+    
+    retrieve(**filters)
+    
     success, message = delete(
         table=AuctionModel.get_table_name(),
         auction_id=auction_id
@@ -64,10 +86,23 @@ def delete_auction(auction_id: int):
 
 
 @router.put("/{auction_id}")
-def update_auction(auction_id: int, request_data: AuctionModel):
+def update_auction(auction_id: int, request_data: UpdateAuction, user: dict[str, Any] = Depends(get_current_user)):
+    filters = {
+        'tables': [PostModel, ArtModel, AuctionModel],
+        'single': True,
+        f'table__{PostModel.get_identifier()}__artist_id': user['artist_id'],
+        f'table__{AuctionModel.get_identifier()}__auction_id': auction_id,
+    }
+    
+    retrieve(**filters)
+    
     success, message, data = update(
         table=AuctionModel.get_table_name(),
-        model=request_data.to_dict(),
+        model={
+            'start_time': request_data.start_time,
+            'end_time': request_data.end_time,
+            'active': request_data.active
+        },
         identifier=AuctionModel.get_identifier(),
         auction_id=auction_id
     )

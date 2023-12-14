@@ -1,5 +1,6 @@
-from typing import Tuple
-from fastapi import APIRouter, HTTPException
+from typing import Any
+from fastapi import APIRouter, Depends
+from modules.user.auth import get_current_user
 
 from db.delete import delete
 from db.update import update
@@ -7,13 +8,12 @@ from db.retrieve import retrieve
 
 from db.insert import insert
 
-from modules.collection.model import CollectionModel
-from db.db import PgDatabase
+from modules.collection.model import CollectionModel, CreateCollection
 
 
 router = APIRouter(prefix="/collections", tags=['collections'])
 
-"""@router.get("/{collection_id}")
+@router.get("/{collection_id}")
 def get_collection(
     collection_id: int
 ):
@@ -23,34 +23,34 @@ def get_collection(
         collection_id=collection_id
     )
 
-    return {"data": items[0], "success": success, "message": message}"""
+    return {"data": items[0], "success": success, "message": message}
 
-@router.get("/{collection_id}")
+""" @router.get("/{collection_id}")
 def get_collection(
     collection_id: int,
     tag: list[str] | None = None,
 ):
     with PgDatabase() as db:
         try:
-            db.cursor.execute(f"""
+            db.cursor.execute(
                 SELECT * FROM collection_view
                 WHERE collection_id = {collection_id} AND tag_name = {tag}
-            """)
+            )
             data: list[Tuple] = db.cursor.fetchall()
             count = len(data)
-            """if single:
+            if single:
                 if count > 1:
                     raise HTTPException(status_code=400, detail=f"More than one object returned:{count}")
                 elif count == 0:
                     print("here")
-                    raise HTTPException(status_code=404, detail=f"Object not found")"""
+                    raise HTTPException(status_code=404, detail=f"Object not found")
             columns: list[str] = [desc[0] for desc in db.cursor.description]
             return True, count, "Data retrieved successfully", [dict(zip(columns, row)) for row in data]
         except HTTPException as e:
             raise e
         except Exception as e:
             print(e)
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) """
 
 @router.get("/")
 def get_collections(
@@ -70,13 +70,23 @@ def get_collections(
 
 
 @router.post("/")
-def create_new_collection(request_data: CollectionModel):
-    success, message, data = insert(request_data)
+def create_new_collection(request_data: CreateCollection, user: dict[str, Any] = Depends(get_current_user)):
+    success, message, data = insert(CollectionModel(
+        collector_id=user['collector_id'],
+        name=request_data.name
+    ))
     return {"message": message, "success": success, "data": data}
 
 
 @router.delete("/{collection_id}")
-def delete_collections(collection_id: int):
+def delete_collections(collection_id: int, user: dict[str, Any] = Depends(get_current_user)):
+    retrieve(
+        tables=[CollectionModel],
+        single=True,
+        collection_id=collection_id,
+        collector_id=user['collector_id']
+    )
+    
     success, message = delete(
         table=CollectionModel.get_table_name(),
         collection_id=collection_id
@@ -85,10 +95,19 @@ def delete_collections(collection_id: int):
 
 
 @router.put("/{collection_id}")
-def update_collections(collection_id: int, request_data: CollectionModel):
+def update_collections(collection_id: int, request_data: CreateCollection, user: dict[str, Any] = Depends(get_current_user)):
+    retrieve(
+        tables=[CollectionModel],
+        single=True,
+        collection_id=collection_id,
+        collector_id=user['collector_id']
+    )
+    
     success, message, data = update(
         table=CollectionModel.get_table_name(),
-        model=request_data.to_dict(),
+        model={
+            'name': request_data.name
+        },
         identifier=CollectionModel.get_identifier(),
         collection_id=collection_id
     )

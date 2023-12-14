@@ -34,7 +34,8 @@ def get_from_table(
         except HTTPException as e:
             raise e
         except Exception as e:
-            print(e)
+            import traceback
+            traceback.print_exc()
             raise HTTPException(status_code=500, detail=str(e))
 
 

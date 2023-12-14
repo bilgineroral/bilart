@@ -34,7 +34,7 @@ class ArtCollectionTrigger(Trigger):
 
         -- Step 2: Create the Trigger
         CREATE TRIGGER art_collection_insert
-        BEFORE INSERT ON Art__Collection
+        BEFORE INSERT ON Art_MM_Collection
         FOR EACH ROW
         EXECUTE FUNCTION check_art_collector_match();
 
@@ -67,7 +67,7 @@ class ArtCollectionTrigger(Trigger):
 
         -- Step 2: Create the Trigger
         CREATE TRIGGER art_collection_delete
-        BEFORE DELETE ON Art__Collection
+        BEFORE DELETE ON Art_MM_Collection
         FOR EACH ROW
         EXECUTE FUNCTION check_art_collector_match_on_delete();
 

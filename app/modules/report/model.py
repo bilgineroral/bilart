@@ -4,6 +4,11 @@ from db.model import Model
 from modules.user.model import UserModel
 
 class ReportModel(Model):
+    content: str
+    entity_name: str
+    entity_id: int
+    user_id: int
+    
     @staticmethod
     def get_table_name() -> str:
         return "Report"
@@ -37,3 +42,7 @@ class ReportModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "report_id"
+    
+
+class CreateReport(Model):
+    content: str

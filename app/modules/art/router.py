@@ -1,12 +1,16 @@
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
+from modules.collection.model import CollectionModel
+from modules.tag__post.model import TagPostModel
+from modules.art__collection.model import ArtCollectionModel
+from  modules.favorite.model import FavoriteModel
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 from fastapi import File, Form, UploadFile
-from modules.art.model import ArtModel, CreateArt, UpdateArt, UpdateArt
+from modules.art.model import ArtModel, UpdateArt, UpdateArt
 from modules.post.model import PostModel
 from modules.user.auth import get_current_user
 import os
@@ -47,10 +51,19 @@ def get_arts(
     description: str | None = None,
     search__title: str | None = None,
     search__description: str | None = None,
-    collector_id: int | None = None
+    collector_id: int | None = None,
+    tag_name: str | None = None,
+    collection: int | None = None,
+    favoriting_collector: int | None = None
 ):
     filters = {
-        "tables": [ArtModel, PostModel],
+        "tables": [
+            ArtModel, 
+            PostModel, 
+            TagPostModel if tag_name else None,
+            ArtCollectionModel if collection else None,
+            FavoriteModel if favoriting_collector else None
+        ],
         "single": False,
         f"table__{ArtModel.get_table_name()}__content": content,
         f"table__{ArtModel.get_table_name()}__collector_id": collector_id,
@@ -60,6 +73,8 @@ def get_arts(
         f"table__{PostModel.get_table_name()}__search__title": search__title,
         f"table__{PostModel.get_table_name()}__description": description,
         f"table__{PostModel.get_table_name()}__search__description": search__description,
+        f"table__{TagPostModel.get_table_name()}__tag_name": tag_name,
+        f"table__{FavoriteModel.get_table_name()}__collector_id": favoriting_collector,
     }
 
     success, count, message, items = retrieve(**filters)
@@ -100,24 +115,24 @@ async def create_new_art( title: str = Form(...),
 
 
 @router.delete("/{art_id}")
-def delete_art(art_id: int):
+def delete_art(art_id: int, user: dict[str, Any] = Depends(get_current_user)):
     success, message = delete(
         table=ArtModel.get_table_name(),
-        art_id=art_id
+        art_id=art_id,
+        artist_id=user['artist_id']
     )
     return {"message": message, "success": success}
 
 
 @router.put("/{art_id}")
-def update_art(art_id: int, request_data: UpdateArt):
-    success, message, art = update(
-        table=ArtModel.get_table_name(),
-        model={
-            'content': request_data.content,
-        },
-        identifier=ArtModel.get_identifier(),
+def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depends(get_current_user)):
+    _, _, _, art = retrieve(
+        tables=[ArtModel],
+        single=True,
         art_id=art_id
     )
+    
+    art = art[0]
     
     success, message, post = update(
         table=PostModel.get_table_name(),
@@ -126,6 +141,16 @@ def update_art(art_id: int, request_data: UpdateArt):
             'description': request_data.description
         },
         identifier=PostModel.get_identifier(),
+        post_id=art['post_id'],
+        artist_id=user['artist_id']
+    )
+    
+    success, message, art = update(
+        table=ArtModel.get_table_name(),
+        model={
+            'content': request_data.content,
+        },
+        identifier=ArtModel.get_identifier(),
         art_id=art_id
     )
     

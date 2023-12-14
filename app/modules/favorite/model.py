@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 from db.model import Model
 
 from modules.collector.model import CollectorModel
@@ -43,4 +44,8 @@ class FavoriteModel(Model):
         
     @staticmethod
     def get_identifier() -> str:
-        return "favorite_pk"
+        return f"favorite_pk"
+    
+
+class CreateFavorite(BaseModel):
+    post_id: int

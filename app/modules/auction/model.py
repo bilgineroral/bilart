@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from db.model import Model
 from modules.art.model import ArtModel
@@ -22,6 +23,7 @@ class AuctionModel(Model):
                 end_time TIMESTAMPTZ NOT NULL,
                 active BOOLEAN NOT NULL DEFAULT True,
                 {ArtModel.get_identifier()} INT NOT NULL,
+                CONSTRAINT end_time_after_start_time CHECK (end_time > start_time),
                 CONSTRAINT fk_art
                     FOREIGN KEY({ArtModel.get_identifier()})
                         REFERENCES {ArtModel.get_table_name()}({ArtModel.get_identifier()})
@@ -41,3 +43,9 @@ class AuctionModel(Model):
     @staticmethod
     def get_identifier() -> str:
         return "auction_id"
+    
+
+class UpdateAuction(BaseModel):
+    start_time: str | None
+    end_time: str | None
+    active: bool | None

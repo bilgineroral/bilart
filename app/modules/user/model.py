@@ -62,5 +62,5 @@ class UpdateUser(BaseModel):
     phone: str | None = None
     bio: str | None = None
     link: str | None = None
-    privledge: str | None = None
+    privileges: str | None = None
     

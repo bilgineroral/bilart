@@ -54,18 +54,22 @@ def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_cur
             'link': request_data.link
         },
         identifier=ArtistModel.get_identifier(),
-        user_id=user['artist_id']
+        artist_id=user['artist_id']
     )
     
     success, message, admin = update(
         table=AdminModel.get_table_name(),
         model={
-            'privledge': request_data.privledge
+            'privileges': request_data.privileges
         },
         identifier=AdminModel.get_identifier(),
-        user_id=user['admin_id']
+        admin_id=user['admin_id']
     )
-    return {"message": message, "success": success, "data": dict(updated_user, **artist, **admin)}
+    
+    updated_user.update(artist)
+    updated_user.update(admin)
+
+    return {"message": message, "success": success, "data": updated_user}
 
 @router.get("/{user_id}")
 def get_user_id(

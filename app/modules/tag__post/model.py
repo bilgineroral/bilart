@@ -11,7 +11,7 @@ class TagPostModel(Model):
     
     @staticmethod
     def get_table_name() -> str:
-        return "Tag__Post"
+        return "Tag_MM_Post"
 
     @staticmethod
     def create_table() -> str:
