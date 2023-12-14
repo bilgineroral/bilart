@@ -1,5 +1,4 @@
 from typing import Type
-from db.trigger import TriggerProtocal
 from db.model import ModelProtocal
 
 from modules.admin.model import AdminModel
@@ -21,6 +20,9 @@ from modules.tutorial.model import TutorialModel
 from modules.user.model import UserModel
 
 from modules.user.trigger import UserTrigger
+from modules.bid.trigger import BidTrigger
+from modules.favorite.trigger import FavoriteTrigger
+from modules.rating.trigger import RatingTrigger
 
 models: list[Type[ModelProtocal]] = [
     AdminModel,
@@ -43,7 +45,10 @@ models: list[Type[ModelProtocal]] = [
 ]
 
 trigger_functions: list[str] = [
-    UserTrigger.create_trigger()
+    UserTrigger.create_trigger(),
+    BidTrigger.create_trigger(),
+    FavoriteTrigger.create_trigger(),
+    RatingTrigger.create_trigger()
 ]
 
 models.sort(key=lambda x: x.get_create_order())
