@@ -26,7 +26,7 @@ class ArtCollectionModel(Model):
                     FOREIGN KEY({CollectionModel.get_identifier()})
                         REFERENCES {CollectionModel.get_table_name()}({CollectionModel.get_identifier()})
                         ON DELETE CASCADE,
-                CONSTRAINT collection_art_pk PRIMARY KEY({CollectionModel.get_identifier()}, {ArtModel.get_identifier()})
+                CONSTRAINT collection_art_pk UNIQUE ({CollectionModel.get_identifier()}, {ArtModel.get_identifier()})
             );
             """
     

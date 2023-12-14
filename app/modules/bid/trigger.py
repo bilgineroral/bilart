@@ -42,6 +42,44 @@ class BidTrigger(Trigger):
         EXECUTE FUNCTION check_bid_price();
     
     
+        -- Step 1: Create the Trigger Function
+        CREATE OR REPLACE FUNCTION assign_art_and_close_auction()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            -- Check if someone is trying to set payment_done back to false
+            IF OLD.payment_done AND NOT NEW.payment_done THEN
+                RAISE EXCEPTION 'Cannot revert payment_done to false once it has been set to true.';
+            END IF;
+
+            -- Check if the payment_done field is updated to true
+            IF NEW.payment_done AND NOT OLD.payment_done THEN
+                -- Update the Art table, setting the collector_id to the collector who made the winning bid
+                UPDATE {ArtModel.get_table_name()}
+                SET {CollectorModel.get_identifier()} = NEW.{CollectorModel.get_identifier()}
+                FROM {AuctionModel.get_table_name()}
+                WHERE {ArtModel.get_table_name()}.{ArtModel.get_identifier()} = {AuctionModel.get_table_name()}.{ArtModel.get_identifier()} 
+                AND {AuctionModel.get_table_name()}.{AuctionModel.get_identifier()} = NEW.{AuctionModel.get_identifier()};
+
+                -- Update the Auction table, setting the active field to false
+                UPDATE {AuctionModel.get_table_name()}
+                SET active = FALSE
+                WHERE {AuctionModel.get_identifier()} = NEW.{AuctionModel.get_identifier()};
+            END IF;
+
+            -- Return the updated record
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        -- Step 2: Create the Trigger
+        CREATE TRIGGER bid_payment_update
+        AFTER UPDATE OF payment_done ON {BidModel.get_table_name()}
+        FOR EACH ROW
+        WHEN (NEW.payment_done IS DISTINCT FROM OLD.payment_done)
+        EXECUTE FUNCTION assign_art_and_close_auction();
+
+    
+    
         -- Step 1: Update the Trigger Function
         CREATE OR REPLACE FUNCTION bid_notifier()
         RETURNS TRIGGER AS $$

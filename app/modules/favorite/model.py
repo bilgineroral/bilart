@@ -26,7 +26,7 @@ class FavoriteModel(Model):
                     FOREIGN KEY({PostModel.get_identifier()})
                         REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
                         ON DELETE CASCADE,
-                CONSTRAINT favorite_pk PRIMARY KEY({CollectorModel.get_identifier()}, {PostModel.get_identifier()})
+                CONSTRAINT favorite_pk UNIQUE ({CollectorModel.get_identifier()}, {PostModel.get_identifier()})
             );
             """
     

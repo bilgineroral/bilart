@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from fastapi import Form, File, UploadFile
+from modules.collector.model import CollectorModel
 
 from db.model import Model
 from modules.post.model import PostModel
@@ -21,10 +22,15 @@ class ArtModel(Model):
                 {ArtModel.get_identifier()} SERIAL PRIMARY KEY,
                 content VARCHAR(255),
                 price DECIMAL NOT NULL,
-                {PostModel.get_identifier()} INT NOT NULL,
+                {CollectorModel.get_identifier()} INT,
+                {PostModel.get_identifier()} INT NOT NULL UNIQUE,
                 CONSTRAINT fk_post
                     FOREIGN KEY({PostModel.get_identifier()})
                         REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
+                        ON DELETE CASCADE,
+                CONSTRAINT fk_collector
+                    FOREIGN KEY({CollectorModel.get_identifier()})
+                        REFERENCES {CollectorModel.get_table_name()}({CollectorModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """

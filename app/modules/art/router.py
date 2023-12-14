@@ -47,11 +47,13 @@ def get_arts(
     description: str | None = None,
     search__title: str | None = None,
     search__description: str | None = None,
+    collector_id: int | None = None
 ):
     filters = {
         "tables": [ArtModel, PostModel],
         "single": False,
         f"table__{ArtModel.get_table_name()}__content": content,
+        f"table__{ArtModel.get_table_name()}__collector_id": collector_id,
         f"table__{PostModel.get_table_name()}__created_at": created_at,
         f"table__{PostModel.get_table_name()}__artist_id": artist_id,
         f"table__{PostModel.get_table_name()}__title": title,

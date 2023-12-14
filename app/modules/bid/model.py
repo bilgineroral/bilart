@@ -19,7 +19,7 @@ class BidModel(Model):
         return f"""
             CREATE TABLE {BidModel.get_table_name()} (
                 {BidModel.get_identifier()} SERIAL PRIMARY KEY,
-                price DECIMAL NOT NULL,
+                price DECIMAL NOT NULL CHECK (price > 0),
                 {AuctionModel.get_identifier()} INT NOT NULL,
                 {CollectorModel.get_identifier()} INT NOT NULL,
                 created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,

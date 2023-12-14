@@ -15,7 +15,7 @@ class CollectorModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {CollectorModel.get_table_name()} (
-                collector_id SERIAL PRIMARY KEY,
+                {CollectorModel.get_identifier()} SERIAL PRIMARY KEY,
                 {UserModel.get_identifier()} INT UNIQUE NOT NULL,
                 rank INT NOT NULL DEFAULT 0,
                 FOREIGN KEY ({UserModel.get_identifier()}) REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})

@@ -16,12 +16,12 @@ class TutorialModel(Model):
     def create_table() -> str:
         return f"""
             CREATE TABLE {TutorialModel.get_table_name()} (
-                art_id SERIAL PRIMARY KEY,
+                {TutorialModel.get_identifier()} SERIAL PRIMARY KEY,
                 media VARCHAR(255),
-                post_id INT NOT NULL,
+                {PostModel.get_identifier()} INT NOT NULL UNIQUE,
                 CONSTRAINT fk_post
-                    FOREIGN KEY(post_id)
-                        REFERENCES {PostModel.get_table_name()}(post_id)
+                    FOREIGN KEY({PostModel.get_identifier()})
+                        REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
                         ON DELETE CASCADE
             );
             """
@@ -34,6 +34,10 @@ class TutorialModel(Model):
     @staticmethod
     def get_create_order() -> int:
         return 8
+    
+    @staticmethod
+    def get_identifier() -> str:
+        return "tutorial_id"
     
     
 class UpdateTutorial(BaseModel):

@@ -16,7 +16,7 @@ class AdminModel(Model):
         return f"""
             CREATE TABLE {AdminModel.get_table_name()} (
                 {AdminModel.get_identifier()} SERIAL PRIMARY KEY,
-                privileges VARCHAR(1),
+                privileges VARCHAR(1) NOT NULL DEFAULT 'N' CHECK (privileges IN ('N', 'M', 'A')),
                 {UserModel.get_identifier()} INT UNIQUE NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES {UserModel.get_table_name()}({UserModel.get_identifier()})
             );

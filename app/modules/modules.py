@@ -23,6 +23,9 @@ from modules.user.trigger import UserTrigger
 from modules.bid.trigger import BidTrigger
 from modules.favorite.trigger import FavoriteTrigger
 from modules.rating.trigger import RatingTrigger
+from modules.auction.trigger import AuctionTrigger
+from modules.art__collection.trigger import ArtCollectionTrigger
+from modules.report.trigger import ReportTrigger
 
 models: list[Type[ModelProtocal]] = [
     AdminModel,
@@ -48,7 +51,10 @@ trigger_functions: list[str] = [
     UserTrigger.create_trigger(),
     BidTrigger.create_trigger(),
     FavoriteTrigger.create_trigger(),
-    RatingTrigger.create_trigger()
+    RatingTrigger.create_trigger(),
+    AuctionTrigger.create_trigger(),
+    ArtCollectionTrigger.create_trigger(),
+    ReportTrigger.create_trigger()
 ]
 
 models.sort(key=lambda x: x.get_create_order())

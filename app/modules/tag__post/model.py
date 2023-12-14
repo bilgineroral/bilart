@@ -20,7 +20,7 @@ class TagPostModel(Model):
                 {TagModel.get_identifier()} VARCHAR(255) REFERENCES {TagModel.get_table_name()}(tag_name),
                 {PostModel.get_identifier()} SERIAL REFERENCES {PostModel.get_table_name()}(post_id),
                 CONSTRAINT {TagPostModel.get_identifier()} 
-                    PRIMARY KEY({TagModel.get_identifier()}, {PostModel.get_identifier()})
+                    UNIQUE ({TagModel.get_identifier()}, {PostModel.get_identifier()})
             );
             """
 
