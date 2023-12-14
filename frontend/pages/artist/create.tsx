@@ -34,7 +34,9 @@ export default function CreateArt() {
   const router = useRouter();
   const {edit} = router.query;
 
-
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState('');
+  const [price, setPrice] = React.useState(0);
   const [tags, setTags] = React.useState(["tag one", "tag two", "tag three"]);
 
   const [imgBlob, setImgBlob] = React.useState<Blob | null>(null);  
@@ -54,9 +56,9 @@ export default function CreateArt() {
         const auth = Buffer.from(`${user?.username}:${user?.password_hash}`).toString('base64');
         const formData = new FormData();
         formData.append("image", imgBlob);
-        formData.append("title", "name");
-        formData.append("description", "desssss");
-        formData.append("price", "2");
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("price", price.toString());
         const res = await fetch("http://localhost:8000/arts", {
           method : "POST",
           headers: {
@@ -122,6 +124,8 @@ export default function CreateArt() {
           placeholder="Enter Art Title"
           fullWidth={true}
           required
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <TextField 
           size="small"
@@ -131,6 +135,9 @@ export default function CreateArt() {
           multiline={true}
           minRows={3}
           required
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+
         />
         <TextField 
           size="small"
@@ -139,6 +146,9 @@ export default function CreateArt() {
           fullWidth={true}
           type="number"
           required
+          value={price}
+          onChange={(e) => setPrice(+(e.target.value))}
+
         />
         <Autocomplete 
           options={tags}

@@ -12,7 +12,8 @@ export type Art = {
   content: string;
   created_at: string;
   description: string;
-  post_id: 5;
+  post_id: number;
+  price: number;
   title: string;
 }
 
