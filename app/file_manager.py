@@ -11,10 +11,10 @@ class FileManager:
         if filename is None: 
             return None
         # test.png >> ["test", "png"] >> return "png"
-        extension = filename.split(".")[1]
+        extension = filename.split(".")[-1]
 
         if extension not in ["png", "jpg", "jpeg"]:
-            raise ValueError("Invalid file extension")
+            raise ValueError(f"Invalid file extension {extension}")
         
         try:
             token = secrets.token_hex(10) + "." + extension

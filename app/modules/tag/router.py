@@ -60,15 +60,3 @@ def delete_tags(name: str,
     return {"message": message, "success": success}
 
 
-@router.put("/{name}")
-def update_tags(name: str, request_data: TagModel,
-                user: dict[str, Any] = Depends(get_current_user)):
-    if user['privileges'] == 'N':
-        raise HTTPException(status_code=401, detail="Not authorized")
-    success, message, data = update(
-        table=TagModel.get_table_name(),
-        model=request_data.to_dict(),
-        tag_name=name,
-        identifier=TagModel.get_identifier()
-    )
-    return {"message": message, "success": success, "data": data}

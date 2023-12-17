@@ -3,8 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from modules.user.auth import get_current_user
 
 from db.retrieve import retrieve
+from db.insert import insert
 
-from modules.report.model import ReportModel
+from modules.report.model import ReportModel, CreateReport
 
 router = APIRouter(prefix="/reports", tags=['reports'])
 
@@ -51,3 +52,14 @@ def get_reports(
 
     return {"data": items, "success": success, "message": message, "count": count}
 
+
+@router.post("/")
+def create_report(report: CreateReport,
+    user: dict[str, Any] = Depends(get_current_user)):
+    success, message, data = insert(ReportModel(
+        content=report.content,
+        entity_name=report.entity_name,
+        entity_id=report.entity_id,
+        user_id=user['user_id']
+    ))
+    return {"message": message, "success": success, "data": data}

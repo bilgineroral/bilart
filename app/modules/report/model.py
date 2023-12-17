@@ -45,4 +45,6 @@ class ReportModel(Model):
     
 
 class CreateReport(Model):
+    entity_name: str
+    entity_id: int
     content: str
