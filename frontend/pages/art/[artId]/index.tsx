@@ -39,12 +39,13 @@ export default function ArtPage() {
   const [comments, setComments] = React.useState<Rating[]>([]);
 
   React.useEffect(() => {
-    const fetchArtInfo = async () => {
+    const fetchArtInfo = async (): Promise<Art | null> => {
       try {
         const data = await getArt(Number(artId));
         console.log(data);
         if ("data" in data) {
           setArtInfo(data.data);
+          return data.data;
         } else {
           snackbar("error", "failed to fetched");
         }
@@ -52,11 +53,12 @@ export default function ArtPage() {
         console.log(err);
         snackbar("error", "failed to fetched");
       }
+      return null;
     };
 
-    const fetchAuctions = async () => {
+    const fetchAuctions = async (art: Art) => {
       try {
-        const data = await getAuctions({ art_id: Number(artId) });
+        const data = await getAuctions({ art_id: Number(art.art_id) });
         console.log(data);
         if ("data" in data && data.data != null) {
           setAuctions(data.data);
@@ -68,11 +70,11 @@ export default function ArtPage() {
         snackbar("error", "failed to fetched");
       }
     };
-    const fetchTags = async () => {
+    const fetchTags = async (art: Art) => {
       try {
         if (artInfo?.post_id == null) return;
-        
-        const data = await getTags({ post_id: artInfo?.post_id });
+
+        const data = await getTags({ post_id: art.post_id });
         console.log(data);
         if ("data" in data && data.data != null) {
           setTags(data.data);
@@ -85,9 +87,9 @@ export default function ArtPage() {
       }
     };
 
-    const fetchComments = async () => {
+    const fetchComments = async (art: Art) => {
       try {
-        const data = await getRatings({ post_id: artInfo?.post_id });
+        const data = await getRatings({ post_id: art.post_id });
         console.log(data);
         if ("data" in data && data.data != null) {
           setComments(data.data);
@@ -101,10 +103,12 @@ export default function ArtPage() {
     };
 
     const fetch = async () => {
-      await fetchArtInfo();
-      await fetchAuctions();
-      await fetchTags();
-      await fetchComments();
+      const art = await fetchArtInfo();
+      if (art != null) {
+        fetchAuctions(art);
+        fetchTags(art);
+        fetchComments(art);
+      }
     };
 
     fetch();
@@ -115,11 +119,14 @@ export default function ArtPage() {
     const date = new Date(timestamp);
 
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
-    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+    const day = date.getDate().toString().padStart(2, "0");
 
     return `${year}/${month}/${day}`;
-}
+  };
+  console.log(
+    `art index photo url:   http://localhost:8000/${artInfo?.content}`
+  );
 
   return (
     <Stack direction="column" gap={2} sx={{ height: "100%" }}>
@@ -127,17 +134,12 @@ export default function ArtPage() {
         <Grid item xs={4}>
           <Box
             sx={{
-              width: "100%",
-              aspectRatio: "1/1",
+              //width: "100%",
+              //aspectRatio: "1/1",
               backgroundColor: theme.palette.primary.main,
             }}
           >
-            <Image
-              alt="art piece image"
-              width={200}
-              height={200}
-              src={`http://localhost:8000/${artInfo?.content}`}
-            />
+            <img src={`http://localhost:8000/${artInfo?.content}`} />
           </Box>
         </Grid>
         <Grid item xs={7.5}>
@@ -239,49 +241,51 @@ export async function getStaticProps() {
   };
 }
 
-
 type RatingsProps = {
   ratings: Rating[];
 };
 
 const Ratings: React.FC<RatingsProps> = ({ ratings }) => {
   return (
-      <div style={{  padding: '20px', borderRadius: '10px' }}>
-          {ratings.map((rating) => (
-              <div key={rating.rating_id} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  background: 'white', 
-                  padding: '10px', 
-                  margin: '10px 0', 
-                  borderRadius: '5px', 
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' 
-              }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {rating.profile_image && (
-                          <img 
-                              src={rating.profile_image} 
-                              alt={`${rating.username}'s profile`} 
-                              style={{ 
-                                  width: '40px', 
-                                  height: '40px', 
-                                  borderRadius: '50%', 
-                                  marginRight: '15px' 
-                              }} 
-                          />
-                      )}
-                      <div>
-                          <div style={{ fontWeight: 'bold' }}>{rating.username}</div>
-                          <div style={{ color: '#999' }}>{rating.comment}</div>
-                      </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                      {'★'.repeat(rating.score)}
-                      {'☆'.repeat(5 - rating.score)}
-                  </div>
-              </div>
-          ))}
-      </div>
+    <div style={{ padding: "20px", borderRadius: "10px" }}>
+      {ratings.map((rating) => (
+        <div
+          key={rating.rating_id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "white",
+            padding: "10px",
+            margin: "10px 0",
+            borderRadius: "5px",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {rating.profile_image && (
+              <img
+                src={rating.profile_image}
+                alt={`${rating.username}'s profile`}
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  marginRight: "15px",
+                }}
+              />
+            )}
+            <div>
+              <div style={{ fontWeight: "bold" }}>{rating.username}</div>
+              <div style={{ color: "#999" }}>{rating.comment}</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {"★".repeat(rating.score)}
+            {"☆".repeat(5 - rating.score)}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
