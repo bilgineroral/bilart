@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Any
 from fastapi import APIRouter, Depends
 from db.tables import JoinModel
@@ -32,6 +33,23 @@ def get_bid(
     return {"data": items[0], "success": success, "message": message}
 
 
+class PriceOrder(Enum):
+    asc = "asc"
+    desc = f"desc"
+    
+    @staticmethod
+    def get_asc():
+        return f"{BidModel.get_table_name()}.price ASC"
+    
+    @staticmethod
+    def get_desc():
+        return f"{BidModel.get_table_name()}.price DESC"
+    
+    @staticmethod
+    def get_val(val: str):
+        return PriceOrder.get_desc() if val == "desc" else PriceOrder.get_asc()
+
+
 @router.get("/")
 def get_bids(
     bid_id: int | None = None,
@@ -41,7 +59,8 @@ def get_bids(
     auction_id: int | None = None,
     collector_id: int | None = None,
     payment_done: bool | None = None,
-    created_at: str | None = None
+    created_at: str | None = None,
+    price_order: PriceOrder | None = PriceOrder.asc
 ):
     filters = {
         'join_tables': [
@@ -59,9 +78,9 @@ def get_bids(
         f'table__{BidModel.get_table_name()}__payment_done':payment_done,
         f'table__{BidModel.get_table_name()}__created_at':created_at
     }
-    success, count, message, items = retrieve(
-        **filters
-    )
+    success, count, message, items = retrieve(**filters, order_by=[
+        price_order.get_val(price_order.value) if price_order else None
+    ])
 
     return {"data": items, "success": success, "message": message, "count": count}
 

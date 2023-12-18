@@ -13,6 +13,7 @@ type BidQueryParams = {
   collector_id?: number;
   payment_done?: boolean;
   created_at?: string;
+  price_order?: "asc" | "desc";
 };
 
 export const getBids = async (

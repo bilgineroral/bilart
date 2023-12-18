@@ -63,7 +63,7 @@ const AuctionPage: React.FC = () => {
   };
   const fetchBids = async (auction: Auction) => {
     try {
-      const data = await getBids({ auction_id: auction.auction_id });
+      const data = await getBids({ auction_id: auction.auction_id, price_order: 'desc' });
       console.log(data);
       if (data.success && data.data != null) {
         setBids(data.data);
@@ -209,7 +209,7 @@ type BidsProps = {
 const Bids: React.FC<BidsProps> = ({ bids, onAcceptBid }) => {
   return (
     <div style={{ padding: "20px", borderRadius: "10px" }}>
-      {bids.map((bid) => (
+      {bids.map((bid, index) => (
         <div
           key={bid.bid_id}
           style={{
@@ -254,7 +254,11 @@ const Bids: React.FC<BidsProps> = ({ bids, onAcceptBid }) => {
             }}
           >
             Offering Price: TL {bid.price}
+            {
+                (index == 0 && (<Chip label={"Highest"} style={{marginLeft: "10px"}}></Chip>))
+            }
           </span>
+
 
           <BidCheckmark bid={bid} onAcceptBid={onAcceptBid} />
         </div>
