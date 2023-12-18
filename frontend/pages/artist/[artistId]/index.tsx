@@ -1,5 +1,5 @@
 import { getArts } from "@/api/art";
-import { getMe } from "@/api/user";
+import { getMe, getUserById, getUsers } from "@/api/user";
 import { ArtCard, CreateArtButton } from "@/components/artist";
 import { GalleryView } from "@/components/shared/GalleryView";
 import { useSnackbar } from "@/store/snackbar";
@@ -7,6 +7,7 @@ import { userAtom } from "@/store/user";
 import { Grid } from "@mui/material";
 import { useAtom } from "jotai";
 import * as React from "react";
+import { useRouter } from 'next/router';
 /* 
 export type Art = {
   art_id : number;
@@ -20,16 +21,20 @@ export type Art = {
 } */
 
 
-export default function ArtistHomePage() {
+export default function ArtistPage() {
 
   const snackbar = useSnackbar();
   const [arts, setArt] = React.useState<Art[]>([]);
+  const router = useRouter();
+  const { artistId } = router.query;
 
   React.useEffect(() => {
-    const fetchArts = async() => {
+    const fetchArts = async () => {
       try {
-        const me = await getMe();
-        const data = await getArts({artist_id: me.data?.artist_id});
+        const id = Number(artistId);
+        if (isNaN(id)) { return; }
+        console.log(artistId);
+        const data = await getArts({ artist_id: id });
         console.log(data);
         if (data.success && data.data != null) {
           setArt(data.data);
@@ -40,14 +45,18 @@ export default function ArtistHomePage() {
         console.log(err);
       }
     };
-
-    fetchArts();
-  }, []);
-
+    if (artistId) {
+      fetchArts();
+    }
+    
+  }, [artistId]);
+  
+  console.log("id: " + artistId);
+  
   const ArtCards = React.useMemo(() => {
     const artcards = arts.map((art, index) => {
       return (
-        <ArtCard 
+        <ArtCard
           key={index}
           artId={art.art_id}
           title={art.title ?? ""}
@@ -76,10 +85,21 @@ export default function ArtistHomePage() {
   )
 }
 
-export async function getStaticProps()  {
+export async function getStaticProps() {
   return {
-    props : {
-      navbar : true
+    props: {
+      navbar: true
     }
   }
+}
+
+export async function getStaticPaths() {
+  // Replace this with your code to fetch artist IDs
+  /* const users = await getUsers({}); // Pass an empty object as the argument
+  console.log(users.data);
+  const paths = users?.data?.map((user) => ({
+    params: { id: user.artist_id.toString() },
+  })); */
+
+  return { paths: [], fallback: true };
 }

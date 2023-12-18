@@ -145,13 +145,4 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
         artist_id=user['artist_id']
     )
     
-    success, message, art = update(
-        table=ArtModel.get_table_name(),
-        model={
-            'content': request_data.content,
-        },
-        identifier=ArtModel.get_identifier(),
-        art_id=art_id
-    )
-    
     return {"message": message, "success": success, "data": dict(post, **art)}
