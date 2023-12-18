@@ -20,7 +20,7 @@ router = APIRouter(prefix="/users", tags=['users'])
 def get_me(
     user: dict[str, Any] = Depends(get_current_user)
 ):
-    return user
+    return {"message": "your current profile", "success": True, "data": user}
 
 @router.delete("/me")
 def delete_user(user: dict[str, Any] = Depends(get_current_user)):

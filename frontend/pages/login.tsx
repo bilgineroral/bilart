@@ -21,6 +21,7 @@ import { accountTypeAtom } from "@/store/accounttype";
 import { userAtom } from "@/store/user";
 import { Co2Sharp } from "@mui/icons-material";
 import { flushSync } from "react-dom";
+import { login } from "@/api/user";
 
 const LoginStack = styled(Stack)(({theme}) => ({
   background : theme.palette.primary.main,
@@ -68,24 +69,27 @@ export default function LoginPage() {
   const handleArtistLogin = async () => {
       flushSync(() => setLoggingIn(true));
       try {
-        const auth = Buffer.from(`${username}:${password}`).toString('base64');
+        /* const auth = Buffer.from(`${username}:${password}`).toString('base64');
         const res = await fetch(`http://localhost:8000/users/me`, {
           method : 'GET',
           headers: {
             "Authorization" : `Basic ${auth}`
           }
-        })
-        const data = await res.json();
+        }) */
+        const data = await login(username, password);
+        //const data = await res.json();
         console.log(data);
-        if ("user_id" in data) {
-          setUser(data);
-          localStorage.setItem('bilart-me', JSON.stringify(data));
+        
+        if (data.data != null && "user_id" in data.data) {
+          setUser(data.data);
+          localStorage.setItem('bilart-me', JSON.stringify(data.data));
           setAccountType("artist");   
           router.replace("/artist");    
         } else {
           snackbar("error", "unauthorized");
         }
       } catch (err) {
+        console.log(err);
         snackbar("error", "an error occured");
       } finally {
         setLoggingIn(false);

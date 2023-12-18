@@ -1,3 +1,5 @@
+import { getArts } from "@/api/art";
+import { getMe } from "@/api/user";
 import { ArtCard, CreateArtButton } from "@/components/artist";
 import { GalleryView } from "@/components/shared/GalleryView";
 import { useSnackbar } from "@/store/snackbar";
@@ -5,7 +7,7 @@ import { userAtom } from "@/store/user";
 import { Grid } from "@mui/material";
 import { useAtom } from "jotai";
 import * as React from "react";
-
+/* 
 export type Art = {
   art_id : number;
   artist_id : number;
@@ -15,7 +17,7 @@ export type Art = {
   post_id: number;
   price: number;
   title: string;
-}
+} */
 
 
 export default function ArtistHomePage() {
@@ -26,18 +28,10 @@ export default function ArtistHomePage() {
   React.useEffect(() => {
     const fetchArts = async() => {
       try {
-        // @ts-ignore
-        const user = JSON.parse(localStorage.getItem('bilart-me'));
-        const auth = Buffer.from(`${user?.username}:${user?.password_hash}`).toString("base64");
-        const res = await fetch(`http://localhost:8000/arts/?artist_id=${user?.artist_id}`, {
-            method : "GET",
-            headers: {
-              "Authorization": `Basic ${auth}`
-            }
-        })
-        const data = await res.json();
+        const me = await getMe();
+        const data = await getArts({artist_id: me.data?.artist_id});
         console.log(data);
-        if (data.hasOwnProperty("success") && data.success) {
+        if (data.success && data.data != null) {
           setArt(data.data);
         } else {
           snackbar("error", "unknown error occured");
@@ -56,9 +50,9 @@ export default function ArtistHomePage() {
         <ArtCard 
           key={index}
           artId={art.art_id}
-          title={art.title}
-          content={art.content}
-          description={art.description}
+          title={art.title ?? ""}
+          content={art.content ?? ""}
+          description={art.description ?? ""}
         />
       )
     });

@@ -1,7 +1,7 @@
-import {get, post, put, deleteItem, toQueryString} from "./crude.js";
+import {get, post, put, deleteItem, toQueryString} from "./crude";
 
-export const getAuction = async (auctionId: number): Promise<Auction> => {
-    return get<Auction>(`https://your-api-url.com/auctions/${auctionId}`);
+export const getAuction = async (auctionId: number): Promise<ApiReuslt<Auction>> => {
+    return get<Auction>(`http://localhost:8000/auctions/${auctionId}`);
 };
 
 type AuctionQueryParams = {
@@ -15,9 +15,9 @@ type AuctionQueryParams = {
     art_id?: number;
 };
 
-export const getAuctions = async (params: AuctionQueryParams): Promise<Auction[]> => {
+export const getAuctions = async (params: AuctionQueryParams): Promise<ApiReuslt<Auction[]>> => {
     const queryString = toQueryString(params);
-    return get<Auction[]>(`https://your-api-url.com/auctions?${queryString}`);
+    return get<Auction[]>(`http://localhost:8000/auctions?${queryString}`);
 };
 
 
@@ -28,8 +28,8 @@ type NewAuctionData = {
     art_id: number;
 };
 
-export const createNewAuction = async (data: NewAuctionData): Promise<Auction> => {
-    return post<NewAuctionData, Auction>(`https://your-api-url.com/auctions`, data);
+export const createNewAuction = async (data: NewAuctionData): Promise<ApiReuslt<Auction>> => {
+    return post<NewAuctionData, Auction>(`http://localhost:8000/auctions`, data);
 };
 
 
@@ -39,12 +39,12 @@ type UpdateAuctionData = {
     active?: boolean;
 };
 
-export const updateAuction = async (auctionId: number, data: UpdateAuctionData): Promise<Auction> => {
-    return put<UpdateAuctionData, Auction>(`https://your-api-url.com/auctions/${auctionId}`, data);
+export const updateAuction = async (auctionId: number, data: UpdateAuctionData): Promise<ApiReuslt<Auction>> => {
+    return put<UpdateAuctionData, Auction>(`http://localhost:8000/auctions/${auctionId}`, data);
 };
 
-export const deleteAuction = async (auctionId: number): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/auctions/${auctionId}`, null);
+export const deleteAuction = async (auctionId: number): Promise<ApiReuslt<null>> => {
+    return await deleteItem(`http://localhost:8000/auctions/${auctionId}`, null);
 };
 
 

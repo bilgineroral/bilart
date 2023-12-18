@@ -1,12 +1,21 @@
-import {get, post, put, deleteItem, toQueryString} from "./crude.js";
+import {get, post, put, deleteItem, toQueryString, setCredentials, cleanCredentials} from "./crude";
 
-export const getMe = async (): Promise<User> => {
-    return get<User>(`https://your-api-url.com/users/me`);
+export const getMe = async (): Promise<ApiReuslt<User>> => {
+    return get<User>(`http://localhost:8000/users/me`);
 };
 
 
-export const deleteUser = async (): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/users/me`, null);
+export const login = async (username: string, password: string): Promise<ApiReuslt<User>> => {
+    setCredentials(username, password);
+    const result = await getMe();
+    if (result.data == null) {
+        cleanCredentials();
+    }
+    return result;
+}
+
+export const deleteUser = async (): Promise<ApiReuslt<null>> => {
+   return await deleteItem(`http://localhost:8000/users/me`, null);
 };
 
 type UpdateUserData = {
@@ -22,18 +31,18 @@ type UpdateUserData = {
 };
 
 
-export const updateUser = async (data: UpdateUserData): Promise<User> => {
-    return put<UpdateUserData, User>(`https://your-api-url.com/users/me`, data);
+export const updateUser = async (data: UpdateUserData): Promise<ApiReuslt<User>> => {
+    return put<UpdateUserData, User>(`http://localhost:8000/users/me`, data);
 };
 
 
-export const getUserById = async (user_id: number): Promise<User> => {
-    return get<User>(`https://your-api-url.com/users/${user_id}`);
+export const getUserById = async (user_id: number): Promise<ApiReuslt<User>> => {
+    return get<User>(`http://localhost:8000/users/${user_id}`);
 };
 
 
-export const getUserByUsername = async (username: string): Promise<User> => {
-    return get<User>(`https://your-api-url.com/users/${encodeURIComponent(username)}`);
+export const getUserByUsername = async (username: string): Promise<ApiReuslt<User>> => {
+    return get<User>(`http://localhost:8000/users/${encodeURIComponent(username)}`);
 };
 
 
@@ -54,12 +63,12 @@ type UserQueryParams = {
     created_at?: string;
 };
 
-export const getUsers = async (params: UserQueryParams): Promise<User[]> => {
+export const getUsers = async (params: UserQueryParams): Promise<ApiReuslt<User[]>> => {
     const queryString = toQueryString(params);
-    return get<User[]>(`https://your-api-url.com/users?${queryString}`);
+    return get<User[]>(`http://localhost:8000/users?${queryString}`);
 };
 
 
-export const createNewUser = async (data: User): Promise<User> => {
-    return post<User, User>(`https://your-api-url.com/users/register`, data);
+export const createNewUser = async (data: User): Promise<ApiReuslt<User>> => {
+    return post<User, User>(`http://localhost:8000/users/register`, data);
 };

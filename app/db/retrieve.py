@@ -11,12 +11,13 @@ def get_from_table(
     tables: str, 
     where_clasue: str, 
     order_by_clasue: str, 
+    select_function: str = "SELECT * FROM",
     single: bool = False
 ) -> Tuple[bool, int, str, list[dict]]:
     
     where = "" if len(where_clasue) == 0 else f"WHERE {where_clasue}"
     order_by = "" if len(order_by_clasue) == 0 else f"ORDER BY {order_by_clasue}"
-    query = f'SELECT * FROM {tables} {where} {order_by};'
+    query = f'{select_function} {tables} {where} {order_by};'
     print(query)
     with PgDatabase() as db:
         try:

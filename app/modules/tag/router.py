@@ -1,6 +1,9 @@
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
+
+from modules.post.model import PostModel
 from modules.user.auth import get_current_user
+from modules.tag__post.model import TagPostModel
 
 from db.delete import delete
 from db.update import update
@@ -29,11 +32,17 @@ def get_tag(
 @router.get("/")
 def get_tags(
     search__tag_name: str | None = None,
+    post_id: int | None = None
 ):
+    filters = {
+        'tables': [TagModel, TagPostModel, PostModel],
+        'single': False,
+        f'table__{TagModel.get_table_name()}__search__tag_name': search__tag_name,
+        f'table__{PostModel.get_table_name()}__post_id': post_id,
+    }
+
     success, count, message, items = retrieve(
-        tables=[TagModel],
-        single=False,
-        search__tag_name=search__tag_name
+        **filters
     )
 
     return {"data": items, "success": success, "message": message, "count": count}
@@ -58,5 +67,3 @@ def delete_tags(name: str,
         tag_name=name
     )
     return {"message": message, "success": success}
-
-

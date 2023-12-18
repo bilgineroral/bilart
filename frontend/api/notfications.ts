@@ -1,10 +1,10 @@
-import {get, post} from "./crude.js";
+import {get, post} from "./crude";
 
-export const getNotifications = async (): Promise<Notification[]> => {
-    return get<Notification[]>(`https://your-api-url.com/notifications`);
+export const getNotifications = async (): Promise<ApiReuslt<Notification[]>> => {
+    return get<Notification[]>(`http://localhost:8000/notifications`);
 };
 
 
-export const readNotifications = async (): Promise<void> => {
-    await post<null, void>(`https://your-api-url.com/notifications`, null);
+export const readNotifications = async (): Promise<ApiReuslt<Notification[]>> => {
+    return await post<null, Notification[]>(`http://localhost:8000/notifications`, null);
 };

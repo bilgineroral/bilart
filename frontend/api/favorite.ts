@@ -1,14 +1,20 @@
-import {post, deleteItem} from "./crude.js";
+import { post, deleteItem } from "./crude";
 
 type CreateFavoriteData = {
-    post_id: number;
+  post_id: number;
 };
 
-export const favorite = async (data: CreateFavoriteData): Promise<void> => {
-    await post<CreateFavoriteData, void>(`https://your-api-url.com/favorite`, data);
+export const favorite = async (
+  data: CreateFavoriteData
+): Promise<ApiReuslt<CreateFavoriteData>> => {
+  return await post<CreateFavoriteData, CreateFavoriteData>(
+    `http://localhost:8000/favorite`,
+    data
+  );
 };
 
-
-export const unFavorite = async (data: CreateFavoriteData): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/favorite`, data);
+export const unFavorite = async (
+  data: CreateFavoriteData
+): Promise<ApiReuslt<CreateFavoriteData>> => {
+  return await deleteItem(`http://localhost:8000/favorite`, data);
 };

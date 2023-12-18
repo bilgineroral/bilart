@@ -1,7 +1,7 @@
-import {get, postFormData, put, deleteItem, toQueryString} from "./crude.js";
+import {get, postFormData, put, deleteItem, toQueryString} from "./crude";
 
-export const getArt = async (artId: number): Promise<Art> => {
-    return get<Art>(`https://your-api-url.com/art/${artId}`);
+export const getArt = async (artId: number): Promise<ApiReuslt<Art>> => {
+    return get<Art>(`http://localhost:8000/arts/${artId}`);
 };
 
 export type ArtQueryParams = {
@@ -18,9 +18,9 @@ export type ArtQueryParams = {
     favoriting_collector?: number;
 };
 
-export const getArts = async (params: ArtQueryParams): Promise<Art[]> => {
+export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
     const queryString = toQueryString(params);
-    return get<Art[]>(`https://your-api-url.com/art?${queryString}`);
+    return get<Art[]>(`http://localhost:8000/arts?${queryString}`);
 };
 
 export type NewArtData = {
@@ -30,7 +30,7 @@ export type NewArtData = {
     image: Blob; // Handle file data appropriately
 };
 
-export const createNewArt = async (data: NewArtData): Promise<Art> => {
+export const createNewArt = async (data: NewArtData): Promise<ApiReuslt<Art>> => {
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
@@ -39,7 +39,7 @@ export const createNewArt = async (data: NewArtData): Promise<Art> => {
 
     // Add any other fields to formData as needed
 
-    return await postFormData<Art>(`https://your-api-url.com/art`, formData);
+    return await postFormData<Art>(`http://localhost:8000/arts`, formData);
 };
 
 type UpdateArtData = {
@@ -49,13 +49,13 @@ type UpdateArtData = {
 };
 
 
-export const updateArt = async (artId: number, data: UpdateArtData): Promise<Art> => {
-    return put<UpdateArtData, Art>(`https://your-api-url.com/art/${artId}`, data);
+export const updateArt = async (artId: number, data: UpdateArtData): Promise<ApiReuslt<Art>> => {
+    return put<UpdateArtData, Art>(`http://localhost:8000/arts/${artId}`, data);
 };
 
 
-export const deleteArt = async (artId: number): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/art/${artId}`, null);
+export const deleteArt = async (artId: number): Promise<ApiReuslt<null>> => {
+    return await deleteItem(`http://localhost:8000/arts/${artId}`, null);
 };
 
 

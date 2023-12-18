@@ -1,7 +1,7 @@
 import * as React from "react";
 import {atom} from "jotai";
 
-export type User = {
+/* export type User = {
   admin_id: number;
   artist_id: number;
   bio: string;
@@ -20,6 +20,6 @@ export type User = {
   user_id: number;
   username: string;
 }
-
+ */
 
 export const userAtom = atom<User|null>(null);

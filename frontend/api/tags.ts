@@ -1,45 +1,54 @@
-import {get, post, put, deleteItem, toQueryString} from "./crude.js";
+import { get, post, put, deleteItem, toQueryString } from "./crude";
 
 type CreateTagData = {
-    tag_name: string;
+  tag_name: string;
 };
 
-export const getTag = async (tag_name: string): Promise<Tag> => {
-    return get<Tag>(`https://your-api-url.com/tags/${encodeURIComponent(tag_name)}`);
+export const getTag = async (tag_name: string): Promise<ApiReuslt<Tag>> => {
+  return get<Tag>(
+    `http://localhost:8000/tags/${encodeURIComponent(tag_name)}`
+  );
 };
-
 
 type TagQueryParams = {
-    search__tag_name?: string;
+  search__tag_name?: string;
+  post_id?: number;
 };
 
-export const getTags = async (params: TagQueryParams): Promise<Tag[]> => {
-    const queryString = toQueryString(params);
-    return get<Tag[]>(`https://your-api-url.com/tags?${queryString}`);
+export const getTags = async (
+  params: TagQueryParams
+): Promise<ApiReuslt<Tag[]>> => {
+  const queryString = toQueryString(params);
+  return get<Tag[]>(`http://localhost:8000/tags?${queryString}`);
 };
 
-
-export const createNewTag = async (data: CreateTagData): Promise<void> => {
-    await post<CreateTagData, void>(`https://your-api-url.com/tags`, data);
+export const createNewTag = async (
+  data: CreateTagData
+): Promise<ApiReuslt<Tag>> => {
+  return await post<CreateTagData, Tag>(`http://localhost:8000/tags`, data);
 };
 
-
-export const deleteTag = async (tag_name: string): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/tags/${encodeURIComponent(tag_name)}`, null);
+export const deleteTag = async (tag_name: string): Promise<ApiReuslt<null>> => {
+  return await deleteItem(
+    `http://localhost:8000/tags/${encodeURIComponent(tag_name)}`,
+    null
+  );
 };
-
 
 type TagPostModel = {
-    tag_name: string;
-    post_id: number;
+  tag_name: string;
+  post_id: number;
 };
 
-
-export const addTagToPost = async (data: TagPostModel): Promise<void> => {
-    await post<TagPostModel, void>(`https://your-api-url.com/categorise`, data);
+export const addTagToPost = async (
+  data: TagPostModel
+): Promise<ApiReuslt<null>> => {
+  return await post<TagPostModel, null>(
+    `http://localhost:8000/categorise`,
+    data
+  );
 };
 
-
-export const deleteTagFromPost = async (data: TagPostModel): Promise<void> => {
-    await deleteItem(`https://your-api-url.com/categorise`, data);
+export const deleteTagFromPost = async (data: TagPostModel): Promise<ApiReuslt<TagPostModel>> => {
+  return await deleteItem<TagPostModel>(`http://localhost:8000/categorise`, data);
 };

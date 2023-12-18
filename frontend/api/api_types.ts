@@ -4,7 +4,6 @@ type User = {
     first_name: string | null;
     last_name: string | null;
     email: string;
-    password_hash: string;
     profile_image: string | null;
     created_at: Date;
     phone: string | null;
@@ -12,7 +11,6 @@ type User = {
     artist_id: number;
     bio: string | null;
     link: string | null;
-    price: number | null;
     admin_id: number;
     privileges: 'N' | 'M' | 'A';
 };
@@ -54,6 +52,13 @@ type Rating = {
     comment: string | null;
     post_id: number;
     collector_id: number;
+    user_id: number;
+    username: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+    profile_image: string | null;
+    created_at: Date;
 };
 
 type Tag = {
@@ -97,3 +102,11 @@ type ReportModel = {
     entity_id: number;
     user_id: number;
 };
+
+
+type ApiReuslt<T> = {
+    data: T | null,
+    message: string | null,
+    count: number | null,
+    success: boolean | null
+}

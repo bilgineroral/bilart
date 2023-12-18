@@ -3,14 +3,17 @@ from fastapi import APIRouter, Depends
 
 from db.delete import delete
 from db.update import update
-from db.retrieve import retrieve
+from db.retrieve import retrieve, get_from_table
 from db.insert import insert
 
 from modules.rating.model import RatingModel, CreateRating, UpdateRating
 from modules.user.auth import get_current_user
+from modules.collector.model import CollectorModel
+from modules.user.model import UserModel
 
 
 router = APIRouter(prefix="/ratings", tags=['ratings'])
+
 
 @router.get("/{rating_id}")
 def get_rating(
@@ -24,6 +27,7 @@ def get_rating(
 
     return {"data": items[0], "success": success, "message": message}
 
+
 @router.get("/")
 def get_ratings(
     score: int | None = None,
@@ -33,15 +37,18 @@ def get_ratings(
     post_id: int | None = None,
     collector_id: int | None = None
 ):
+    filters = {
+        'tables': [RatingModel, CollectorModel, UserModel],
+        'single': False,
+        f'table__{RatingModel.get_table_name()}__score': score,
+        f'table__{RatingModel.get_table_name()}__gt__score': gt__score,
+        f'table__{RatingModel.get_table_name()}__lt__score': lt__score,
+        f'table__{RatingModel.get_table_name()}__search__comment': search__comment,
+        f'table__{RatingModel.get_table_name()}__post_id': post_id,
+        'collector_id': collector_id
+    }
     success, count, message, items = retrieve(
-        tables=[RatingModel],
-        single=False,
-        score=score,
-        gt__score=gt__score,
-        lt__score=lt__score,
-        search__comment=search__comment,
-        post_id=post_id,
-        collector_id=collector_id
+        **filters
     )
 
     return {"data": items, "success": success, "message": message, "count": count}
@@ -81,3 +88,34 @@ def update_ratings(rating_id: int, request_data: UpdateRating, user: dict[str, A
         collector_id=user['collector_id']
     )
     return {"message": message, "success": success, "data": data}
+
+
+@router.get("/art/{art_id}")
+def art_average_rating(art_id: int):
+    success, count, message, result = get_from_table(
+        tables="""
+        FROM Art A
+        INNER JOIN Post P ON A.post_id = P.post_id
+        INNER JOIN Rating R ON P.post_id = R.post_id""",
+        where_clasue=f"""WHERE A.art_id = {art_id}""",
+        order_by_clasue="",
+        select_function="SELECT AVG(R.score) AS average_rating"
+    )
+
+    return {"message": message, "count": count, "success": success, "data": result}
+
+
+@router.get("/artist/{artist_id}")
+def artist_average_rating(artist_id: int):
+    success, count, message, result = get_from_table(
+        tables="""
+        FROM Artist AR
+        INNER JOIN Post P ON AR.artist_id = P.artist_id
+        INNER JOIN Art A ON P.post_id = A.post_id
+        LEFT JOIN Rating R ON P.post_id = R.post_id""",
+        where_clasue=f"""WHERE AR.artist_id = {artist_id}""",
+        order_by_clasue="",
+        select_function="SELECT AVG(R.score) AS average_rating"
+    )
+
+    return {"message": message, "count": count, "success": success, "data": result}
