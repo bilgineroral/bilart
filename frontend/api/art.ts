@@ -16,6 +16,8 @@ export type ArtQueryParams = {
     tag_name?: string;
     collection?: number;
     favoriting_collector?: number;
+    date_order?: "asc" | "dsc";
+    price_order?: "asc" | "dsc";
 };
 
 export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {

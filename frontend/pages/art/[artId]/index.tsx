@@ -60,7 +60,7 @@ export default function ArtPage() {
       try {
         const data = await getAuctions({ art_id: Number(art.art_id) });
         console.log(data);
-        if ("data" in data && data.data != null) {
+        if (data.data != null) {
           setAuctions(data.data);
         } else {
           snackbar("error", "failed to fetched");
@@ -72,11 +72,9 @@ export default function ArtPage() {
     };
     const fetchTags = async (art: Art) => {
       try {
-        if (artInfo?.post_id == null) return;
-
         const data = await getTags({ post_id: art.post_id });
         console.log(data);
-        if ("data" in data && data.data != null) {
+        if (data.data != null) {
           setTags(data.data);
         } else {
           snackbar("error", "failed to fetched");
@@ -90,8 +88,7 @@ export default function ArtPage() {
     const fetchComments = async (art: Art) => {
       try {
         const data = await getRatings({ post_id: art.post_id });
-        console.log(data);
-        if ("data" in data && data.data != null) {
+        if ( data.data != null) {
           setComments(data.data);
         } else {
           snackbar("error", "failed to fetched");
@@ -112,7 +109,7 @@ export default function ArtPage() {
     };
 
     fetch();
-  }, []);
+  }, [artId]);
 
   const formatDate = (dateString: string): string => {
     const timestamp = Date.parse(dateString);

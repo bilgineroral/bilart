@@ -1,17 +1,19 @@
 from typing import Any
 from fastapi import APIRouter, Depends
+from db.tables import JoinModel
 
-from modules.art.model import ArtModel
-from modules.post.model import PostModel
-from modules.auction.model import AuctionModel
-from modules.user.auth import get_current_user
+
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve, get_from_table
 from db.insert import insert
 
-from modules.bid.model import BidModel, CreateBid, Updatebid
+from modules.bid.model import BidModel, CreateBid
+from modules.collector.model import CollectorModel
+from modules.user.auth import get_current_user
+from modules.user.model import UserModel
+
 
 
 router = APIRouter(prefix="/bids", tags=['bids'])
@@ -41,17 +43,24 @@ def get_bids(
     payment_done: bool | None = None,
     created_at: str | None = None
 ):
+    filters = {
+        'join_tables': [
+            JoinModel(BidModel, 'collector_id'),
+            JoinModel(CollectorModel, 'user_id'),
+            JoinModel(UserModel, 'user_id')
+        ],
+        'single':False,
+        f'table__{BidModel.get_table_name()}__bid_id':bid_id,
+        f'table__{BidModel.get_table_name()}__price':price,
+        f'table__{BidModel.get_table_name()}__gt__price':gt__price,
+        f'table__{BidModel.get_table_name()}__lt__price':lt__price,
+        f'table__{BidModel.get_table_name()}__auction_id':auction_id,
+        'collector_id':collector_id,
+        f'table__{BidModel.get_table_name()}__payment_done':payment_done,
+        f'table__{BidModel.get_table_name()}__created_at':created_at
+    }
     success, count, message, items = retrieve(
-        tables=[BidModel],
-        single=False,
-        bid_id=bid_id,
-        price=price,
-        gt__price=gt__price,
-        lt__price=lt__price,
-        auction_id=auction_id,
-        collector_id=collector_id,
-        payment_done=payment_done,
-        created_at=created_at
+        **filters
     )
 
     return {"data": items, "success": success, "message": message, "count": count}

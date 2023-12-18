@@ -1,23 +1,9 @@
 import { getArts } from "@/api/art";
 import { getMe } from "@/api/user";
 import { ArtCard, CreateArtButton } from "@/components/artist";
-import { GalleryView } from "@/components/shared/GalleryView";
 import { useSnackbar } from "@/store/snackbar";
-import { userAtom } from "@/store/user";
 import { Grid } from "@mui/material";
-import { useAtom } from "jotai";
 import * as React from "react";
-/* 
-export type Art = {
-  art_id : number;
-  artist_id : number;
-  content: string;
-  created_at: string;
-  description: string;
-  post_id: number;
-  price: number;
-  title: string;
-} */
 
 
 export default function ArtistHomePage() {

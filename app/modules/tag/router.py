@@ -35,7 +35,11 @@ def get_tags(
     post_id: int | None = None
 ):
     filters = {
-        'tables': [TagModel, TagPostModel, PostModel],
+        'tables': [
+            TagModel, 
+            TagPostModel if (post_id) else None, 
+            PostModel if (post_id) else None
+        ],
         'single': False,
         f'table__{TagModel.get_table_name()}__search__tag_name': search__tag_name,
         f'table__{PostModel.get_table_name()}__post_id': post_id,
