@@ -1,5 +1,6 @@
 import {useRouter} from "next/router";
 import * as React from "react";
+import { postFormData } from "@/api/crude";
 
 import {useAtom} from "jotai";
 
@@ -59,16 +60,12 @@ export default function CreateArt() {
         formData.append("title", title);
         formData.append("description", description);
         formData.append("price", price.toString());
-        const res = await fetch("http://localhost:8000/arts", {
-          method : "POST",
-          headers: {
-            "Authorization": `Basic ${auth}`
-          },
-          body: formData
-        })
-        const data  = await res.json();
-        console.log(data)
-        router.replace("/artist");
+
+        const res = await postFormData("http://localhost:8000/arts/", formData);
+        console.log(res);
+        // const data  = await res.json();
+        //console.log(data)
+        router.replace("/home");
       }catch (err) {
         console.log(err);
       }

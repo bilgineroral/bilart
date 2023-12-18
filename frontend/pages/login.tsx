@@ -84,7 +84,7 @@ export default function LoginPage() {
           setUser(data.data);
           localStorage.setItem('bilart-me', JSON.stringify(data.data));
           setAccountType("artist");   
-          router.replace("/artist");    
+          router.replace("/home");    
         } else {
           snackbar("error", "unauthorized");
         }
