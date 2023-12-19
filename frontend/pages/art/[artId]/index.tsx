@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import * as React from "react";
-
+import type {Tag, Art, Auction, Rating} from "@/api/api_types";
 import {
   Grid,
   Stack,
@@ -23,8 +23,11 @@ import { useSnackbar } from "@/store/snackbar";
 import { getArt } from "@/api/art";
 import { getAuctions } from "@/api/auction";
 import { getTags } from "@/api/tags";
-import Image from "next/image";
 import { getRatings } from "@/api/rating";
+
+import { AxiosError } from "axios";
+import { AuthError } from "@/api/crude";
+
 
 export default function ArtPage() {
   const router = useRouter();
@@ -39,19 +42,30 @@ export default function ArtPage() {
   const [comments, setComments] = React.useState<Rating[]>([]);
 
   React.useEffect(() => {
-    const fetchArtInfo = async (): Promise<Art | null> => {
+    const fetchArtInfo = async () : Promise<Art | null> => {
       try {
         const data = await getArt(Number(artId));
         console.log(data);
+        setArtInfo(data.data);
         if ("data" in data) {
           setArtInfo(data.data);
           return data.data;
         } else {
-          snackbar("error", "failed to fetched");
+          snackbar("error", "failed to fetch art");
+          return null;
         }
       } catch (err) {
-        console.log(err);
-        snackbar("error", "failed to fetched");
+        if (err instanceof AuthError) {
+          snackbar("error", "Session does not exist");
+          router.replace("/login")
+        }
+        if (err instanceof AxiosError && err.response?.status === 401) {
+          snackbar("error", "Incorrect username or password");
+          router.replace("/login");
+        } else {
+          snackbar("error", "an error occured. See console for more details");
+          console.error(err);
+        }
       }
       return null;
     };
@@ -107,8 +121,8 @@ export default function ArtPage() {
         fetchComments(art);
       }
     };
-
-    fetch();
+    if (artId) 
+      fetch();
   }, [artId]);
 
   const formatDate = (dateString: string): string => {
@@ -121,9 +135,6 @@ export default function ArtPage() {
 
     return `${year}/${month}/${day}`;
   };
-  console.log(
-    `art index photo url:   http://localhost:8000/${artInfo?.content}`
-  );
 
   return (
     <Stack direction="column" gap={2} sx={{ height: "100%" }}>
@@ -131,12 +142,17 @@ export default function ArtPage() {
         <Grid item xs={4}>
           <Box
             sx={{
-              //width: "100%",
-              //aspectRatio: "1/1",
+              width: "100%",
+              aspectRatio: "1/1",
               backgroundColor: theme.palette.primary.main,
+              display: "flex",
+              alignItems: "center"    
             }}
           >
-            <img src={`http://localhost:8000/${artInfo?.content}`} />
+            <DomainImage 
+              src={`http://localhost:8000/${artInfo?.content}`}
+              alt={"art image"}
+            />
           </Box>
         </Grid>
         <Grid item xs={7.5}>

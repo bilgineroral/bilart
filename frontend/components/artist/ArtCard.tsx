@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import CardMedia from '@mui/material/CardMedia';
-import { CardContent, Typography } from '@mui/material';
+import { CardContent, Typography, useTheme } from '@mui/material';
 
 import LinkIcon from '@mui/icons-material/Link';
 
@@ -16,6 +16,9 @@ interface ArtCardProps {
 }
 
 export function ArtCard({title, content, description, artId} : ArtCardProps) {
+  
+  const theme = useTheme();
+
   return (
     <Card sx={{ width: "100%" }}>
       <CardMedia
@@ -33,7 +36,7 @@ export function ArtCard({title, content, description, artId} : ArtCardProps) {
       </CardContent>
       <CardActions>
         <Link href={`/art/${artId}`}>
-          <Button size="small" startIcon={<LinkIcon />}>Open</Button>       
+          <Button size="small" startIcon={<LinkIcon style={{fill : theme.palette.primary.main}}/>}>Open</Button>       
         </Link>
       </CardActions>
     </Card>

@@ -1,4 +1,5 @@
 import {get, postFormData, put, deleteItem, toQueryString} from "./crude";
+import type {Art, ApiReuslt} from "./api_types";
 
 export const getArt = async (artId: number): Promise<ApiReuslt<Art>> => {
     return get<Art>(`http://localhost:8000/arts/${artId}`);

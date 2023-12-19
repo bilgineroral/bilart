@@ -1,4 +1,5 @@
 import { get, post, put, deleteItem, toQueryString } from "./crude";
+import type {Tag, ApiReuslt} from "./api_types";
 
 type CreateTagData = {
   tag_name: string;
@@ -35,7 +36,7 @@ export const deleteTag = async (tag_name: string): Promise<ApiReuslt<null>> => {
   );
 };
 
-type TagPostModel = {
+export type TagPostModel = {
   tag_name: string;
   post_id: number;
 };

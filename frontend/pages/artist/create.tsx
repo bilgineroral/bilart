@@ -1,7 +1,7 @@
 import {useRouter} from "next/router";
 import * as React from "react";
-
-import {useAtom} from "jotai";
+import { AxiosError } from "axios";
+import { AuthError } from "@/api/crude";
 
 import {
   Stack,
@@ -27,17 +27,29 @@ const FieldsBox = styled(Box)(({theme}) => ({
 })) as typeof Box;
 
 import { ActionButtonProps, DomainDivider, DomainImageUpload, PostActionsBar } from "@/components/shared";
-import { userAtom } from "@/store/user";
+import { NewArtData, createNewArt } from "@/api/art";
+import { useSnackbar } from "@/store/snackbar";
+import { TagPostModel, addTagToPost, getTags } from "@/api/tags";
 
 export default function CreateArt() {
 
   const router = useRouter();
   const {edit} = router.query;
+  const snackbar = useSnackbar();
+
+  const [tags, setTags] = React.useState<string[]>([]);
+  React.useEffect(() => {
+      getTags({})
+      .then(res => {
+        setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
+      });
+  }, []);
 
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState('');
   const [price, setPrice] = React.useState(0);
-  const [tags, setTags] = React.useState(["tag one", "tag two", "tag three"]);
+  const [assignedTags, setAssignedTags] = React.useState<string[]>([]);
+
 
   const [imgBlob, setImgBlob] = React.useState<Blob | null>(null);  
   const handleImageFinal = (imgSrc : string, imgBlob : Blob) => {
@@ -47,30 +59,38 @@ export default function CreateArt() {
 
   const handleOnSave = async () => {
     console.log("sending");
-    
     if (imgBlob) {
-      console.log("sending");
       try {
-        // @ts-ignore
-        const user = JSON.parse(localStorage.getItem('bilart-me'));
-        const auth = Buffer.from(`${user?.username}:${user?.password_hash}`).toString('base64');
-        const formData = new FormData();
-        formData.append("image", imgBlob);
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("price", price.toString());
-        const res = await fetch("http://localhost:8000/arts", {
-          method : "POST",
-          headers: {
-            "Authorization": `Basic ${auth}`
-          },
-          body: formData
+        const newArt : NewArtData = {
+          title: title,
+          description: description,
+          price: price,
+          image: imgBlob,
+        };
+        const res = await createNewArt(newArt);
+        console.log(res);
+        assignedTags.forEach(tagName => {
+          const categorize : TagPostModel = {
+            tag_name: tagName as string,
+            post_id: res.data!.post_id
+          }
+          console.log(categorize);
+          addTagToPost(categorize);
         })
-        const data  = await res.json();
-        console.log(data)
         router.replace("/artist");
       }catch (err) {
-        console.log(err);
+        if (err instanceof AuthError) {
+          snackbar("error", "Session does not exist");
+          router.replace("/login")
+          return;
+        }
+        if (err instanceof AxiosError && err.response?.status === 401) {
+          snackbar("error", "Incorrect username or password");
+          router.replace("/login");
+        } else {
+          snackbar("error", "an error occured. See console for more details");
+          console.error(err);
+        }  
       }
       
     }
@@ -83,6 +103,10 @@ export default function CreateArt() {
   const handleOnDelete = React.useCallback(() => {
     console.log("Deleting");
   }, []);
+
+  const handleOnChangeTags = (_ : any , newValues : string[]) => {
+    setAssignedTags(newValues);
+  };
 
   const actionButtons = React.useMemo(() => {
     const buttons : ActionButtonProps[] = [];
@@ -153,6 +177,8 @@ export default function CreateArt() {
         <Autocomplete 
           options={tags}
           multiple
+          value={assignedTags!}
+          onChange={handleOnChangeTags}  
           renderInput={(params) => (
             <TextField
               {...params}

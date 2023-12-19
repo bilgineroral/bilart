@@ -58,7 +58,7 @@ export default function ArtistHomePage() {
           )
         })
       }
-      <Grid item xs={3}>
+      <Grid item xs={3} style={{display : "flex", alignItems : "center", justifyContent: "center"}}>
         <AddArtCard />
       </Grid>
     </Grid>
