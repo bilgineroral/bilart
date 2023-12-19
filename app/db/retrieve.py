@@ -3,7 +3,7 @@ from typing import Tuple
 from fastapi import HTTPException
 from db.model import ModelProtocal
 
-from db.tables import natural_join_models, params_to_where_clause
+from db.tables import natural_join_models, params_to_where_clause, JoinModel, join_models
 from db.db import PgDatabase
 
 
@@ -40,10 +40,16 @@ def get_from_table(
             raise HTTPException(status_code=500, detail=str(e))
 
 
-def retrieve(tables: list[ModelProtocal], single: bool = False, order_by: list[str] = [],**kwargs):
+def retrieve(
+    tables: list[ModelProtocal] = [], 
+    join_tables: list[JoinModel] = [], 
+    single: bool = False, 
+    order_by: list[str | None] = [],
+    **kwargs
+):
     return get_from_table(
-        natural_join_models(tables), 
+        natural_join_models(tables) if not join_tables else join_models(join_tables), 
         params_to_where_clause(**kwargs), 
-        " ".join(order_by),
+        ", ".join([order for order in order_by if order]),
         single=single
     )

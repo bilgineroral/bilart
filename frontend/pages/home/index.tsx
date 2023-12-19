@@ -18,10 +18,6 @@ export default function Home() {
     const [sort, setSort] = React.useState<any>("");
     const [tag, setTag] = React.useState('');
 
-    const handleChange = (event: any) => {
-        setSort(event.target.value);
-    };
-
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -47,6 +43,7 @@ export default function Home() {
         const fetchArts = async () => {
             try {
                 console.log(tag);
+                console.log("sort= ", sort);
                 
                 const resp = await getArts({
                     date_order: sort == "da" ? "asc" :
