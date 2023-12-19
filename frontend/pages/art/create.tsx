@@ -15,7 +15,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 
-import type { ApiReuslt } from "@/api/api_types";
+import { Art, type ApiReuslt } from "@/api/api_types";
 
 const FieldsBox = styled(Box)(({theme}) => ({
   backgroundColor : "#fff", 
@@ -37,7 +37,7 @@ import { BACKEND_URL } from "@/routes";
 export default function CreateArt() {
 
   const router = useRouter();
-  const {edit, post_id} = router.query;
+  const {edit, art_id} = router.query;
   const snackbar = useSnackbar();
 
   const originalAssignedTagsRef = React.useRef<string[]>([]);
@@ -48,6 +48,8 @@ export default function CreateArt() {
   const [assignedTags, setAssignedTags] = React.useState<string[]>([]);
   const [content, setContent] = React.useState<string>("");
 
+  const [art, setArt] = React.useState<Art | null>(null);
+
   const [imgBlob, setImgBlob] = React.useState<Blob | null>(null);  
   const handleImageFinal = (imgSrc : string, imgBlob : Blob) => {
     setImgBlob(imgBlob);
@@ -55,32 +57,31 @@ export default function CreateArt() {
 
   const [tags, setTags] = React.useState<string[]>([]);
   React.useEffect(() => {
-    if (post_id) {
-      getArt(Number(post_id))
-      .then(res => {
-        if (res.data) {
-          res.data.title && setTitle(res.data.title);
-          res.data.description && setDescription(res.data.description);
-          setPrice(Number(res.data.price));
-          res.data.content && setContent(res.data.content);
+    const fetchInitData = async() => {
+      if (art_id) {
+        const artRes = await getArt(Number(art_id));
+        if (artRes.data) {
+          artRes.data.title && setTitle(artRes.data.title);
+          artRes.data.description && setDescription(artRes.data.description);
+          setPrice(Number(artRes.data.price));
+          artRes.data.content && setContent(artRes.data.content);
+          setArt(artRes.data!);
+          const queryParams : TagQueryParams = {
+            post_id: Number(artRes.data.post_id)
+          }
+          const tagsRes = await getTags(queryParams);
+          setAssignedTags(Object.entries(tagsRes.data!).map(([key, value]) => value.tag_name));
+          originalAssignedTagsRef.current = Object.entries(tagsRes.data!).map(([key, value]) => value.tag_name);
         }
-      })
-
-      const queryParams : TagQueryParams = {
-        post_id: Number(post_id) 
-      };
-      getTags(queryParams)
-      .then(res => {
-        setAssignedTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
-        originalAssignedTagsRef.current = Object.entries(res.data!).map(([key, value]) => value.tag_name);
-      })
+      }
     }
 
+    fetchInitData();
     getTags({})
     .then(res => {
       setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
     });
-  }, []);
+  }, [art_id]);
 
 
 
@@ -132,13 +133,13 @@ export default function CreateArt() {
     const unAppliedTags = originalAssignedTagsRef.current.filter(tag => !assignedTags.includes(tag));
     const newAppliedTags = assignedTags.filter(tag => !originalAssignedTagsRef.current.includes(tag));
     try {
-      const updateRes = await updateArt(Number(post_id), updatedArt);
+      const updateRes = await updateArt(Number(art_id), updatedArt);
       // remove unmarked tags
       const unappliedTagsAsync : Promise<ApiReuslt<TagPostModel>>[] = [];
       unAppliedTags.forEach(tag => {
         unappliedTagsAsync.push(deleteTagFromPost({
           tag_name: tag,
-          post_id: Number(post_id)
+          post_id: Number(art?.post_id)
           } as TagPostModel))
       });
       await Promise.allSettled(unappliedTagsAsync);
@@ -147,7 +148,7 @@ export default function CreateArt() {
         newappliedTagsAsync.push(
           addTagToPost({
           tag_name: tag,
-          post_id: Number(post_id)
+          post_id: Number(art?.post_id)
         }));
       })
       await Promise.allSettled(newappliedTagsAsync);

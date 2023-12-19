@@ -88,6 +88,7 @@ export default function ArtPage() {
     const fetchTags = async (art: Art) => {
       try {
         const data = await getTags({ post_id: art.post_id });
+        console.info(data);
         console.log(data);
         if (data.data != null) {
           setTags(data.data);
@@ -204,7 +205,7 @@ export default function ArtPage() {
             >
               <Button sx={{ color: "#fff" }}>Auction</Button>
               <Button sx={{ color: "#fff" }} onClick={handleArtDelete}>Delete</Button>
-              <Link href={`/art/create?edit=true&post_id=${artInfo?.art_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
+              <Link href={`/art/create?edit=true&art_id=${artInfo?.art_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
             </ButtonGroup>
           </Stack>
         </Grid>
