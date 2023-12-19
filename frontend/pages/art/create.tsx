@@ -12,7 +12,6 @@ import {
 } from "@mui/material"
 import {styled} from "@mui/system"; 
 import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { Art, type ApiReuslt } from "@/api/api_types";

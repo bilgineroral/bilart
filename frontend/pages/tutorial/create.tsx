@@ -8,13 +8,16 @@ import {
   TextField,
   Box,
   Button,
+  Autocomplete
 } from "@mui/material"
 import {styled} from "@mui/system"; 
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 
 import {createNewTutorial, getTutorial, UpdateTutorialData, type NewTutorialData, updateTutorial} from "@/api/tutorial";
-import { Tutorial, type ApiReuslt } from "@/api/api_types";
+import type { Tutorial, ApiReuslt } from "@/api/api_types";
+import { TagPostModel, TagQueryParams, addTagToPost, deleteTagFromPost, getTags } from "@/api/tags";
+
 
 const FieldsBox = styled(Box)(({theme}) => ({
   backgroundColor : "#fff", 
@@ -37,9 +40,12 @@ export default function CreateArt() {
   const {edit, tutorial_id} = router.query;
   const snackbar = useSnackbar();
 
+  const originalAssignedTagsRef = React.useRef<string[]>([]);
+
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState('');
   const [content, setContent] = React.useState<string>("");
+  const [assignedTags, setAssignedTags] = React.useState<string[]>([]);
   const [tutorialInfo, setTutorialInfo] = React.useState<Tutorial | null>(null);
 
 
@@ -48,18 +54,32 @@ export default function CreateArt() {
     setImgBlob(imgBlob);
   }
 
+  const [tags, setTags] = React.useState<string[]>([]);
+
   React.useEffect(() => {
-    if (tutorial_id) {
-      getTutorial(Number(tutorial_id))
-      .then(res => {
-        if (res.data) {
-          res.data.title && setTitle(res.data.title);
-          res.data.description && setDescription(res.data.description);
-          res.data.media && setContent(res.data.media);
-          setTutorialInfo(res.data!);
+    const fetchInitData = async() => {
+      if (tutorial_id) {
+        const tutorialRes = await getTutorial(Number(tutorial_id));
+        if (tutorialRes.data) {
+          tutorialRes.data.title && setTitle(tutorialRes.data.title);
+          tutorialRes.data.description && setDescription(tutorialRes.data.description);
+          tutorialRes.data.media && setContent(tutorialRes.data.media);
+          setTutorialInfo(tutorialRes.data!);
+          const queryParams : TagQueryParams = {
+            post_id: Number(tutorialRes.data.post_id)
+          }
+          const tagsRes = await getTags(queryParams);
+          setAssignedTags(Object.entries(tagsRes.data!).map(([key, value]) => value.tag_name));
+          originalAssignedTagsRef.current = Object.entries(tagsRes.data!).map(([key, value]) => value.tag_name);
         }
-      })
+      }
     }
+
+    fetchInitData();
+    getTags({})
+    .then(res => {
+      setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
+    });
   }, [tutorial_id]);
 
   const handleOnSave = async () => {
@@ -71,6 +91,13 @@ export default function CreateArt() {
           media: imgBlob
         };
         const res = await createNewTutorial(newTutorial);
+        assignedTags.forEach(tagName => {
+          const categorize : TagPostModel = {
+            tag_name: tagName as string,
+            post_id: res.data!.post_id
+          }
+          addTagToPost(categorize);
+        })
         router.replace("/tutorial");
       }catch (err) {
         if (err instanceof AuthError) {
@@ -98,8 +125,27 @@ export default function CreateArt() {
       description: description,
       post_id: tutorialInfo?.post_id
     } 
+    const unAppliedTags = originalAssignedTagsRef.current.filter(tag => !assignedTags.includes(tag));
+    const newAppliedTags = assignedTags.filter(tag => !originalAssignedTagsRef.current.includes(tag));
     try {
       const updateRes = await updateTutorial(updatedTutorial);
+      const unappliedTagsAsync : Promise<ApiReuslt<TagPostModel>>[] = [];
+      unAppliedTags.forEach(tag => {
+        unappliedTagsAsync.push(deleteTagFromPost({
+          tag_name: tag,
+          post_id: Number(tutorialInfo?.post_id)
+          } as TagPostModel))
+      });
+      await Promise.allSettled(unappliedTagsAsync);
+      const newappliedTagsAsync : Promise<ApiReuslt<null>>[] = [];
+      newAppliedTags.forEach(tag => {
+        newappliedTagsAsync.push(
+          addTagToPost({
+          tag_name: tag,
+          post_id: Number(tutorialInfo?.post_id)
+        }));
+      })
+      await Promise.allSettled(newappliedTagsAsync);
       snackbar("success", "updated tutorial info");
       router.back();
       console.log(updateRes);
@@ -113,6 +159,9 @@ export default function CreateArt() {
     router.replace("/artist");
   }, []);
 
+  const handleOnChangeTags = (_ : any , newValues : string[]) => {
+    setAssignedTags(newValues);
+  };
 
   const actionButtons = React.useMemo(() => {
     const buttons : ActionButtonProps[] = [];
@@ -172,6 +221,22 @@ export default function CreateArt() {
           onChange={(e) => setDescription(e.target.value)}
 
         />
+        <Autocomplete
+          options={tags}
+          multiple
+          value={assignedTags!}
+          onChange={handleOnChangeTags}  
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Tags"
+              placeholder="Categorize your tutorial"
+              variant="outlined"
+              size="small"
+            />
+          )}
+        />
+
         <Button
           variant="outlined"
           disabled
