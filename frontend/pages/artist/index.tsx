@@ -5,7 +5,11 @@ import { getArts } from "@/api/art";
 import { getMe } from "@/api/user";
 import { ArtCard, CreateArtButton } from "@/components/artist";
 import { useSnackbar } from "@/store/snackbar";
-import { Grid } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
+import { AddArtCard } from "@/components/artist/AddArtCard";
+
+import { DomainDivider, PostActionsBar } from "@/components/shared";
+
 
 export default function ArtistHomePage() {
 
@@ -32,35 +36,34 @@ export default function ArtistHomePage() {
     fetchArts();
   }, []);
 
-  const ArtCards = React.useMemo(() => {
-    const artcards = arts.map((art, index) => {
-      return (
-        <ArtCard 
-          key={index}
-          artId={art.art_id}
-          title={art.title ?? ""}
-          content={art.content ?? ""}
-          description={art.description ?? ""}
-        />
-      )
-    });
-    return artcards;
-  }, [arts]);
-
   return (
+    <Stack direction="column" gap={2} sx={{height:"100%"}}>
+      <PostActionsBar 
+        title={"Your Arts"}
+        actions={[]}
+      />
+      <DomainDivider color="#fff" />
     <Grid container gap={3}>
       {
-        React.Children.toArray(
-          ArtCards.map((card) => {
-            return (
-              <Grid item xs={3}>
-                {card}
-              </Grid>
-            )
-          })
-        )
+        arts.map((art, index) => {
+          return (
+            <Grid item xs={3} key={art.art_id}>
+              <ArtCard 
+                artId={art.art_id}
+                title={art.title ?? ""}
+                content={art.content ?? ""}
+                description={art.description ?? ""}
+              />
+            </Grid>
+          )
+        })
       }
+      <Grid item xs={3}>
+        <AddArtCard />
+      </Grid>
     </Grid>
+
+    </Stack>
   )
 }
 

@@ -106,7 +106,7 @@ export default function Layout(props : LayoutProps) {
         props.show &&
       <AppBar position="static" color="primary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
         <Grid container sx={{width : "100%"}} spacing={1}>
-          <Grid item xs={1} sx={{height : 35, display : "flex", alignItems : "center"}}>
+          <Grid item xs={1} sx={{display : "flex", alignItems : "center"}}>
           <DomainImage 
             alt="bil art"
             src="/app-logo.svg"
