@@ -15,6 +15,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 
+import type { ApiReuslt } from "@/api/api_types";
+
 const FieldsBox = styled(Box)(({theme}) => ({
   backgroundColor : "#fff", 
   width : "100%", 
@@ -27,38 +29,62 @@ const FieldsBox = styled(Box)(({theme}) => ({
 })) as typeof Box;
 
 import { ActionButtonProps, DomainDivider, DomainImageUpload, PostActionsBar } from "@/components/shared";
-import { NewArtData, createNewArt } from "@/api/art";
+import { NewArtData, UpdateArtData, createNewArt, updateArt, getArt } from "@/api/art";
 import { useSnackbar } from "@/store/snackbar";
-import { TagPostModel, addTagToPost, getTags } from "@/api/tags";
+import { TagPostModel, TagQueryParams, addTagToPost, deleteTagFromPost, getTags } from "@/api/tags";
+import { BACKEND_URL } from "@/routes";
 
 export default function CreateArt() {
 
   const router = useRouter();
-  const {edit} = router.query;
+  const {edit, post_id} = router.query;
   const snackbar = useSnackbar();
 
-  const [tags, setTags] = React.useState<string[]>([]);
-  React.useEffect(() => {
-      getTags({})
-      .then(res => {
-        setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
-      });
-  }, []);
+  const originalAssignedTagsRef = React.useRef<string[]>([]);
 
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState('');
   const [price, setPrice] = React.useState(0);
   const [assignedTags, setAssignedTags] = React.useState<string[]>([]);
-
+  const [content, setContent] = React.useState<string>("");
 
   const [imgBlob, setImgBlob] = React.useState<Blob | null>(null);  
   const handleImageFinal = (imgSrc : string, imgBlob : Blob) => {
-    console.log(imgBlob);
     setImgBlob(imgBlob);
   }
 
+  const [tags, setTags] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (post_id) {
+      getArt(Number(post_id))
+      .then(res => {
+        if (res.data) {
+          res.data.title && setTitle(res.data.title);
+          res.data.description && setDescription(res.data.description);
+          setPrice(Number(res.data.price));
+          res.data.content && setContent(res.data.content);
+        }
+      })
+
+      const queryParams : TagQueryParams = {
+        post_id: Number(post_id) 
+      };
+      getTags(queryParams)
+      .then(res => {
+        setAssignedTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
+        originalAssignedTagsRef.current = Object.entries(res.data!).map(([key, value]) => value.tag_name);
+      })
+    }
+
+    getTags({})
+    .then(res => {
+      setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
+    });
+  }, []);
+
+
+
   const handleOnSave = async () => {
-    console.log("sending");
     if (imgBlob) {
       try {
         const newArt : NewArtData = {
@@ -93,8 +119,47 @@ export default function CreateArt() {
         }  
       }
       
+    } else {
+      snackbar("error", "please upload an image for your art")
     }
   };
+
+  const handleOnUpdate = async () => {
+    const updatedArt : UpdateArtData = {
+      title : title,
+      description: description
+    }
+    const unAppliedTags = originalAssignedTagsRef.current.filter(tag => !assignedTags.includes(tag));
+    const newAppliedTags = assignedTags.filter(tag => !originalAssignedTagsRef.current.includes(tag));
+    console.log(unAppliedTags);
+    console.log(newAppliedTags);
+    try {
+      const updateRes = await updateArt(Number(post_id), updatedArt);
+      // remove unmarked tags
+      const unappliedTagsAsync : Promise<ApiReuslt<TagPostModel>>[] = [];
+      unAppliedTags.forEach(tag => {
+        unappliedTagsAsync.push(deleteTagFromPost({
+          tag_name: tag,
+          post_id: Number(post_id)
+          } as TagPostModel))
+      });
+      await Promise.allSettled(unappliedTagsAsync);
+      const newappliedTagsAsync : Promise<ApiReuslt<null>>[] = [];
+      newAppliedTags.forEach(tag => {
+        newappliedTagsAsync.push(
+          addTagToPost({
+          tag_name: tag,
+          post_id: Number(post_id)
+        }));
+      })
+      await Promise.allSettled(newappliedTagsAsync);
+      snackbar("success", "art edits completed");
+      router.back();
+    } catch (err) {
+      snackbar("error", "art edit failed");
+      console.error(err);
+    }
+  }
 
   const handleOnCancel = React.useCallback(() => {
     router.replace("/artist");
@@ -110,20 +175,32 @@ export default function CreateArt() {
 
   const actionButtons = React.useMemo(() => {
     const buttons : ActionButtonProps[] = [];
-    buttons.push(
-      {
-        text : "Save",
-        onClick: handleOnSave,
-        icon : <SaveIcon style={{fill : "white"}} />
-      }
-    );
-    buttons.unshift(
-      {
-        text: "Delete",
-        onClick: handleOnDelete,
-        icon: <DeleteIcon style={{fill : "white"}} />
-      }
-    );
+    if (edit === "true") {
+      buttons.push(
+        {
+          text : "Apply Edit",
+          onClick: handleOnUpdate,
+          icon : <SaveIcon style={{fill : "white"}} />
+        }
+      );
+    } else {
+      buttons.push(
+        {
+          text : "Save",
+          onClick: handleOnSave,
+          icon : <SaveIcon style={{fill : "white"}} />
+        }
+      );
+    }
+    if (edit === "true") {
+      buttons.unshift(
+        {
+          text: "Delete",
+          onClick: handleOnDelete,
+          icon: <DeleteIcon style={{fill : "white"}} />
+        }
+      );
+    }
     buttons.unshift(
       {
         text: "Cancel",
@@ -132,7 +209,7 @@ export default function CreateArt() {
       }
     )
     return buttons;
-  }, [handleOnSave])
+  }, [handleOnSave, edit])
 
   return(
     <Stack direction="column" gap={2} sx={{height : "100%"}} >
@@ -170,11 +247,11 @@ export default function CreateArt() {
           fullWidth={true}
           type="number"
           required
-          value={price}
+          value={price}   
           onChange={(e) => setPrice(+(e.target.value))}
-
+          disabled={edit === "true"}
         />
-        <Autocomplete 
+        <Autocomplete
           options={tags}
           multiple
           value={assignedTags!}
@@ -199,10 +276,20 @@ export default function CreateArt() {
         >
           Select Image For your art piece
         </Button>
-        <DomainImageUpload 
-          onImageFinal={handleImageFinal}
-          justifyContent="left"
-        />
+        {
+          edit === "true"? 
+          <DomainImageUpload 
+            onImageFinal={handleImageFinal}
+            justifyContent="left"
+            startingSrc={`${BACKEND_URL}/${content}`}
+            disabled={edit === "true"}
+          />
+          :
+          <DomainImageUpload 
+            onImageFinal={handleImageFinal}
+            justifyContent="left"
+          />
+        }
       </FieldsBox>
     </Stack>
   )

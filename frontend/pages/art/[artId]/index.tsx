@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 import type {Tag, Art, Auction, Rating} from "@/api/api_types";
@@ -146,7 +147,7 @@ export default function ArtPage() {
               aspectRatio: "1/1",
               backgroundColor: theme.palette.primary.main,
               display: "flex",
-              alignItems: "center"    
+              alignItems: "center"
             }}
           >
             <DomainImage 
@@ -188,7 +189,7 @@ export default function ArtPage() {
             </div>
             <Box sx={{padding: "1rem", borderRadius: 5, backgroundColor: theme.palette.primary.main, flexGrow: 1, overflowY: "scroll"}}>
               <Typography variant="h5" color="#fff">Description</Typography>
-              <Typography color="#fff">{artInfo?.description}</Typography>
+              <Typography variant="h6" color="#fff">{artInfo?.description}</Typography>
             </Box>
             <ButtonGroup
               variant="contained"
@@ -196,7 +197,7 @@ export default function ArtPage() {
             >
               <Button sx={{ color: "#fff" }}>Auction</Button>
               <Button sx={{ color: "#fff" }}>Delete</Button>
-              <Button sx={{ color: "#fff" }}>Edit</Button>
+              <Link href={`/artist/create?edit=true&post_id=${artInfo?.post_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
             </ButtonGroup>
           </Stack>
         </Grid>

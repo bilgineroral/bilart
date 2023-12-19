@@ -45,7 +45,7 @@ export const createNewArt = async (data: NewArtData): Promise<ApiReuslt<Art>> =>
     return await postFormData<Art>(`http://localhost:8000/arts`, formData);
 };
 
-type UpdateArtData = {
+export type UpdateArtData = {
     content?: string;
     title?: string;
     description?: string;

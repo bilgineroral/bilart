@@ -84,11 +84,11 @@ export const deleteItem = async <T>(
   url: string,
   data: T
 ): Promise<ApiReuslt<T>> => {
-  const credentials = getEncodedCredentials();
   const response = await axios.delete<ApiReuslt<T>>(url, {
     headers: {
       Authorization: `Basic ${getEncodedCredentials()}`,
     },
+    data: data
   }); 
   return response.data;
 };

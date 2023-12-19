@@ -32,10 +32,12 @@ def categorise(favortie: TagPostModel,
 @router.delete('/')
 def un_categorise(favortie: TagPostModel,
                   user: dict[str, Any] = Depends(get_current_user)):
+    
     filters = {
         'tables': [PostModel],
         'single': True,
         'artist_id': user['artist_id'],
+        'post_id': favortie.post_id
     }
     
     retrieve(**filters)

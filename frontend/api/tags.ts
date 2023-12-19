@@ -11,7 +11,7 @@ export const getTag = async (tag_name: string): Promise<ApiReuslt<Tag>> => {
   );
 };
 
-type TagQueryParams = {
+export type TagQueryParams = {
   search__tag_name?: string;
   post_id?: number;
 };
