@@ -165,9 +165,6 @@ export default function CreateArt() {
     router.replace("/artist");
   }, []);
 
-  const handleOnDelete = React.useCallback(() => {
-    console.log("Deleting");
-  }, []);
 
   const handleOnChangeTags = (_ : any , newValues : string[]) => {
     setAssignedTags(newValues);
@@ -189,15 +186,6 @@ export default function CreateArt() {
           text : "Save",
           onClick: handleOnSave,
           icon : <SaveIcon style={{fill : "white"}} />
-        }
-      );
-    }
-    if (edit === "true") {
-      buttons.unshift(
-        {
-          text: "Delete",
-          onClick: handleOnDelete,
-          icon: <DeleteIcon style={{fill : "white"}} />
         }
       );
     }

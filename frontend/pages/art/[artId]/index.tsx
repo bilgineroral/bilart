@@ -21,7 +21,7 @@ import {
 } from "@/components/shared";
 
 import { useSnackbar } from "@/store/snackbar";
-import { getArt } from "@/api/art";
+import { deleteArt, getArt } from "@/api/art";
 import { getAuctions } from "@/api/auction";
 import { getTags } from "@/api/tags";
 import { getRatings } from "@/api/rating";
@@ -137,6 +137,13 @@ export default function ArtPage() {
     return `${year}/${month}/${day}`;
   };
 
+  const handleArtDelete= async() => {
+    // try {
+    //   await deleteArt(Number(artId));
+    //   snackbar("success", "art deleted");
+    // }
+  }
+
   return (
     <Stack direction="column" gap={2} sx={{ height: "100%" }}>
       <Grid container gap={0.5} justifyContent="space-between">
@@ -196,7 +203,7 @@ export default function ArtPage() {
               sx={{ alignSelf: "flex-end" }}
             >
               <Button sx={{ color: "#fff" }}>Auction</Button>
-              <Button sx={{ color: "#fff" }}>Delete</Button>
+              <Button sx={{ color: "#fff" }} onClick={handleArtDelete}>Delete</Button>
               <Link href={`/artist/create?edit=true&post_id=${artInfo?.post_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
             </ButtonGroup>
           </Stack>
