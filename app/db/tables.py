@@ -33,3 +33,25 @@ def params_to_where_clause(**kwargs):
 
 def natural_join_models(models: list[ModelProtocal]) -> str:
     return " NATURAL JOIN ".join([model.get_table_name() for model in models if model is not None])
+
+
+class JoinModel:
+    def __init__(self, model: ModelProtocal, on: str, join_type: str = "INNER JOIN") -> None:
+        self.model = model
+        self.on = on
+        self.join_type = join_type
+    
+    
+
+def join_models(models: list[JoinModel]) -> str:
+    if not models:
+        return ""
+    
+    result = f"{models[0].model.get_table_name()}"
+    
+    for i in range(1, len(models)):
+        prev = models[i-1]
+        curr = models[i]
+        result += f" {prev.join_type} {curr.model.get_table_name()} ON {prev.model.get_table_name()}.{prev.on} = {curr.model.get_table_name()}.{prev.on}"
+    
+    return result

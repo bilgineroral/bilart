@@ -1,17 +1,20 @@
+from enum import Enum
 from typing import Any
 from fastapi import APIRouter, Depends
+from db.tables import JoinModel
 
-from modules.art.model import ArtModel
-from modules.post.model import PostModel
-from modules.auction.model import AuctionModel
-from modules.user.auth import get_current_user
+
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve, get_from_table
 from db.insert import insert
 
-from modules.bid.model import BidModel, CreateBid, Updatebid
+from modules.bid.model import BidModel, CreateBid
+from modules.collector.model import CollectorModel
+from modules.user.auth import get_current_user
+from modules.user.model import UserModel
+
 
 
 router = APIRouter(prefix="/bids", tags=['bids'])
@@ -30,6 +33,23 @@ def get_bid(
     return {"data": items[0], "success": success, "message": message}
 
 
+class PriceOrder(Enum):
+    asc = "asc"
+    desc = f"desc"
+    
+    @staticmethod
+    def get_asc():
+        return f"{BidModel.get_table_name()}.price ASC"
+    
+    @staticmethod
+    def get_desc():
+        return f"{BidModel.get_table_name()}.price DESC"
+    
+    @staticmethod
+    def get_val(val: str):
+        return PriceOrder.get_desc() if val == "desc" else PriceOrder.get_asc()
+
+
 @router.get("/")
 def get_bids(
     bid_id: int | None = None,
@@ -39,20 +59,28 @@ def get_bids(
     auction_id: int | None = None,
     collector_id: int | None = None,
     payment_done: bool | None = None,
-    created_at: str | None = None
+    created_at: str | None = None,
+    price_order: PriceOrder | None = PriceOrder.asc
 ):
-    success, count, message, items = retrieve(
-        tables=[BidModel],
-        single=False,
-        bid_id=bid_id,
-        price=price,
-        gt__price=gt__price,
-        lt__price=lt__price,
-        auction_id=auction_id,
-        collector_id=collector_id,
-        payment_done=payment_done,
-        created_at=created_at
-    )
+    filters = {
+        'join_tables': [
+            JoinModel(BidModel, 'collector_id'),
+            JoinModel(CollectorModel, 'user_id'),
+            JoinModel(UserModel, 'user_id')
+        ],
+        'single':False,
+        f'table__{BidModel.get_table_name()}__bid_id':bid_id,
+        f'table__{BidModel.get_table_name()}__price':price,
+        f'table__{BidModel.get_table_name()}__gt__price':gt__price,
+        f'table__{BidModel.get_table_name()}__lt__price':lt__price,
+        f'table__{BidModel.get_table_name()}__auction_id':auction_id,
+        'collector_id':collector_id,
+        f'table__{BidModel.get_table_name()}__payment_done':payment_done,
+        f'table__{BidModel.get_table_name()}__created_at':created_at
+    }
+    success, count, message, items = retrieve(**filters, order_by=[
+        price_order.get_val(price_order.value) if price_order else None
+    ])
 
     return {"data": items, "success": success, "message": message, "count": count}
 

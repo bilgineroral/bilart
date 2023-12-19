@@ -1,5 +1,6 @@
+from enum import Enum
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from modules.collection.model import CollectionModel
 from modules.tag__post.model import TagPostModel
 from modules.art__collection.model import ArtCollectionModel
@@ -42,6 +43,40 @@ def get_art(
     return {"data": items[0], "success": success, "message": message}
 
 
+class ArtDateOrder(Enum):
+    asc = "asc"
+    desc = f"desc"
+    
+    @staticmethod
+    def get_asc():
+        return f"{PostModel.get_table_name()}.created_at ASC"
+    
+    @staticmethod
+    def get_desc():
+        return f"{PostModel.get_table_name()}.created_at DESC"
+    
+    @staticmethod
+    def get_val(val: str):
+        return ArtDateOrder.get_desc() if val == "desc" else ArtDateOrder.get_asc()
+
+
+class PriceOrder(Enum):
+    asc = "asc"
+    desc = f"desc"
+    
+    @staticmethod
+    def get_asc():
+        return f"{ArtModel.get_table_name()}.price ASC"
+    
+    @staticmethod
+    def get_desc():
+        return f"{ArtModel.get_table_name()}.price DESC"
+    
+    @staticmethod
+    def get_val(val: str):
+        return PriceOrder.get_desc() if val == "desc" else PriceOrder.get_asc()
+
+
 @router.get("/")
 def get_arts(
     content: str | None = None,
@@ -54,7 +89,9 @@ def get_arts(
     collector_id: int | None = None,
     tag_name: str | None = None,
     collection: int | None = None,
-    favoriting_collector: int | None = None
+    favoriting_collector: int | None = None,
+    date_order: ArtDateOrder | None = ArtDateOrder.asc,
+    price_order: PriceOrder | None = PriceOrder.asc
 ):
     filters = {
         "tables": [
@@ -77,7 +114,10 @@ def get_arts(
         f"table__{FavoriteModel.get_table_name()}__collector_id": favoriting_collector,
     }
 
-    success, count, message, items = retrieve(**filters)
+    success, count, message, items = retrieve(**filters, order_by=[
+        date_order.get_val(date_order.value) if date_order else None,
+        price_order.get_val(price_order.value) if price_order else None
+    ])
 
     return {"data": items, "success": success, "message": message, "count": count}
 
