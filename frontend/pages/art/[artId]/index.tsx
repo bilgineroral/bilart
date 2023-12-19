@@ -186,10 +186,13 @@ export default function ArtPage() {
                 starting price
               </Typography>
             </div>
-            <Typography color="#fff">{artInfo?.description}</Typography>
+            <Box sx={{padding: "1rem", borderRadius: 5, backgroundColor: theme.palette.primary.main, flexGrow: 1, overflowY: "scroll"}}>
+              <Typography variant="h5" color="#fff">Description</Typography>
+              <Typography color="#fff">{artInfo?.description}</Typography>
+            </Box>
             <ButtonGroup
               variant="contained"
-              sx={{ position: "absolute", bottom: 0, right: 0 }}
+              sx={{ alignSelf: "flex-end" }}
             >
               <Button sx={{ color: "#fff" }}>Auction</Button>
               <Button sx={{ color: "#fff" }}>Delete</Button>

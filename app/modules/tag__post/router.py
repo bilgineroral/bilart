@@ -19,6 +19,7 @@ def categorise(favortie: TagPostModel,
         'tables': [PostModel],
         'single': True,
         'artist_id': user['artist_id'],
+        'post_id': favortie.post_id
     }
     
     retrieve(**filters)

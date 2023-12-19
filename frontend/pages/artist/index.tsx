@@ -43,7 +43,7 @@ export default function ArtistHomePage() {
         actions={[]}
       />
       <DomainDivider color="#fff" />
-    <Grid container gap={3}>
+    <Grid container spacing={1}>
       {
         arts.map((art, index) => {
           return (
