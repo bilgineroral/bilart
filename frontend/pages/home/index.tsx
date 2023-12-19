@@ -3,12 +3,22 @@ import { getArts } from "@/api/art";
 import { ArtCard } from "@/components/artist";
 import { useSnackbar } from "@/store/snackbar";
 import { getTags } from "@/api/tags";
-import { ListItemIcon, IconButton, Select, MenuItem, FormControl, InputLabel, Chip, Button, Menu, Grid, Tooltip, Typography, Divider } from '@mui/material';
-import { ArrowUpward, ArrowDownward, Tune, Sell } from "@mui/icons-material";
+import {
+    ListItemIcon, IconButton, Select, MenuItem, FormControl,
+    InputLabel, Chip, Button, Menu, Grid, Tooltip, Typography, Divider,
+    Fab, Box
+} from '@mui/material';
+import { useAtom } from "jotai";
+import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
+import { ArrowUpward, ArrowDownward, Tune, Sell, Collections } from "@mui/icons-material";
+import Link from "next/link";
+
 
 export default function Home() {
 
     const snackbar = useSnackbar();
+    const [accountType] = useAtom(accountTypeAtom);
+
     const [arts, setArts] = React.useState<Art[]>([]);
     const [tags, setTags] = React.useState<any>([]);
 
@@ -33,7 +43,7 @@ export default function Home() {
 
     const handleCloseTag = (val: any) => {
         console.log(val);
-        
+
         setTag(val);
         setAnchorEl2(null);
     };
@@ -44,7 +54,7 @@ export default function Home() {
             try {
                 console.log(tag);
                 console.log("sort= ", sort);
-                
+
                 const resp = await getArts({
                     date_order: sort == "da" ? "asc" :
                         sort == "dd" ? "desc" : null,
@@ -95,8 +105,8 @@ export default function Home() {
     }, [arts]);
 
     return (
-        <div style={{alignContent: 'center'}}>
-            <Grid container gap={3} style={{ marginBottom: '20px'}}>
+        <div style={{ alignContent: 'center' }}>
+            <Grid container gap={3} style={{ marginBottom: '20px' }}>
                 <Tooltip title="Sort art works">
                     <Button variant="contained" endIcon={<Tune />} onClick={handleClick} style={{ minWidth: 150 }}>
                         Sort
@@ -166,7 +176,7 @@ export default function Home() {
                     React.Children.toArray(
                         ArtCards.map((card) => {
                             return (
-                                <Grid item xs={3} style={{ marginRight: '40px', marginBottom: '40px'}}>
+                                <Grid item xs={3} style={{ marginRight: '40px', marginBottom: '40px' }}>
                                     {card}
                                 </Grid>
                             )
@@ -174,10 +184,20 @@ export default function Home() {
                     )
                 }
             </Grid>
+            {
+                accountType == "collector" &&
+                <Box position="fixed" right={60} bottom={60} m={2}>
+                    <Link href={"/collections"}>
+                        <Fab variant="extended">
+                            <Collections sx={{ mr: 1 }} /> {/* Collections: Icon name, not a component */}
+                            Go to collections
+                        </Fab>
+                    </Link>
+                </Box>
+            }
         </div>
     )
 }
-
 
 
 export async function getStaticProps() {

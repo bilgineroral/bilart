@@ -112,7 +112,8 @@ export default function Layout(props : LayoutProps) {
           </Grid>
           <Grid item xs={2}>
             <div style={{display : "flex", alignItems : "center"}}>
-              <Link href={accountType === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
+              {/* accountType === "artist" ? "/collector" : "/artist" */}
+              <Link href={"/home"} style={{width : "100%"}}>
                 <Button 
                   color="secondary" 
                   variant="contained" 
