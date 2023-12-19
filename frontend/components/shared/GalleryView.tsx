@@ -14,14 +14,11 @@ export function GalleryView( props: CardView ) {
 
     return(
         <Grid container gap={3} justifyContent="space-between">
-
             {props.cards?.map((element, index) => (
                 <Grid item xs={3} key={index}>
                     {element}
                 </Grid>
             ))}
-            
         </Grid>
-
     )
 };

@@ -1,10 +1,19 @@
 import axios from "axios";
 
+export const AuthError = class extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
 export const getEncodedCredentials = (): string => {
   const username = localStorage.getItem("username");
   const password = localStorage.getItem("password");
   if (!username || !password) {
-    throw new Error("Credentials not found in local storage");
+    throw new AuthError("Credentials not found in local storage");
   }
   return Buffer.from(`${username}:${password}`).toString("base64");
 };
@@ -15,17 +24,19 @@ export const setCredentials = (username: string, password: string): void => {
 };
 
 export const cleanCredentials = (): void => {
-    localStorage.clear();
+    localStorage.removeItem("username");
+    localStorage.removeItem("password");
 };
 
 // Generic GET function
 export const get = async <T>(url: string): Promise<ApiReuslt<T>> => {
-  const response = await axios.get<ApiReuslt<T>>(url, {
-    headers: {
-      Authorization: `Basic ${getEncodedCredentials()}`,
-    },
-  });
-  return response.data;
+    const credentials = getEncodedCredentials();
+    const response = await axios.get<ApiReuslt<T>>(url, {
+      headers: {
+        Authorization: `Basic ${credentials}`,
+      },
+    });
+    return response.data;
 };
 
 // Generic POST function
