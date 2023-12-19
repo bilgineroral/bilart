@@ -1,4 +1,5 @@
 import {get, post, put, deleteItem, toQueryString} from "./crude";
+import type {Auction, ApiReuslt} from "./api_types";
 
 export const getAuction = async (auctionId: number): Promise<ApiReuslt<Auction>> => {
     return get<Auction>(`http://localhost:8000/auctions/${auctionId}`);
@@ -21,7 +22,7 @@ export const getAuctions = async (params: AuctionQueryParams): Promise<ApiReuslt
 };
 
 
-type NewAuctionData = {
+export type NewAuctionData = {
     start_time: string;
     end_time: string;
     active: boolean;

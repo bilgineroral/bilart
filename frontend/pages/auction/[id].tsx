@@ -1,4 +1,5 @@
 import * as React from "react";
+import type { Art, Bid, Tag, Auction } from "@/api/api_types";
 import { useRouter } from "next/router";
 import {
   Badge,
@@ -16,14 +17,14 @@ import { acceptPayment, getBids } from "@/api/bid";
 import { getTags } from "@/api/tags";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { DomainDivider } from "@/components/shared";
+import { DomainDivider, PostActionsBar } from "@/components/shared";
 
 const AuctionPage: React.FC = () => {
   const router = useRouter();
   const snackbar = useSnackbar();
   const theme = useTheme();
   const { query } = router;
-  const auctionId = query.auctionId;
+  const auctionId = query.id;
 
   const [art, setArt] = React.useState<Art>();
   const [auction, setAuction] = React.useState<Auction>();
@@ -124,6 +125,10 @@ const AuctionPage: React.FC = () => {
 
   return (
     <Stack direction="column" gap={2} sx={{ height: "100%", padding: "20px" }}>
+      <PostActionsBar 
+        title="Auction Management"
+        actions={[]}
+      />
       <Stack
         direction="column"
         gap={1}

@@ -3,8 +3,6 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from db.tables import JoinModel
 
-
-
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve, get_from_table
@@ -14,8 +12,6 @@ from modules.bid.model import BidModel, CreateBid
 from modules.collector.model import CollectorModel
 from modules.user.auth import get_current_user
 from modules.user.model import UserModel
-
-
 
 router = APIRouter(prefix="/bids", tags=['bids'])
 
