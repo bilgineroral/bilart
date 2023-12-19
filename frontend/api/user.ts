@@ -1,11 +1,12 @@
 import {get, post, put, deleteItem, toQueryString, setCredentials, cleanCredentials} from "./crude";
+import type {User, ApiReuslt} from "./api_types";
 
 export const getMe = async (): Promise<ApiReuslt<User>> => {
     return get<User>(`http://localhost:8000/users/me`);
 };
 
 
-export const login = async (username: string, password: string): Promise<ApiReuslt<User>> => {
+export const loginUser = async (username: string, password: string): Promise<ApiReuslt<User>> => {
     setCredentials(username, password);
     const result = await getMe();
     if (result.data == null) {

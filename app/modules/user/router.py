@@ -1,5 +1,6 @@
+import os
 from typing import Any
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 
 from db.delete import delete
 from db.update import update
@@ -11,7 +12,9 @@ from modules.user.auth import get_current_user
 from modules.admin.model import AdminModel
 from modules.collector.model import CollectorModel
 from modules.artist.model import ArtistModel
+from file_manager import FileManager
 
+FILEPATH = os.getenv("FILEPATH")
 
 router = APIRouter(prefix="/users", tags=['users'])
 
@@ -140,6 +143,26 @@ def get_users(
 
 @router.post("/register")
 def create_new_user(request_data: UserModel):
+    print(request_data)
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
 
+@router.post("/profile-image")
+async def upload_profile_picture(image : UploadFile = File(...),
+                           user: dict[str, Any] = Depends(get_current_user)
+                           ):
+    file_mgr = FileManager(f"{FILEPATH}profile_images/")
+    content = await file_mgr.save(image)
+    if content is None:
+        raise HTTPException(status_code=500, detail="Image upload failed")
+
+    success, message, user = update(
+        table=UserModel.get_table_name(),
+        model={
+            'profile_image': content
+        },
+        identifier=UserModel.get_identifier(),
+        user_id=user['user_id']
+    )
+
+    return {"message": message, "success": success, "data": dict(user)}

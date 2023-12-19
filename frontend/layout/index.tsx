@@ -11,17 +11,23 @@ import {
   IconButton,
   Badge,
   Button,
+  Avatar,
   useTheme
 } from "@mui/material";
 import {styled} from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PersonIcon from '@mui/icons-material/Person';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { getMe } from "@/api/user";
+import { AxiosError } from "axios";
+
+
 
 import {
   snackbarAtom,
   snackbarMessage,
-  snackbarSeverity
+  snackbarSeverity,
+  useSnackbar
 } from "@/store/snackbar";
 
 import { DomainImage } from "@/components/shared";
@@ -29,6 +35,10 @@ import { useNoticationCount } from "@/store/notificationcount";
 import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 
 import type { AccountType } from "@/store/accounttype";
+import { userAtom } from "@/store/user";
+import { BACKEND_URL } from "@/routes";
+import { useRouter } from "next/router";
+import { AuthError } from "@/api/crude";
 
 export interface LayoutProps {
   show: boolean | undefined;
@@ -44,17 +54,46 @@ const PageContainer = styled("div")(({theme}) => ({
 }))
 
 export default function Layout(props : LayoutProps) {
-
+  const router = useRouter();
   const theme = useTheme();
 
   const [snackbarStatus, setSnackbarStatus] = useAtom(snackbarAtom);
   const [severity, __] = useAtom(snackbarSeverity);
   const [message, ___] = useAtom(snackbarMessage);
 
-
+  const snackbar = useSnackbar();
   const [notificationCount] = useNoticationCount(2500);
   const [accountType] = useAtom(accountTypeAtom);
   const toggleAccountType = useToggleAccountType();
+
+  const [profileImgSrc, setProfileImgSrc] = React.useState<string>("");
+  const [user] = useAtom(userAtom);
+  React.useEffect(() => {
+      const fetchMe = async () => {
+        try {
+          const me = await getMe();
+          console.info("Current User");
+          console.info(me.data);
+          setProfileImgSrc(`${BACKEND_URL}/${me.data?.profile_image}`);
+        } catch (err) {
+          if (err instanceof AuthError) {
+            snackbar("error", "Session does not exist");
+            router.replace("/login")
+            return;
+          }
+          if (err instanceof AxiosError && err.response?.status === 401) {
+            snackbar("error", "Incorrect username or password");
+            router.replace("/login");
+          } else {
+            snackbar("error", "an error occured. See console for more details");
+            console.error(err);
+          }  
+        }
+      }
+
+      fetchMe();
+  }, [user]);
+
 
   return (
     <>
@@ -66,8 +105,8 @@ export default function Layout(props : LayoutProps) {
       {
         props.show &&
       <AppBar position="static" color="primary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
-        <Grid container sx={{width : "100%"}}>
-          <Grid item xs={1} sx={{height : 35}}>
+        <Grid container sx={{width : "100%"}} spacing={1}>
+          <Grid item xs={1} sx={{height : 35, display : "flex", alignItems : "center"}}>
           <DomainImage 
             alt="bil art"
             src="/app-logo.svg"
@@ -77,9 +116,7 @@ export default function Layout(props : LayoutProps) {
           <Grid item xs={1}>
             <div style={{display : "flex", justifyContent : "right", width: "100%"}}>
               <Link href={accountType === "artist" ?  "/artist/create" : "/collector/create"}>
-                <IconButton
-                  size="small"  
-                >
+                <IconButton>
                   <AddCircleOutlineIcon 
                     style={{
                       fill: "#fff"
@@ -99,15 +136,9 @@ export default function Layout(props : LayoutProps) {
                   />
                 </Badge>
               </IconButton>
-              <IconButton
-                size="small"  
-              >
-                <PersonIcon 
-                  style={{
-                    fill: "#fff"
-                  }}
-                />
-              </IconButton>
+              <Avatar 
+                src={profileImgSrc}
+              />
             </div>
           </Grid>
           <Grid item xs={2}>
@@ -116,7 +147,6 @@ export default function Layout(props : LayoutProps) {
                 <Button 
                   color="secondary" 
                   variant="contained" 
-                  size="small"
                   onClick={toggleAccountType}
                   fullWidth={true}
                 >

@@ -1,6 +1,7 @@
-type User = {
+export type User = {
     user_id: number;
     username: string;
+    password: string;
     first_name: string | null;
     last_name: string | null;
     email: string;
@@ -15,14 +16,14 @@ type User = {
     privileges: 'N' | 'M' | 'A';
 };
 
-type Collection = {
+export type Collection = {
     collection_id: number;
     name: string;
     collector_id: number;
     created_at: Date;
 };
 
-type Art = {
+export type Art = {
     art_id: number;
     content: string | null;
     price: number;
@@ -35,7 +36,7 @@ type Art = {
 };
 
 
-type Tutorial = {
+export type Tutorial = {
     tutorial_id: number;
     media: string | null;
     post_id: number;
@@ -46,7 +47,7 @@ type Tutorial = {
 };
 
 
-type Rating = {
+export type Rating = {
     rating_id: number;
     score: number;
     comment: string | null;
@@ -61,12 +62,12 @@ type Rating = {
     created_at: Date;
 };
 
-type Tag = {
+export type Tag = {
     tag_name: string;
 };
 
 
-type Auction = {
+export type Auction = {
     auction_id: number;
     start_time: Date;
     end_time: Date;
@@ -75,7 +76,7 @@ type Auction = {
 };
 
 
-type Bid = {
+export type Bid = {
     bid_id: number;
     price: number;
     auction_id: number;
@@ -91,7 +92,7 @@ type Bid = {
 };
 
 
-type NotificationModel = {
+export type NotificationModel = {
     notification_id: number;
     content: string;
     created_at: Date;
@@ -100,7 +101,7 @@ type NotificationModel = {
 };
 
 
-type ReportModel = {
+export type ReportModel = {
     report_id: number;
     content: string;
     created_at: Date;
@@ -110,7 +111,7 @@ type ReportModel = {
 };
 
 
-type ApiReuslt<T> = {
+export type ApiReuslt<T> = {
     data: T | null,
     message: string | null,
     count: number | null,

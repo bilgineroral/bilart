@@ -1,4 +1,5 @@
 import axios from "axios";
+import type {ApiReuslt} from "./api_types";
 
 export const AuthError = class extends Error {
   constructor(message: string) {
@@ -83,11 +84,13 @@ export const deleteItem = async <T>(
   url: string,
   data: T
 ): Promise<ApiReuslt<T>> => {
-  return await axios.delete(url, {
+  const credentials = getEncodedCredentials();
+  const response = await axios.delete<ApiReuslt<T>>(url, {
     headers: {
       Authorization: `Basic ${getEncodedCredentials()}`,
     },
-  });
+  }); 
+  return response.data;
 };
 
 export const toQueryString = (params: Record<string, any>): string => {

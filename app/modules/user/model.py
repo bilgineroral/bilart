@@ -12,6 +12,7 @@ class UserModel(Model):
     last_name: str | None = None
     email: str
     password: str
+    profile_image: str | None = None
     phone: str | None = None
 
     @staticmethod

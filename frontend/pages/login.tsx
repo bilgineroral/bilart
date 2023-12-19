@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 import * as React from "react";
 import { useAtom } from "jotai";
 
@@ -17,11 +16,10 @@ import { useSnackbar } from "@/store/snackbar";
 
 import {FilledInputField, DomainImage, DomainDivider, DomainButton} from "@/components/shared";
 import { useRouter } from "next/router";
-import { accountTypeAtom } from "@/store/accounttype";
 import { userAtom } from "@/store/user";
-import { Co2Sharp } from "@mui/icons-material";
-import { flushSync } from "react-dom";
-import { login } from "@/api/user";
+import {accountTypeAtom} from "@/store/accounttype";
+import { loginUser } from "@/api/user";
+import { AxiosError } from "axios";
 
 const LoginStack = styled(Stack)(({theme}) => ({
   background : theme.palette.primary.main,
@@ -40,61 +38,39 @@ export default function LoginPage() {
 
   const router = useRouter();
   const theme = useTheme();
+  const snackbar = useSnackbar();
 
   const[_, setUser] = useAtom(userAtom);
-
-  const [accountType, setAccountType] = useAtom(accountTypeAtom);
-
+  const [__, setAccountType] = useAtom(accountTypeAtom);
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword]  = React.useState<string>("");
   const [loggingIn, setLoggingIn] = React.useState<boolean>(false);
-
-  const snackbar = useSnackbar();
 
   React.useEffect(() => {
     setUsername("");
     setPassword("");
     setLoggingIn(false);
   }, [])
-
-  const handleCollectorLogin = async () => {
-      // setUser({
-      //   username: username,
-      //   password: password
-      // });
-      // setAccountType("collector");
-      // router.replace("/");  
-  } 
-
-  const handleArtistLogin = async () => {
-      flushSync(() => setLoggingIn(true));
-      try {
-        /* const auth = Buffer.from(`${username}:${password}`).toString('base64');
-        const res = await fetch(`http://localhost:8000/users/me`, {
-          method : 'GET',
-          headers: {
-            "Authorization" : `Basic ${auth}`
-          }
-        }) */
-        const data = await login(username, password);
-        //const data = await res.json();
-        console.log(data);
-        
-        if (data.data != null && "user_id" in data.data) {
-          setUser(data.data);
-          localStorage.setItem('bilart-me', JSON.stringify(data.data));
-          setAccountType("artist");   
-          router.replace("/artist");    
-        } else {
-          snackbar("error", "unauthorized");
-        }
-      } catch (err) {
-        console.log(err);
-        snackbar("error", "an error occured");
-      } finally {
-        setLoggingIn(false);
+  
+  const handleLogin = () => {
+    setLoggingIn(true);
+    loginUser(username, password)
+    .then(res => {
+      console.log(res.data);
+      setUser(res.data);
+      setAccountType("artist");
+      snackbar("success", "Login Successful");
+      router.replace("/artist");
+    })
+    .catch(err => {
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        snackbar("error", "Incorrect username or password");
+      } else {
+        snackbar("error", "an error occured. See console for more details");
+        console.error(err);
       }
-      
+    })
+    .finally(() => setLoggingIn(false));
   }
 
   return (
@@ -156,35 +132,14 @@ export default function LoginPage() {
           labelColor={theme.palette.secondary.main}
         />
 
-        <Typography 
-          variant="body2"
-          sx={{
-            textTransform : "none",
-            width : "fit-content",
-            color : theme.palette.primary.light
-          }}
-        >
-        Choose Account Type:
-        </Typography>
-
-        <ButtonGroup
-          disabled={loggingIn}
+        <DomainButton 
+          onClick={handleLogin}
+          domainType="secondary"
+          text="Login"
           size="small"
-          fullWidth
-          variant="contained"
-        >
-          <DomainButton 
-            onClick={handleCollectorLogin}
-            domainType="primary"
-            text="Login As Collector"
-          />
-          <DomainButton 
-            onClick={handleArtistLogin}
-            domainType="secondary"
-            text="Login As Artist"
-          />
-        </ButtonGroup>
-        
+          fullWidth 
+          variant="contained"           
+        />
         <DomainDivider />
 
         <Typography variant="h6" sx={{color : theme.palette.primary.light}}>

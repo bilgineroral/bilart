@@ -1,10 +1,11 @@
+import * as React from "react";
+
+import type {Art} from "@/api/api_types";
 import { getArts } from "@/api/art";
 import { getMe } from "@/api/user";
 import { ArtCard, CreateArtButton } from "@/components/artist";
 import { useSnackbar } from "@/store/snackbar";
 import { Grid } from "@mui/material";
-import * as React from "react";
-
 
 export default function ArtistHomePage() {
 
@@ -16,6 +17,7 @@ export default function ArtistHomePage() {
       try {
         const me = await getMe();
         const data = await getArts({artist_id: me.data?.artist_id});
+        console.info("Arts");
         console.log(data);
         if (data.success && data.data != null) {
           setArt(data.data);

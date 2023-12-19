@@ -1,13 +1,10 @@
 import Link from "next/link";
 
 import * as React from "react";
-
 import {
   Stack, 
   useTheme,
   Button,
-  ButtonGroup,
-  Typography,
   CircularProgress,
   Grid,
 } from "@mui/material";
@@ -23,6 +20,10 @@ import {
   DomainImageUpload
 } from "@/components/shared";
 import { useRouter } from "next/router";
+import { createNewUser, loginUser } from "@/api/user";
+import { User } from "@/api/api_types";
+import { postFormData } from "@/api/crude";
+import { profile } from "console";
 
 const RegisterStack = styled(Stack)(({theme}) => ({
   background : theme.palette.primary.main,
@@ -47,9 +48,9 @@ export default function RegisterPage() {
 
   const [username, setUsername] = React.useState<string>("");
   const [password, setPassword]  = React.useState<string>("");
-
-  const [phonenumber, setPhonenumber] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
+  const [profileImg, setProfileImg] = React.useState<Blob | null>(null);
+
 
   const [registering, setRegistering] = React.useState<boolean>(false);
 
@@ -63,29 +64,32 @@ export default function RegisterPage() {
   }, [])
 
   const handleRegister = async () => {
-    try {
-      const res = await fetch(`http://localhost:8000/users/register`, {
-        method : "POST",
-        headers: {
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-          email: email,
-          phone: phonenumber,
-          first_name: firstname,
-          last_name: lastname 
-        })
-      })
-      const data = await res.json();
-      console.log(data);
-      snackbar("success", "registered");
-      router.replace("/login");
-  
-    } catch(err) {
-      console.log(err);
+    const newUser: Partial<User> = {
+      username : username,
+      password: password,
+      first_name: firstname,
+      last_name: lastname,
+      email: email
     }
+
+    createNewUser(newUser as User)
+    .then(() => {
+      return loginUser(username, password);
+    })
+    .then(data => {
+      if (profileImg !== null) {
+        const profileImgUrl = "http://localhost:8000/users/profile-image";
+        const formData = new FormData();
+        formData.append("image", profileImg);
+        return postFormData(profileImgUrl, formData);
+      }
+      return data;
+    })
+    .then(data => {
+      snackbar("success", "Account was registered");
+      router.replace("/login");      
+    })
+    .catch(err => console.error(err))
   }
 
   return (
@@ -119,7 +123,7 @@ export default function RegisterPage() {
         />
         <DomainDivider />
         <Grid container gap={0.5} justifyContent="space-between">
-          <Grid item xs={5.75}>
+          <Grid item xs={5.75}> 
             <FilledInputField
               disabled={registering}
               placeholder="First Name"
@@ -151,66 +155,58 @@ export default function RegisterPage() {
               labelColor={theme.palette.secondary.main}
             />
           </Grid>
-        </Grid>
-        <FilledInputField
-          disabled={registering}
-          placeholder="Username"
-          label="Username"
-          fullWidth
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          multiline={false}
-          size="small"
-          background={theme.palette.primary.light}
-          hoverbackground={theme.palette.secondary.light}
-          focusedbackground={theme.palette.secondary.light}
-          labelColor={theme.palette.secondary.main}
-        />
-        <FilledInputField 
-          disabled={registering}
-          placeholder="Password"
-          label="Password"
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          multiline={false}
-          size="small"
-          background={theme.palette.primary.light}
-          hoverbackground={theme.palette.secondary.light}
-          focusedbackground={theme.palette.secondary.light}
-          labelColor={theme.palette.secondary.main}
-        />
-        <FilledInputField 
-          disabled={registering}
-          placeholder="Email"
-          label="Email"
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          multiline={false}
-          size="small"
-          background={theme.palette.primary.light}
-          hoverbackground={theme.palette.secondary.light}
-          focusedbackground={theme.palette.secondary.light}
-          labelColor={theme.palette.secondary.main}
-        />
-        <FilledInputField 
-          disabled={registering}
-          placeholder="Phone Number"
-          label="Phone Number"
-          fullWidth
-          value={phonenumber}
-          onChange={(e) => setPhonenumber(e.target.value)}
-          multiline={false}
-          size="small"
-          background={theme.palette.primary.light}
-          hoverbackground={theme.palette.secondary.light}
-          focusedbackground={theme.palette.secondary.light}
-          labelColor={theme.palette.secondary.main}
-        />
-
+          <Grid item xs={5.75}>
+            <FilledInputField
+              disabled={registering}
+              placeholder="Username"
+              label="Username"
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              multiline={false}
+              size="small"
+              background={theme.palette.primary.light}
+              hoverbackground={theme.palette.secondary.light}
+              focusedbackground={theme.palette.secondary.light}
+              labelColor={theme.palette.secondary.main}
+            />
+          </Grid>
+          <Grid item xs={5.75}>
+            <FilledInputField 
+              disabled={registering}
+              placeholder="Email"
+              label="Email"
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              multiline={false}
+              size="small"
+              background={theme.palette.primary.light}
+              hoverbackground={theme.palette.secondary.light}
+              focusedbackground={theme.palette.secondary.light}
+              labelColor={theme.palette.secondary.main}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <FilledInputField 
+              disabled={registering}
+              placeholder="Password"
+              label="Password"
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              multiline={false}
+              size="small"
+              background={theme.palette.primary.light}
+              hoverbackground={theme.palette.secondary.light}
+              focusedbackground={theme.palette.secondary.light}
+              labelColor={theme.palette.secondary.main}
+            />
+          </Grid>
+      </Grid>
         <DomainImageUpload 
-          onImageFinal={(imgSrc)=> {}}
+          onImageFinal={(imgSrc, imgBlob)=> setProfileImg(imgBlob)}
+          justifyContent="left"
         />
 
         <div>
@@ -232,7 +228,7 @@ export default function RegisterPage() {
                 width : "fit-content"
               }}
             >
-              or click here to Log In 
+              or Log In 
             </Button>
           </Link>
         </div>
