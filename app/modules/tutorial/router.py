@@ -25,14 +25,14 @@ FILEPATH = os.getenv("FILEPATH")
 router = APIRouter(prefix="/tutorials", tags=['tutorials'])
 
 
-@router.get("/{art_id}")
+@router.get("/{tutorial_id}")
 def get_art(
-    art_id: int
+    tutorial_id: int
 ):
     success, _, message, items = retrieve(
         tables=[TutorialModel, PostModel],
         single=True,
-        art_id=art_id
+        tutorial_id=tutorial_id
     )
 
     return {"data": items[0], "success": success, "message": message}
@@ -68,7 +68,6 @@ def get_arts(
 @router.post("/")
 async def create_new_art( title: str = Form(...),
                     description: str = Form(...),
-                    price: int = Form(...),
                     image: UploadFile = File(...),
                     user: dict[str, Any] = Depends(get_current_user)):
     
@@ -96,26 +95,17 @@ async def create_new_art( title: str = Form(...),
     return {"message": message, "success": success, "data": dict(post, **art)}
 
 
-@router.delete("/{art_id}")
-def delete_art(art_id: int):
+@router.delete("/{post_id}")
+def delete_art(post_id: int):
     success, message = delete(
-        table=TutorialModel.get_table_name(),
-        art_id=art_id
+        table=PostModel.get_table_name(),
+        post_id=post_id
     )
     return {"message": message, "success": success}
 
 
-@router.put("/{art_id}")
-def update_art(art_id: int, request_data: UpdateTutorial):
-    success, message, art = update(
-        table=TutorialModel.get_table_name(),
-        model={
-            'media': request_data.media,
-        },
-        identifier=TutorialModel.get_identifier(),
-        art_id=art_id
-    )
-    
+@router.put("/")
+def update_art(request_data: UpdateTutorial):
     success, message, post = update(
         table=PostModel.get_table_name(),
         model={
@@ -123,7 +113,7 @@ def update_art(art_id: int, request_data: UpdateTutorial):
             'description': request_data.description
         },
         identifier=PostModel.get_identifier(),
-        art_id=art_id
+        post_id=request_data.post_id
     )
     
-    return {"message": message, "success": success, "data": dict(post, **art)}
+    return {"message": message, "success": success, "data": dict(post)}

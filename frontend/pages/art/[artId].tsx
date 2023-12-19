@@ -204,7 +204,7 @@ export default function ArtPage() {
             >
               <Button sx={{ color: "#fff" }}>Auction</Button>
               <Button sx={{ color: "#fff" }} onClick={handleArtDelete}>Delete</Button>
-              <Link href={`/artist/create?edit=true&post_id=${artInfo?.post_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
+              <Link href={`/art/create?edit=true&post_id=${artInfo?.art_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
             </ButtonGroup>
           </Stack>
         </Grid>

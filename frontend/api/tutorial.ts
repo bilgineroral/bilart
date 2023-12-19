@@ -1,13 +1,14 @@
 import {get, postFormData, put, deleteItem, toQueryString} from "./crude";
+import type { Tutorial, ApiReuslt } from "./api_types";
 
 export const getTutorial = async (tutorialId: number): Promise<ApiReuslt<Tutorial>> => {
-    return get<Tutorial>(`http://localhost:8000/tutorial/${tutorialId}`);
+    return get<Tutorial>(`http://localhost:8000/tutorials/${tutorialId}`);
 };
 
 export type TutorialQueryParams = {
     media?: string;
     created_at?: string;
-    tutorialist_id?: number;
+    artist_id?: number;
     title?: string;
     description?: string;
     search__title?: string;
@@ -18,39 +19,39 @@ export type TutorialQueryParams = {
 
 export const getTutorials = async (params: TutorialQueryParams): Promise<ApiReuslt<Tutorial[]>> => {
     const queryString = toQueryString(params);
-    return get<Tutorial[]>(`http://localhost:8000/tutorial?${queryString}`);
+    return get<Tutorial[]>(`http://localhost:8000/tutorials?${queryString}`);
 };
 
 export type NewTutorialData = {
     title: string;
     description: string;
-    media: File; // Handle file data appropriately
+    media: Blob; // Handle file data appropriately
 };
 
 export const createNewTutorial = async (data: NewTutorialData): Promise<ApiReuslt<Tutorial>> => {
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
-    formData.append('media', data.media);
+    formData.append('image', data.media);
 
     // Add any other fields to formData as needed
-    return await postFormData<Tutorial>(`http://localhost:8000/art`, formData);
+    return await postFormData<Tutorial>(`http://localhost:8000/tutorials`, formData);
 };
 
-type UpdateTutorialData = {
-    content?: string;
+export type UpdateTutorialData = {
     title?: string;
     description?: string;
+    post_id?: number;
 };
 
 
-export const updateTutorial = async (tutorialId: number, data: UpdateTutorialData): Promise<ApiReuslt<Tutorial>> => {
-    return put<UpdateTutorialData, Tutorial>(`http://localhost:8000/tutorial/${tutorialId}`, data);
+export const updateTutorial = async ( data: UpdateTutorialData): Promise<ApiReuslt<Tutorial>> => {
+    return put<UpdateTutorialData, Tutorial>(`http://localhost:8000/tutorials`, data);
 };
 
 
-export const deleteTutorial = async (tutorialId: number): Promise<ApiReuslt<null>> => {
-    return await deleteItem(`http://localhost:8000/tutorial/${tutorialId}`, null);
+export const deleteTutorial = async (tutorial : Tutorial): Promise<ApiReuslt<null>> => {
+    return await deleteItem(`http://localhost:8000/tutorials/${tutorial.post_id}`, null);
 };
 
 

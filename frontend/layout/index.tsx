@@ -10,14 +10,14 @@ import {
   Grid,
   IconButton,
   Badge,
-  Button,
   Avatar,
-  useTheme
+  Menu,
+  useTheme,
+  Button,
+  MenuItem
 } from "@mui/material";
 import {styled} from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import PersonIcon from '@mui/icons-material/Person';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { getMe } from "@/api/user";
 import { AxiosError } from "axios";
 
@@ -63,8 +63,15 @@ export default function Layout(props : LayoutProps) {
 
   const snackbar = useSnackbar();
   const [notificationCount] = useNoticationCount(2500);
-  const [accountType] = useAtom(accountTypeAtom);
-  const toggleAccountType = useToggleAccountType();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };  
 
   const [profileImgSrc, setProfileImgSrc] = React.useState<string>("");
   const [user] = useAtom(userAtom);
@@ -112,19 +119,9 @@ export default function Layout(props : LayoutProps) {
             src="/app-logo.svg"
           />
           </Grid>
-          <Grid item xs={8} />
-          <Grid item xs={1}>
-            <div style={{display : "flex", justifyContent : "right", width: "100%"}}>
-              <Link href={accountType === "artist" ?  "/artist/create" : "/collector/create"}>
-                <IconButton>
-                  <AddCircleOutlineIcon 
-                    style={{
-                      fill: "#fff"
-                    }}
-                  />
-                </IconButton>
-              </Link>
-              
+          <Grid item xs={9} />
+          <Grid item xs={2}>
+            <div style={{display : "flex", justifyContent : "right", width: "100%", gap: 5}}>
               <IconButton
                 size="small"  
               >
@@ -136,23 +133,34 @@ export default function Layout(props : LayoutProps) {
                   />
                 </Badge>
               </IconButton>
-              <Avatar 
-                src={profileImgSrc}
-              />
-            </div>
-          </Grid>
-          <Grid item xs={2}>
-            <div style={{display : "flex", alignItems : "center"}}>
-              <Link href={accountType === "artist" ? "/collector" : "/artist"} style={{width : "100%"}}>
-                <Button 
-                  color="secondary" 
-                  variant="contained" 
-                  onClick={toggleAccountType}
-                  fullWidth={true}
-                >
-                  Switch To {accountType === "artist" ? "collector" : "artist"}
-                </Button>
-              </Link>
+              <Button
+                id="menu-btn" 
+                size="small"
+                onClick={handleClick}
+              >
+                <Avatar 
+                  src={profileImgSrc}
+                />
+              </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'menu- btn'
+                }}
+              >
+                <MenuItem onClick={handleClose}>Profile</MenuItem>
+                <Link href="/art">
+                  <MenuItem onClick={handleClose}>My Arts</MenuItem>
+                </Link>
+                <Link href="/collector">
+                  <MenuItem onClick={handleClose}>My Collections</MenuItem>
+                </Link>
+                <Link href="/tutorial">
+                  <MenuItem onClick={handleClose}>My Tutorials</MenuItem>
+                </Link>
+              </Menu>
             </div>
           </Grid>
         </Grid>

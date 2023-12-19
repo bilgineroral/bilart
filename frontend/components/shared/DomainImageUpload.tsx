@@ -182,7 +182,7 @@ export function DomainImageUpload (props : DomainImageUploadProps) {
                 height : 150
               }}
             >
-              <Typography color="#fff">Art Image Cannot Be Changed. Please Create A New Art Piece</Typography>
+              <Typography color="#fff">Image Cannot Be Changed</Typography>
             </DropBox>
             :
             <DropBox

@@ -41,7 +41,6 @@ class TutorialModel(Model):
     
     
 class UpdateTutorial(BaseModel):
-    media: str | None
     post_id: int | None
     title: str | None
     description: str | None

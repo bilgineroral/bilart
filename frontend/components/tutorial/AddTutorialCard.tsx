@@ -8,7 +8,7 @@ import { CardContent, Typography, useTheme } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 
 
-export function AddArtCard() {
+export function AddTutorialCard() {
   
   const theme = useTheme();
   
@@ -21,13 +21,13 @@ export function AddArtCard() {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Create New Art
+          Create New Tutorial
         </Typography>
         <Typography variant="body2" color="text.secondary">
         </Typography>
       </CardContent>
       <CardActions>
-        <Link href={`/art/create`}>
+        <Link href={`/tutorial/create`}>
           <Button size="small" startIcon={<LinkIcon style={{fill : theme.palette.primary.main}} />}>Create</Button>       
         </Link>
       </CardActions>
