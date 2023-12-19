@@ -3,51 +3,59 @@ import { getArts } from "@/api/art";
 import { ArtCard } from "@/components/artist";
 import { useSnackbar } from "@/store/snackbar";
 import { getTags } from "@/api/tags";
-import { Select, MenuItem, FormControl, InputLabel, Chip, Button, Menu, Grid } from '@mui/material';
-
-
-
+import { ListItemIcon, IconButton, Select, MenuItem, FormControl, InputLabel, Chip, Button, Menu, Grid, Tooltip, Typography, Divider } from '@mui/material';
+import { ArrowUpward, ArrowDownward, Tune, Sell } from "@mui/icons-material";
 
 export default function Home() {
 
     const snackbar = useSnackbar();
     const [arts, setArts] = React.useState<Art[]>([]);
     const [tags, setTags] = React.useState<any>([]);
-    const [anchorEl1, setAnchorEl1] = React.useState<null | HTMLElement>(null);
+
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [anchorEl2, setAnchorEl2] = React.useState<null | HTMLElement>(null);
-    const [selectedOptions, setSelectedOptions] = React.useState<any>([]);
-    const [sortOption, setSortOption] = React.useState('');
 
-    const handleOption = (event: React.ChangeEvent<{ value: unknown }>) => {
-
-    };
+    const [sort, setSort] = React.useState<any>("");
+    const [tag, setTag] = React.useState('');
 
     const handleChange = (event: any) => {
-        setSelectedOptions(event.target.value);
+        setSort(event.target.value);
     };
 
-
-    const handleClick1 = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl1(event.currentTarget);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
     };
 
-    const handleClose1 = () => {
-        setAnchorEl1(null);
+    const handleClickTag = (event: any) => {
+        setAnchorEl2(event.currentTarget)
     };
 
-    const handleClick2 = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl2(event.currentTarget);
+    const handleCloseSort = (value: any) => {
+        setSort(value);
+        setAnchorEl(null);
     };
 
-    const handleClose2 = () => {
+    const handleCloseTag = (val: any) => {
+        console.log(val);
+        
+        setTag(val);
         setAnchorEl2(null);
     };
+
 
     React.useEffect(() => {
         const fetchArts = async () => {
             try {
+                console.log(tag);
+                
+                const resp = await getArts({
+                    date_order: sort == "da" ? "asc" :
+                        sort == "dd" ? "desc" : null,
+                    price_order: sort == "pa" ? "asc" :
+                        sort == "pd" ? "desc" : null,
+                    tag_name: tag || null
 
-                const resp = await getArts({});
+                });
                 if (resp.success && resp.data != null) {
                     setArts(resp.data);
                 } else {
@@ -72,7 +80,7 @@ export default function Home() {
         fetchArts();
         fetchTags();
         console.log(tags);
-    }, [arts.length]);
+    }, [arts.length, sort, tag]);
 
     const ArtCards = React.useMemo(() => {
         const artcards = arts.map((art, index) => {
@@ -90,46 +98,70 @@ export default function Home() {
     }, [arts]);
 
     return (
-        <div>
-            <Grid container gap={3} style={{ marginBottom: '20px' }}>
-                <FormControl>
-                    <InputLabel id="demo-multiple-chip-label">Select Options</InputLabel>
-                    <Select
-                        labelId="demo-multiple-chip-label"
-                        id="demo-multiple-chip"
-                        multiple
-                        value={selectedOptions}
-                        onChange={handleChange}
-                        renderValue={(selected) => (
-                            <div>
-                                {selected.map((value: any) => (
-                                    <Chip key={value} label={value} />
-                                ))}
-                            </div>
-                        )}
-                    >
-                        <MenuItem value={"Date ascending"} disabled={selectedOptions.includes("Date descending")}>Date ascending</MenuItem>
-                        <MenuItem value={"Date descending"} disabled={selectedOptions.includes("Date ascending")}>Date descending</MenuItem>
-                        <MenuItem value={"Price ascending"} disabled={selectedOptions.includes("Price descending")}>Price ascending</MenuItem>
-                        <MenuItem value={"Price descending"} disabled={selectedOptions.includes("Price ascending")}>Price descending</MenuItem>
-                    </Select>
-                </FormControl>
+        <div style={{alignContent: 'center'}}>
+            <Grid container gap={3} style={{ marginBottom: '20px'}}>
+                <Tooltip title="Sort art works">
+                    <Button variant="contained" endIcon={<Tune />} onClick={handleClick} style={{ minWidth: 150 }}>
+                        Sort
+                    </Button>
 
-                <Button aria-controls="dropdown-menu-2" aria-haspopup="true" onClick={handleClick2}>
-                    Dropdown 2
-                </Button>
+                </Tooltip>
                 <Menu
-                    id="dropdown-menu-2"
-                    anchorEl={anchorEl2}
-                    keepMounted
-                    open={Boolean(anchorEl2)}
-                    onClose={handleClose2}
+                    anchorEl={anchorEl}
+                    id="options-menu"
+                    open={anchorEl ? true : false}
+                    onClose={() => setAnchorEl(null)}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    {tags.map((tag: any) => (
-                        <MenuItem key={tag} onClick={handleClose2}>
-                            {tag}
-                        </MenuItem>
-                    ))}
+                    <MenuItem onClick={() => handleCloseSort('da')}>
+                        <ListItemIcon>
+                            <ArrowUpward fontSize="small" />
+                        </ListItemIcon>
+                        Date ascending
+                    </MenuItem>
+                    <MenuItem onClick={() => handleCloseSort("dd")}>
+                        <ListItemIcon>
+                            <ArrowDownward fontSize="small" />
+                        </ListItemIcon>
+                        Date descending
+                    </MenuItem>
+                    <MenuItem onClick={() => handleCloseSort("pa")}>
+                        <ListItemIcon>
+                            <ArrowUpward fontSize="small" />
+                        </ListItemIcon>
+                        Price ascending
+                    </MenuItem>
+                    <MenuItem onClick={() => handleCloseSort("pd")}>
+                        <ListItemIcon>
+                            <ArrowDownward fontSize="small" />
+                        </ListItemIcon>
+                        Price descending
+                    </MenuItem>
+                </Menu>
+                <Tooltip title="Filter by tags">
+                    <Button variant="contained" endIcon={<Sell />} onClick={handleClickTag} style={{ minWidth: 150 }}>
+                        Tags
+                    </Button>
+                </Tooltip>
+                <Menu
+                    anchorEl={anchorEl2}
+                    id="tags-menu"
+                    open={Boolean(anchorEl2)}
+                    onClose={() => setAnchorEl2(null)}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                    <MenuItem onClick={() => handleCloseTag(null)}>
+                        <em>None</em>
+                    </MenuItem>
+                    {
+                        tags.map((tag: any, index: any) => (
+                            <MenuItem key={index} value={tag.tag_name} onClick={() => handleCloseTag(tag.tag_name)}>
+                                {tag.tag_name}
+                            </MenuItem>
+                        ))
+                    }
                 </Menu>
             </Grid>
             <Grid container direction="row" style={{ marginTop: '20px' }}>
@@ -137,7 +169,7 @@ export default function Home() {
                     React.Children.toArray(
                         ArtCards.map((card) => {
                             return (
-                                <Grid item xs={3} style={{ marginRight: '40px' }}>
+                                <Grid item xs={3} style={{ marginRight: '40px', marginBottom: '40px'}}>
                                     {card}
                                 </Grid>
                             )
@@ -145,11 +177,7 @@ export default function Home() {
                     )
                 }
             </Grid>
-
         </div>
-
-
-
     )
 }
 
