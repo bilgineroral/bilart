@@ -4,6 +4,8 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from modules.post.model import PostModel
 from modules.art.model import ArtModel
+from pydantic import BaseModel
+
 
 from db.delete import delete
 from db.update import update
@@ -81,7 +83,6 @@ def get_auctions(
 
     return {"data": items, "success": success, "message": message, "count": count}
 
-
 @router.post("/")
 def create_new_auction(request_data: AuctionModel, user: dict[str, Any] = Depends(get_current_user)):
     filters = {
@@ -92,7 +93,6 @@ def create_new_auction(request_data: AuctionModel, user: dict[str, Any] = Depend
     }
 
     retrieve(**filters)
-
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
 

@@ -149,10 +149,10 @@ export default function Layout(props: LayoutProps) {
     }
   }
 
-  React.useEffect(() => {
-    const fetcherInterval = setInterval(fetchNotifications, 500);
-    return () => clearInterval(fetcherInterval);
-  }, []);
+  // React.useEffect(() => {
+  //   const fetcherInterval = setInterval(fetchNotifications, 500);
+  //   return () => clearInterval(fetcherInterval);
+  // }, []);
 
   return (
     <>

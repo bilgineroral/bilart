@@ -20,6 +20,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { DomainDivider, DomainImage, PostActionsBar } from "@/components/shared";
 import { getUserById } from "@/api/user";
 import { BACKEND_URL } from "@/routes";
+import { AxiosError } from "axios";
 
 type BidUser = {
   bid: Bid;
@@ -124,10 +125,15 @@ const AuctionPage: React.FC = () => {
     try {
       const update : UpdateAuctionData = {
         active: !(auction?.active),
+        start_time: auction!.start_time,
+        end_time: auction!.end_time
       }
       await updateAuction(Number(auctionId), update);
       fetchAuction();
     } catch (err) {
+      if (err instanceof AxiosError) {
+        snackbar("error", err.response?.data.detail);
+      }
       console.error(err);
     }
   }

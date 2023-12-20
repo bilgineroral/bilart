@@ -171,7 +171,7 @@ export default function ArtPage() {
         snackbar("error", "Incorrect username or password");
         router.replace("/login");
       } else if (err instanceof AxiosError && err.response?.status === 500) {
-        snackbar("error", "end date should be greater than startdate");
+        snackbar("error", err.response.data.detail);
       } else {
         snackbar("error", "an error occured. See console for more details");
         console.error(err);
