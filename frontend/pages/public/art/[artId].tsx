@@ -264,28 +264,28 @@ export default function ArtPage() {
               React.Children.toArray(
                 auctions.map((data, index) => (
                   <Grid item xs={2}>
-                    <Paper sx={{ padding: "0.25rem 1rem" }}>
-                      <Typography>
+                    <Paper sx={{ padding: "0.25rem 1rem", backgroundColor: data.active ? theme.palette.primary.main : theme.palette.primary.light }}>
+                      <Typography color="#fff">
                         Auction {index + 1}
                         <Link href={`/public/auction/${data.auction_id}`}>
                           <IconButton>
-                            <LinkIcon fontSize="small" style={{fill: theme.palette.primary.main}} />
+                            <LinkIcon fontSize="small" style={{fill: theme.palette.secondary.main}} />
                           </IconButton>
                         </Link>
                       </Typography>
                       <DomainDivider color="black" />{" "}
                       {data.start_time != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Starting: {formatDate(data.start_time as any)}
                         </Typography>
                       ) : null}
                       {data.start_time != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Ending: {formatDate(data.end_time as any)}
                         </Typography>
                       ) : null}
                       {data.active != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Active: {data.active ? "True" : "False"}
                         </Typography>
                       ) : null}

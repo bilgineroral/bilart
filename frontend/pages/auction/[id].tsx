@@ -124,8 +124,6 @@ const AuctionPage: React.FC = () => {
     try {
       const update : UpdateAuctionData = {
         active: !(auction?.active),
-        start_time: auction!.start_time,
-        end_time: auction!.end_time
       }
       await updateAuction(Number(auctionId), update);
       fetchAuction();

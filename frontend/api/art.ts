@@ -11,7 +11,7 @@ export type ArtQueryParams = {
     artist_id?: number;
     title?: string;
     description?: string;
-    search__title?: string;
+    search__title?: string | null;
     search__description?: string;
     collector_id?: number;
     tag_name?: string | null; // null means no tag

@@ -153,7 +153,8 @@ export default function ArtPage() {
       start_time : startDate,
       end_time: endDate,
       active: true,
-      art_id: artInfo!.art_id
+      art_id: artInfo!.art_id,
+      artist_id: artInfo!.artist_id
     }
 
     try {

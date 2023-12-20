@@ -17,11 +17,27 @@ interface ArtCardProps {
   description: string;
   artId: number;
   view? :"public" | "private";
+  search? : boolean;
+  searchTitle?: string;
 }
 
-export function ArtCard({ title, content, description, artId, view }: ArtCardProps) {
+export function ArtCard({ title, content, description, artId, view, search, searchTitle }: ArtCardProps) {
 
   const theme = useTheme();
+
+  let searchedTitle = <Typography gutterBottom variant="h5" component="div" color="white">{title}</Typography>;
+  if (search && searchTitle?.trim().length !== 0) {
+    const index = title.indexOf(searchTitle!);
+    if (index !== -1) {
+      searchedTitle = 
+        <Typography gutterBottom variant="h5" component="div" color="white">
+          {title.substring(0, index)}
+          <span style={{color: theme.palette.secondary.main}}>{searchTitle}</span>
+          {title.substring(index+searchTitle!.length)}
+        </Typography>
+ 
+    }
+  }
 
   return (
     <Card sx={{ 
@@ -43,10 +59,10 @@ export function ArtCard({ title, content, description, artId, view }: ArtCardPro
 
       </CardMedia>
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div" color="white">
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" overflow={'auto'} maxHeight={'100px'}>
+        {/* <Typography gutterBottom variant="h5" component="div" color="white"> */}
+          {searchedTitle}
+        {/* </Typography> */}
+        <Typography variant="body2" color="white" overflow={'auto'} maxHeight={'100px'}>
           {description}
         </Typography>
       </CardContent>
