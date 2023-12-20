@@ -60,7 +60,7 @@ export default function LoginPage() {
       setUser(res.data);
       setAccountType("artist");
       snackbar("success", "Login Successful");
-      router.replace("/artist");
+      router.replace("/home");
     })
     .catch(err => {
       if (err instanceof AxiosError && err.response?.status === 401) {

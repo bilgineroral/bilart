@@ -83,12 +83,6 @@ export type Bid = {
     collector_id: number;
     created_at: Date;
     payment_done: boolean;
-    user_id: number;
-    username: string;
-    first_name: string | null;
-    last_name: string | null;
-    email: string;
-    profile_image: string | null;
 };
 
 

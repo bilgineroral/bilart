@@ -90,9 +90,11 @@ def get_arts(
     tag_name: str | None = None,
     collection: int | None = None,
     favoriting_collector: int | None = None,
-    date_order: ArtDateOrder | None = ArtDateOrder.asc,
-    price_order: PriceOrder | None = PriceOrder.asc
+    date_order: ArtDateOrder | None = None,
+    price_order: PriceOrder | None = None
 ):
+    print(f"date_order: {date_order}")
+    print(f"price_order: {price_order}")
     filters = {
         "tables": [
             ArtModel, 

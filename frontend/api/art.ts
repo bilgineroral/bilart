@@ -14,11 +14,11 @@ export type ArtQueryParams = {
     search__title?: string;
     search__description?: string;
     collector_id?: number;
-    tag_name?: string;
+    tag_name?: string | null; // null means no tag
     collection?: number;
     favoriting_collector?: number;
-    date_order?: "asc" | "desc";
-    price_order?: "asc" | "desc";
+    date_order?: "asc" | "desc" | null; // null means no order
+    price_order?: "asc" | "desc" | null; // null means no order
 };
 
 export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {

@@ -32,9 +32,7 @@ import {
 
 import { DomainImage } from "@/components/shared";
 import { useNoticationCount } from "@/store/notificationcount";
-import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 
-import type { AccountType } from "@/store/accounttype";
 import { userAtom } from "@/store/user";
 import { BACKEND_URL } from "@/routes";
 import { useRouter } from "next/router";
@@ -154,7 +152,7 @@ export default function Layout(props : LayoutProps) {
                 <Link href="/art">
                   <MenuItem onClick={handleClose}>My Arts</MenuItem>
                 </Link>
-                <Link href="/collector">
+                <Link href="/collections">
                   <MenuItem onClick={handleClose}>My Collections</MenuItem>
                 </Link>
                 <Link href="/tutorial">

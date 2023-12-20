@@ -31,4 +31,5 @@ drop table favorite cascade;
 drop table report cascade;
 drop table tag__post cascade;
 drop table tutorial cascade;
-
+drop table art_mm_collection;
+drop table tag_mm_art;
