@@ -1,6 +1,7 @@
 
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
+from modules.report.view import ReportView
 from db.tables import JoinModel
 from modules.user.model import UserModel
 
@@ -99,6 +100,7 @@ def get_reports(
     entity_name: str | None = None,
     entity_id: int | None = None,
     user_id: int | None = None,
+    all: bool | None = None,
     user: dict[str, Any] = Depends(get_current_user)
 ):
     if user['privileges'] == 'N':
@@ -114,7 +116,8 @@ def get_reports(
         f"table__{ReportModel.get_table_name()}__created_at": created_at,
         f"table__{ReportModel.get_table_name()}__entity_name": entity_name,
         f"table__{ReportModel.get_table_name()}__entity_id": entity_id,
-        "user_id": user_id
+        "user_id": user_id,
+        "view": ReportView if all else None
     }
 
     success, count, message, items = retrieve(**filters)

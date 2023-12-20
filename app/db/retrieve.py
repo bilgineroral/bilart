@@ -1,6 +1,7 @@
 from typing import Tuple
 
 from fastapi import HTTPException
+from db.view import ViewProtocal
 from db.model import ModelProtocal
 
 from db.tables import natural_join_models, params_to_where_clause, JoinModel, join_models
@@ -8,15 +9,16 @@ from db.db import PgDatabase
 
 
 def get_from_table(
-    tables: str, 
-    where_clasue: str, 
-    order_by_clasue: str, 
+    tables: str,
+    where_clasue: str,
+    order_by_clasue: str,
     select_function: str = "SELECT * FROM",
     single: bool = False
 ) -> Tuple[bool, int, str, list[dict]]:
-    
+
     where = "" if len(where_clasue) == 0 else f"WHERE {where_clasue}"
-    order_by = "" if len(order_by_clasue) == 0 else f"ORDER BY {order_by_clasue}"
+    order_by = "" if len(
+        order_by_clasue) == 0 else f"ORDER BY {order_by_clasue}"
     query = f'{select_function} {tables} {where} {order_by};'
     print(query)
     with PgDatabase() as db:
@@ -26,10 +28,12 @@ def get_from_table(
             count = len(data)
             if single:
                 if count > 1:
-                    raise HTTPException(status_code=400, detail=f"More than one object returned:{count}")
+                    raise HTTPException(
+                        status_code=400, detail=f"More than one object returned:{count}")
                 elif count == 0:
                     print("here")
-                    raise HTTPException(status_code=404, detail=f"Object not found")
+                    raise HTTPException(
+                        status_code=404, detail=f"Object not found")
             columns: list[str] = [desc[0] for desc in db.cursor.description]
             return True, count, "Data retrieved successfully", [dict(zip(columns, row)) for row in data]
         except HTTPException as e:
@@ -41,15 +45,17 @@ def get_from_table(
 
 
 def retrieve(
-    tables: list[ModelProtocal] = [], 
-    join_tables: list[JoinModel] = [], 
-    single: bool = False, 
+    tables: list[ModelProtocal] = [],
+    join_tables: list[JoinModel] = [],
+    single: bool = False,
     order_by: list[str | None] = [],
+    view: ViewProtocal | None = None,
     **kwargs
 ):
     return get_from_table(
-        natural_join_models(tables) if not join_tables else join_models(join_tables), 
-        params_to_where_clause(**kwargs), 
+        view.get_name() if view is not None else natural_join_models(
+            tables) if not join_tables else join_models(join_tables),
+        params_to_where_clause(**kwargs),
         ", ".join([order for order in order_by if order]),
         single=single
     )

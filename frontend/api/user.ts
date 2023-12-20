@@ -62,6 +62,7 @@ type UserQueryParams = {
     search__email?: string;
     search__bio?: string;
     created_at?: string;
+    all?: boolean;
 };
 
 export const getUsers = async (params: UserQueryParams): Promise<ApiReuslt<User[]>> => {

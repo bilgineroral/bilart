@@ -1,3 +1,4 @@
+from modules.user.view import UserView
 from modules.report.model import CreateReport, ReportRequest
 from modules.report.router import create_report
 import os
@@ -122,7 +123,8 @@ def get_users(
     search__last_name: str | None = None,
     search__email: str | None = None,
     search__bio: str | None = None,
-    created_at: str | None = None
+    created_at: str | None = None,
+    all: bool | None = None
 ):
     filters = {
         "tables": [UserModel, CollectorModel, ArtistModel, AdminModel],
@@ -141,6 +143,7 @@ def get_users(
         f"table__{ArtistModel.get_table_name()}__search__bio": search__bio,
         f"table__{AdminModel.get_table_name()}__privledge": privledge,
         f"table__{CollectorModel.get_table_name()}__rank": rank,
+        "view": UserView if all else None
     }
 
     success, count, message, items = retrieve(**filters)

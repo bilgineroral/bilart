@@ -1,3 +1,4 @@
+from modules.art.views import ArtView
 from modules.report.model import CreateReport, ReportRequest
 from modules.report.router import create_report
 from enum import Enum
@@ -29,22 +30,17 @@ FILEPATH = os.getenv("FILEPATH")
 
 router = APIRouter(prefix="/arts", tags=['arts'])
 
-
-@router.get('/available')
-def get_available_arts(
-    user: dict[str, Any] = Depends(get_current_user)
-):
-    filters = {
-        "tables": [
+""" "tables": [
             PostModel,
             ArtModel
         ],
-        "single": False,
         f"table__{PostModel.get_table_name()}__ne__artist_id": user['artist_id'],
-        f"table__{ArtModel.get_table_name()}__collector_id": [None]
-    }
+        f"table__{ArtModel.get_table_name()}__collector_id": [None], """
 
-    success, count, message, items = retrieve(**filters)
+
+@router.get('/available')
+def get_available_arts():
+    success, count, message, items = retrieve(view=ArtView, single=False)
 
     return {"message": message, "success": success, "data": items, "count": count}
 
@@ -96,7 +92,6 @@ class PriceOrder(Enum):
         return PriceOrder.get_desc() if val == "desc" else PriceOrder.get_asc()
 
 
-
 @router.get("/")
 def get_arts(
     content: str | None = None,
@@ -142,7 +137,6 @@ def get_arts(
     ])
 
     return {"data": items, "success": success, "message": message, "count": count}
-
 
 
 @router.post("/")
@@ -207,5 +201,5 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
         post_id=art['post_id'],
         artist_id=user['artist_id']
     )
-    
+
     return {"message": message, "success": success, "data": dict(post, **art)}

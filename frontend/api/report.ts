@@ -20,6 +20,7 @@ type ReportQueryParams = {
   entity_name?: string;
   entity_id?: number;
   user_id?: number;
+  all?: boolean;
 };
 
 export const getReports = async (
