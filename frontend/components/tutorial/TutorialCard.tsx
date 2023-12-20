@@ -5,6 +5,7 @@ import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import CardMedia from '@mui/material/CardMedia';
 import { CardContent, Typography, useTheme } from '@mui/material';
+import { DomainImage } from "../shared";
 
 import LinkIcon from '@mui/icons-material/Link';
 
@@ -20,17 +21,22 @@ export function TutorialCard({title, content, description, tutorialId} : Tutoria
   const theme = useTheme();
 
   return (
-    <Card sx={{ width: "100%" }}>
+    <Card sx={{ width: "100%", backgroundColor: theme.palette.primary.light }}>
       <CardMedia
-        sx={{ width: "100%", aspectRatio: "1/1" }}
-        image={`http://localhost:8000/${content}`}
+        sx={{ width: "100%", aspectRatio: "1/1", padding: "0.5rem" }}
         title="art"
-      />
+      >
+        <DomainImage 
+          src={`http://localhost:8000/${content}`}
+          alt="tutorial image"
+        />
+        
+      </CardMedia>
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant="h5" component="div" color="white">
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="white">
           {description}
         </Typography>
       </CardContent>

@@ -28,7 +28,7 @@ export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>>
 
 export const getAvailableArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
   const queryString = toQueryString(params);
-  return get<Art[]>(`http://localhost:8000/arts/public/all?${queryString}`);
+  return get<Art[]>(`http://localhost:8000/arts/available?${queryString}`);
 }
 
 export type NewArtData = {

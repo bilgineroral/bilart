@@ -65,6 +65,7 @@ export default function Home() {
                     tag_name: tag || null
                 });
                 if (resp.success && resp.data != null) {
+                  console.log(resp.data)
                     setArts(resp.data);
                 } else {
                     snackbar("error", "Couldn't fetch arts");

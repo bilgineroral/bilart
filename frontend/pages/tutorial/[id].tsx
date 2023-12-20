@@ -154,7 +154,7 @@ export default function ArtPage() {
             sx={{ position: "relative", height: "100%" }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h4" color="#fff">
+              <Typography variant="h4" color={theme.palette.primary.main}>
                 {tutorialInfo?.title}
               </Typography>
               <div>
@@ -184,7 +184,7 @@ export default function ArtPage() {
           </Stack>
         </Grid>
       </Grid>
-      <Typography variant="h4" color="#fff">
+      <Typography variant="h4" color={theme.palette.primary.main}>
         Comments
       </Typography>
       <Ratings ratings={comments} />
