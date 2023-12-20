@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import {styled} from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import HomeIcon from '@mui/icons-material/Home';
 import { getMe } from "@/api/user";
 import { AxiosError } from "axios";
 
@@ -120,11 +121,22 @@ export default function Layout(props : LayoutProps) {
           <Grid item xs={9} />
           <Grid item xs={2}>
             <div style={{display : "flex", justifyContent : "right", width: "100%", gap: 5}}>
+              <Link href="/home">
+                <IconButton size="small">
+                  <HomeIcon 
+                    fontSize="large"
+                    style={{
+                      fill: "#fff"
+                    }}
+                  />
+                </IconButton>
+              </Link>
               <IconButton
                 size="small"  
               >
                 <Badge badgeContent={notificationCount} color="secondary">
                   <NotificationsIcon  
+                    fontSize="large"
                     style={{
                       fill: "#fff"
                     }}

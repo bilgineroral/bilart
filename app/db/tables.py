@@ -6,7 +6,10 @@ def params_to_where_clause(**kwargs):
     search_params = []
     
     for k, v in kwargs.items():
+        markNull : bool = False
         if v is None: continue
+        elif isinstance(v, list) and v[0] is None:
+            markNull = True
         
         if "table__" in k:
             splited = k.split("__")
@@ -15,16 +18,31 @@ def params_to_where_clause(**kwargs):
             
         if "search__" in k:
             k = k.replace("search__", "")
+            if markNull:
+                continue
             search_params.append(f"{k} LIKE '%{v}%'")
         elif "gt__" in k:
             k = k.replace("gt__", "")
+            if markNull:
+              continue
             params.append(f"{k} > '{v}'")
         elif "lt__" in k:
             k = k.replace("lt__", "")
+            if markNull:
+              continue
             params.append(f"{k} < '{v}'")
+        elif "ne__" in k:
+            k = k.replace("ne__", "")
+            if markNull:
+                params.append(f"{k} IS NOT NULL")
+            else:
+              params.append(f"{k} <> '{v}'")
         else:
-            params.append(f"{k} = '{v}'")
-    
+            if markNull:
+                params.append(f"{k} IS NULL")
+            else:
+              params.append(f"{k} = '{v}'")
+
     if search_params:
         params.append(f'({" OR ".join(search_params)})')
     

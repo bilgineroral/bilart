@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getArts } from "@/api/art";
+import { getArts, getAvailableArts } from "@/api/art";
 import { ArtCard } from "@/components/artist";
 import { useSnackbar } from "@/store/snackbar";
 import { getTags } from "@/api/tags";
@@ -57,7 +57,7 @@ export default function Home() {
                 console.log("tag= ", tag);
 
                 
-                const resp = await getArts({
+                const resp = await getAvailableArts({
                     date_order: sort == "da" ? "asc" :
                         sort == "dd" ? "desc" : null,
                     price_order: sort == "pa" ? "asc" :

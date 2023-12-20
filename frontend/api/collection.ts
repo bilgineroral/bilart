@@ -1,4 +1,5 @@
 import {get, post, put, deleteItem, toQueryString} from "./crude";
+import type {Collection, ApiReuslt} from "./api_types";
 
 export const getCollection = async (collection_id: number): Promise<ApiReuslt<Collection>> => {
     return get<Collection>(`http://localhost:8000/collections/${collection_id}`);

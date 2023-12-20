@@ -10,6 +10,7 @@ import {
   Typography,
   ButtonGroup,
   Button,
+  Chip
 } from "@mui/material";
 
 import {
@@ -19,6 +20,7 @@ import {
 
 import { useSnackbar } from "@/store/snackbar";
 import { getRatings } from "@/api/rating";
+import { getTags } from "@/api/tags";
 
 import { AxiosError } from "axios";
 import { AuthError } from "@/api/crude";
@@ -34,6 +36,7 @@ export default function ArtPage() {
   const [tutorialInfo, setTutorialInfo] = React.useState<Tutorial | null>(null);
   const theme = useTheme();
   const [comments, setComments] = React.useState<Rating[]>([]);
+  const [tags, setTags] = React.useState<Tag[]>([]);
 
   React.useEffect(() => {
     const fetchTutorialInfo = async () : Promise<Tutorial | null> => {
@@ -62,6 +65,23 @@ export default function ArtPage() {
       return null;
     };
 
+    const fetchTags = async (tutorial: Tutorial) => {
+      try {
+        const data = await getTags({ post_id: tutorial.post_id });
+        console.info(data);
+        console.log(data);
+        if (data.data != null) {
+          setTags(data.data);
+        } else {
+          snackbar("error", "failed to fetched");
+        }
+      } catch (err) {
+        console.log(err);
+        snackbar("error", "failed to fetched");
+      }
+    };
+
+
     const fetchComments = async (tutorial : Tutorial) => {
       try {
         const data = await getRatings({ post_id: tutorial.post_id });
@@ -80,6 +100,7 @@ export default function ArtPage() {
       const tutorial = await fetchTutorialInfo();
       if (tutorial !== null) {
         fetchComments(tutorial);
+        fetchTags(tutorial);
       }
     };
     if (tutorialId) 
@@ -136,6 +157,17 @@ export default function ArtPage() {
               <Typography variant="h4" color="#fff">
                 {tutorialInfo?.title}
               </Typography>
+              <div>
+                {React.Children.toArray(
+                  tags.map((tagname) => (
+                    <Chip
+                      label={tagname.tag_name}
+                      sx={{ marginLeft: "10px" }}
+                      color="primary"
+                    />
+                  ))
+                )}
+              </div>
             </div>
             <DomainDivider color={theme.palette.primary.main} />
             <Box sx={{padding: "1rem", borderRadius: 5, backgroundColor: theme.palette.primary.main, flexGrow: 1, overflowY: "scroll"}}>

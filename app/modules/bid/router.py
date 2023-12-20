@@ -1,17 +1,19 @@
 from typing import Any
 from fastapi import APIRouter, Depends
+from db.tables import JoinModel
 
-from modules.art.model import ArtModel
-from modules.post.model import PostModel
-from modules.auction.model import AuctionModel
-from modules.user.auth import get_current_user
+
 
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve, get_from_table
 from db.insert import insert
 
-from modules.bid.model import BidModel, CreateBid, Updatebid
+from modules.bid.model import BidModel, CreateBid
+from modules.collector.model import CollectorModel
+from modules.user.auth import get_current_user
+from modules.user.model import UserModel
+
 
 
 router = APIRouter(prefix="/bids", tags=['bids'])
