@@ -11,6 +11,10 @@ from db.insert import insert
 from modules.auction.model import AuctionModel, UpdateAuction
 from modules.user.auth import get_current_user
 
+import pytz 
+from datetime import datetime
+
+utc=pytz.UTC
 
 router = APIRouter(prefix="/auctions", tags=['auctions'])
 
@@ -23,6 +27,16 @@ def get_auction(
         single=True,
         auction_id=auction_id
     )
+    
+    if items[0]['end_time'] < utc.localize(datetime.now()):
+        _, _, items[0] = update(
+            table=AuctionModel.get_table_name(),
+            model={
+                'active': False
+            },
+            identifier=AuctionModel.get_identifier(),
+            auction_id=auction_id
+        )
 
     return {"data": items[0], "success": success, "message": message}
 
@@ -49,6 +63,17 @@ def get_auctions(
         active=active,
         art_id=art_id
     )
+    
+    for i in range(len(items)):
+        if items[i]['end_time'] < utc.localize(datetime.now()):
+            _, _, items[i] = update(
+                table=AuctionModel.get_table_name(),
+                model={
+                    'active': False
+                },
+                identifier=AuctionModel.get_identifier(),
+                auction_id=items[i]['auction_id']
+            )
 
     return {"data": items, "success": success, "message": message, "count": count}
 

@@ -15,6 +15,11 @@ def create_tables() -> Tuple[bool, str]:
     commands = "\n".join(create_functions)
     triggers = "\n".join(trigger_functions)
     
+    commands = """
+    DROP SCHEMA PUBLIC CASCADE;
+    CREATE SCHEMA PUBLIC;
+    """ + commands
+    
     with PgDatabase() as db:
         try:
             print(commands)
