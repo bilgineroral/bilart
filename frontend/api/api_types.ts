@@ -69,8 +69,8 @@ export type Tag = {
 
 export type Auction = {
     auction_id: number;
-    start_time: Date;
-    end_time: Date;
+    start_time: string;
+    end_time: string;
     active: boolean;
     art_id: number;
 };

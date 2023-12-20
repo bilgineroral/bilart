@@ -90,8 +90,8 @@ def update_auction(auction_id: int, request_data: UpdateAuction, user: dict[str,
     filters = {
         'tables': [PostModel, ArtModel, AuctionModel],
         'single': True,
-        f'table__{PostModel.get_identifier()}__artist_id': user['artist_id'],
-        f'table__{AuctionModel.get_identifier()}__auction_id': auction_id,
+        f'table__{PostModel.get_table_name()}__artist_id': user['artist_id'],
+        f'table__{AuctionModel.get_table_name()}__auction_id': auction_id,
     }
     
     retrieve(**filters)

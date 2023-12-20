@@ -34,7 +34,7 @@ export const createNewAuction = async (data: NewAuctionData): Promise<ApiReuslt<
 };
 
 
-type UpdateAuctionData = {
+export type UpdateAuctionData = {
     start_time?: string;
     end_time?: string;
     active?: boolean;

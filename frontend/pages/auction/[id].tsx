@@ -1,24 +1,30 @@
 import * as React from "react";
-import type { Art, Bid, Tag, Auction } from "@/api/api_types";
+import type { Art, Bid, Tag, Auction, User } from "@/api/api_types";
 import { useRouter } from "next/router";
 import {
-  Badge,
+  Avatar,
   Chip,
-  Grid,
+  Button,
   IconButton,
   Stack,
   Typography,
   useTheme,
 } from "@mui/material";
-import { getAuction } from "@/api/auction";
+import { UpdateAuctionData, getAuction, updateAuction } from "@/api/auction";
 import { useSnackbar } from "@/store/snackbar";
 import { getArt } from "@/api/art";
 import { acceptPayment, getBids } from "@/api/bid";
 import { getTags } from "@/api/tags";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { DomainDivider, PostActionsBar } from "@/components/shared";
+import { DomainDivider, DomainImage, PostActionsBar } from "@/components/shared";
+import { getUserById } from "@/api/user";
+import { BACKEND_URL } from "@/routes";
 
+type BidUser = {
+  bid: Bid;
+  collector: User;
+}
 const AuctionPage: React.FC = () => {
   const router = useRouter();
   const snackbar = useSnackbar();
@@ -28,9 +34,14 @@ const AuctionPage: React.FC = () => {
 
   const [art, setArt] = React.useState<Art>();
   const [auction, setAuction] = React.useState<Auction>();
-  const [bids, setBids] = React.useState<Bid[]>([]);
+
+  const [bidUsers, setBidUsers] = React.useState<BidUser[]>([]);
+
   const [bidCount, setBidCount] = React.useState<number>(0);
   const [tags, setTags] = React.useState<Tag[]>([]);
+
+
+  const [auctionStatus, setAuctionStatus] = React.useState<boolean>(false);
 
   const fetchArt = async (auction: Auction): Promise<Art | null> => {
     try {
@@ -53,6 +64,7 @@ const AuctionPage: React.FC = () => {
       console.log(data);
       if (data.success && data.data != null) {
         setAuction(data.data);
+        setAuctionStatus(data.data.active);
         return data.data;
       } else {
         snackbar("error", "unknown error occured");
@@ -62,12 +74,18 @@ const AuctionPage: React.FC = () => {
     }
     return null;
   };
+
   const fetchBids = async (auction: Auction) => {
     try {
       const data = await getBids({ auction_id: auction.auction_id, price_order: 'desc' });
-      console.log(data);
       if (data.success && data.data != null) {
-        setBids(data.data);
+        const biddingUsers : BidUser[] = [];
+        for(let i = 0; i < data.data.length; i++) {
+          const user = await getUserById(data.data[i].collector_id);
+          biddingUsers.push({bid: data.data[i], collector: user.data!});
+        }
+        console.log(biddingUsers);
+        setBidUsers(biddingUsers);
         setBidCount(data.count ?? 0);
       } else {
         snackbar("error", "unknown error occured");
@@ -102,7 +120,19 @@ const AuctionPage: React.FC = () => {
     }
   };
 
-  
+  const handleToggleStatus = async() => {
+    try {
+      const update : UpdateAuctionData = {
+        active: !(auction?.active),
+        start_time: auction!.start_time,
+        end_time: auction!.end_time
+      }
+      await updateAuction(Number(auctionId), update);
+      fetchAuction();
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   React.useEffect(() => {
     fetch();
@@ -163,11 +193,12 @@ const AuctionPage: React.FC = () => {
           >
             Auction Status
           </Typography>
-          <Chip
-            label={auction?.active ? "Active" : "Inactive"}
-            color={auction?.active ? "primary" : "secondary"}
-            
-          />
+          <Button size="small" variant="text" onClick={handleToggleStatus}>
+            <Chip
+              label={<Typography variant="body2" color="white">{auction?.active ? "Active" : "Inactive"}</Typography>}
+              color={auction?.active ? "primary" : "secondary"}
+            />
+          </Button>
         </div>
         <DomainDivider color={theme.palette.primary.main} />
 
@@ -180,12 +211,9 @@ const AuctionPage: React.FC = () => {
         <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           Bid count: {bidCount}
         </Typography>
-        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
-          Highest bid: {bidCount}
-        </Typography>
         <DomainDivider color={theme.palette.primary.main} />
 
-        <Bids bids={bids} onAcceptBid={onSelectBid} />
+        <Bids bidUsers={bidUsers} onAcceptBid={onSelectBid} />
       </Stack>
     </Stack>
   );
@@ -209,68 +237,39 @@ export async function getStaticProps() {
 export default AuctionPage;
 
 type BidsProps = {
-  bids: Bid[];
+  bidUsers: BidUser[];
   onAcceptBid: (bid: Bid) => void;
 };
 
-const Bids: React.FC<BidsProps> = ({ bids, onAcceptBid }) => {
+const Bids: React.FC<BidsProps> = ({ bidUsers, onAcceptBid}) => {
+  
+  const theme = useTheme();
+  
   return (
-    <div style={{ padding: "20px", borderRadius: "10px" }}>
-      {bids.map((bid, index) => (
-        <div
-          key={bid.bid_id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "white",
-            padding: "10px",
-            margin: "10px 0",
-            borderRadius: "5px",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          }}
+    <Stack direction="column" gap={1}>
+     {
+      bidUsers.map(({bid, collector : user}, index) => (
+        <Stack key={bid.bid_id} direction="row" justifyContent="space-between" alignItems="center"
+        sx={{width: "100%", backgroundColor: theme.palette.primary.main, padding: "0.5rem 1rem", borderRadius: 50}}
         >
-          <span style={{ paddingLeft: "10px" /* , paddingRight: "30%" */ }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                paddingLeft: "10px",
-                paddingRight: "10px",
-              }}
-            >
-              {bid.profile_image && (
-                <img
-                  src={bid.profile_image}
-                  alt={`${bid.username}'s profile`}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    marginRight: "15px",
-                  }}
-                />
-              )}
-            </div>
-            <b>{bid.username}</b>
-          </span>
-
-          <span
-            style={{
-              color: "#808080",
-            }}
-          >
+          <div style={{display: "flex", justifyContent: "center", alignItems:"center", gap : 5}}>
+            <Avatar 
+              src={`${BACKEND_URL}/${user.profile_image}`}
+              alt="bidder profile image"
+            />
+            <Typography color="#fff" component="span">{user.username}</Typography>
+          </div>
+          <Typography color="white">
             Offering Price: TL {bid.price}
             {
-                (index == 0 && (<Chip label={"Highest"} style={{marginLeft: "10px"}}></Chip>))
+                (index == 0 && (<Chip label={<Typography color="#fff">Highest</Typography>} style={{marginLeft: "10px"}} color="secondary" />))
             }
-          </span>
-
-
+          </Typography>
           <BidCheckmark bid={bid} onAcceptBid={onAcceptBid} />
-        </div>
-      ))}
-    </div>
+        </Stack>
+      ))
+    }
+    </Stack>
   );
 };
 
