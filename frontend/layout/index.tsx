@@ -231,13 +231,10 @@ export default function Layout(props: LayoutProps) {
                 >
                   <MenuItem onClick={handleClose}>Profile</MenuItem>
                   <Link href="/art">
-                    <MenuItem onClick={handleClose}>My Arts</MenuItem>
+                    <MenuItem onClick={handleClose}>My Posts</MenuItem>
                   </Link>
                   <Link href="/collections">
                     <MenuItem onClick={handleClose}>My Collections</MenuItem>
-                  </Link>
-                  <Link href="/tutorial">
-                    <MenuItem onClick={handleClose}>My Tutorials</MenuItem>
                   </Link>
                 </Menu>
               </div>

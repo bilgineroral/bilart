@@ -8,6 +8,8 @@ import Layout from "@/layout";
 
 export default function App({ Component, pageProps }: AppProps) {
 
+  // @ts-ignore
+  const getLayout = Component.getLayout || ((page) => page);
 
   return (
     <StoreProvider> 
@@ -15,10 +17,12 @@ export default function App({ Component, pageProps }: AppProps) {
         {
           pageProps.navbar ? 
           <Layout show={pageProps.navbar}>
-            <Component  {...pageProps} />
+            {getLayout(<Component  {...pageProps} />)}
           </Layout>
           :
-          <Component {...pageProps} />
+          <>
+            {getLayout(<Component  {...pageProps} />)}
+          </>
         }
       </MuiThemeProvider> 
     </StoreProvider>
