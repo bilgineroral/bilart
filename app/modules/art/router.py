@@ -29,6 +29,24 @@ FILEPATH = os.getenv("FILEPATH")
 
 router = APIRouter(prefix="/arts", tags=['arts'])
 
+@router.get('/available')
+def get_available_arts(
+    user: dict[str, Any] = Depends(get_current_user)
+):
+    filters = {
+        "tables": [
+            PostModel,
+            ArtModel
+        ],
+        "single": False,
+        f"table__{PostModel.get_table_name()}__ne__artist_id": user['artist_id'],
+        f"table__{ArtModel.get_table_name()}__collector_id": [None]
+    }
+
+    success, count, message, items = retrieve(**filters)
+
+    return {"message": message, "success": success, "data": items, "count": count}
+    
 
 @router.get("/{art_id}")
 def get_art(
@@ -131,7 +149,7 @@ async def create_new_art( title: str = Form(...),
     
     success, message, post = insert(
         PostModel(
-            artist_id=user['artist_id'], 
+            artist_id=user['artist_id'],  
             description=description, 
             title=title
         )

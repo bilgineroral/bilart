@@ -1,4 +1,5 @@
 import { get, post, put, deleteItem, toQueryString } from "./crude";
+import type {Bid, ApiReuslt} from "./api_types";
 
 export const getBid = async (bid_id: number): Promise<ApiReuslt<Bid>> => {
   return get<Bid>(`http://localhost:8000/bids/${bid_id}`);
