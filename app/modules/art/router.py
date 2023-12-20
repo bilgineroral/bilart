@@ -125,51 +125,6 @@ def get_arts(
 
     return {"data": items, "success": success, "message": message, "count": count}
 
-# def get_available_arts(
-#     content: str | None = None,
-#     created_at: str | None = None,
-#     artist_id: int | None = None,
-#     title: str | None = None,
-#     description: str | None = None,
-#     search__title: str | None = None,
-#     search__description: str | None = None,
-#     collector_id: int | None = None,
-#     tag_name: str | None = None,
-#     collection: int | None = None,
-#     favoriting_collector: int | None = None,
-#     date_order: ArtDateOrder | None = None,
-#     price_order: PriceOrder | None = None,
-#     user: dict[str, Any] = Depends(get_current_user)
-# ):
-#     filters = {
-#         "tables": [
-#             PostModel,
-#             ArtModel,
-#             TagPostModel if tag_name else None,
-#             ArtCollectionModel if collection else None,
-#             FavoriteModel if favoriting_collector else None
-#         ],
-#         "single": False,
-#         # f"table__{PostModel.get_table_name()}__ne__artist_id": user['artist_id'],
-#         # f"table__{ArtModel.get_table_name()}__collector_id": [None],
-#         f"table__{ArtModel.get_table_name()}__collector_id": collector_id,
-#         f"table__{PostModel.get_table_name()}__artist_id": artist_id,
-#         f"table__{ArtModel.get_table_name()}__content": content,
-#         f"table__{PostModel.get_table_name()}__created_at": created_at,
-#         f"table__{PostModel.get_table_name()}__title": title,
-#         f"table__{PostModel.get_table_name()}__search__title": search__title,
-#         f"table__{PostModel.get_table_name()}__description": description,
-#         f"table__{PostModel.get_table_name()}__search__description": search__description,
-#         f"table__{TagPostModel.get_table_name()}__tag_name": tag_name,
-#         f"table__{FavoriteModel.get_table_name()}__collector_id": favoriting_collector,
-#     }
-
-#     success, count, message, items = retrieve(**filters, order_by=[
-#         date_order.get_val(date_order.value) if date_order else None,
-#         price_order.get_val(price_order.value) if price_order else None
-#     ])
-
-#     return {"message": message, "success": success, "data": items, "count": count}
 
 @router.get("/public/all")
 def get_available_arts(

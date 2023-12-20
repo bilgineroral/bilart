@@ -20,14 +20,16 @@ import {
 } from "@/components/shared";
 import LinkIcon from '@mui/icons-material/Link';
 import { useSnackbar } from "@/store/snackbar";
-import { deleteArt, getArt } from "@/api/art";
-import { NewAuctionData, createNewAuction, getAuctions } from "@/api/auction";
+import { ArtQueryParams, getArt, getArts } from "@/api/art";
+import { getAuctions } from "@/api/auction";
 import { getTags } from "@/api/tags";
 import { getRatings } from "@/api/rating";
+import {favorite, getFavoritePosts, unFavorite} from "@/api/favorite"; 
 
 import { AxiosError } from "axios";
 import { AuthError } from "@/api/crude";
 import AuctionModal from "@/components/auction/AuctionModal";
+import { getMe } from "@/api/user";
 
 
 export default function ArtPage() {
@@ -42,8 +44,8 @@ export default function ArtPage() {
   const [auctions, setAuctions] = React.useState<Auction[]>([]);
   const [comments, setComments] = React.useState<Rating[]>([]);
 
-  const [showNewAuctionModal, setShowNewAuctionModal] = React.useState<boolean>(false);
 
+  const [isFavorited, setIsFavorited] = React.useState<boolean>(false);
   React.useEffect(() => {
     const fetchArtInfo = async () : Promise<Art | null> => {
       try {
@@ -129,6 +131,22 @@ export default function ArtPage() {
       fetch();
   }, [artId]);
 
+  const fetchFavorites = async() => {
+    try {
+        const favoritedArts = await getFavoritePosts();
+        if (favoritedArts.data?.some(post => post.post_id === artInfo?.post_id)) {
+          setIsFavorited(true);
+        } else {
+          setIsFavorited(false);
+        }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  React.useEffect(() => {
+    if (artInfo)
+      fetchFavorites();
+  }, [artInfo]);
 
   const formatDate = (dateString: string): string => {
     const timestamp = Date.parse(dateString);
@@ -141,26 +159,17 @@ export default function ArtPage() {
     return `${year}/${month}/${day}`;
   };
 
-  const handleArtDelete= async() => {
-    // try {
-    //   await deleteArt(Number(artId));
-    //   snackbar("success", "art deleted");
-    // }
-  }
-
-  const handleAuctionCreate = async (startDate: string, endDate: string) => {
-    const newAuction : NewAuctionData = {
-      start_time : startDate,
-      end_time: endDate,
-      active: true,
-      art_id: artInfo!.art_id
-    }
-
+  const handleArtFavorite = async () => {
     try {
-      const res = await createNewAuction(newAuction);
-      setAuctions(prev => [...prev, res.data as Auction]);
-      snackbar("success", "new auction created");
-      setShowNewAuctionModal(false);
+      if (!isFavorited) {
+        const favRes = await favorite({post_id : artInfo!.post_id});
+        snackbar("success", "added to favorites");
+        setIsFavorited(true);
+      } else {
+        const unfavRes = await unFavorite({post_id: artInfo!.post_id});
+        snackbar("success", "removed from favorites");
+        setIsFavorited(false);
+      }
     } catch (err) {
       if (err instanceof AuthError) {
         snackbar("error", "Session does not exist");
@@ -180,11 +189,6 @@ export default function ArtPage() {
 
   return (
     <>
-      <AuctionModal 
-        open={showNewAuctionModal}
-        onClose={() => setShowNewAuctionModal(false)}
-        onCreate={handleAuctionCreate}
-      />
       <Stack direction="column" gap={2} sx={{ height: "100%" }}>
         <Grid container gap={0.5} justifyContent="space-between">
           <Grid item xs={4}>
@@ -230,21 +234,21 @@ export default function ArtPage() {
                 <Typography variant="h4" sx={{color: theme.palette.primary.main}}>
                   TL {artInfo?.price}
                 </Typography>
-                <Typography variant="h6" sx={{color: theme.palette.primary.main}}>
+                <Typography variant="h6" sx={{color: theme.palette.primary.light}}>
                   starting price
                 </Typography>
               </div>
               <Box sx={{padding: "1rem", borderRadius: 5, backgroundColor: theme.palette.primary.main, flexGrow: 1}}>
-                <Typography variant="h5" sx={{color: theme.palette.primary.main}}>Description</Typography>
-                <Typography variant="h6" sx={{color: theme.palette.primary.main}}>{artInfo?.description}</Typography>
+                <Typography variant="h5" color="#fff">Description</Typography>
+                <Typography variant="h6" color="#fff">{artInfo?.description}</Typography>
               </Box>
               <ButtonGroup
                 variant="contained"
                 sx={{ alignSelf: "flex-end" }}
               >
-                <Button sx={{ color: "#fff" }} onClick={() => setShowNewAuctionModal(true)}>Auction</Button>
-                <Button sx={{ color: "#fff" }} onClick={handleArtDelete}>Delete</Button>
-                <Link href={`/art/create?edit=true&art_id=${artInfo?.art_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
+                <Button sx={{ color: "#fff" }} onClick={handleArtFavorite}>
+                  {isFavorited? "Remove From Favorites" : "Add To Favorites"}
+                </Button>
               </ButtonGroup>
             </Stack>
           </Grid>
@@ -263,7 +267,7 @@ export default function ArtPage() {
                     <Paper sx={{ padding: "0.25rem 1rem" }}>
                       <Typography>
                         Auction {index + 1}
-                        <Link href={`/auction/${data.auction_id}`}>
+                        <Link href={`/public/auction/${data.auction_id}`}>
                           <IconButton>
                             <LinkIcon fontSize="small" style={{fill: theme.palette.primary.main}} />
                           </IconButton>

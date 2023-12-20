@@ -99,7 +99,8 @@ export default function Home() {
                     title={art.title ?? ""}
                     content={art.content ?? ""}
                     description={art.description ?? ""}
-                />
+                    view="public"
+                  />
             )
         });
         return artcards;

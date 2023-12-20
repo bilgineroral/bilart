@@ -23,13 +23,11 @@ export type ArtQueryParams = {
 
 export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
     const queryString = toQueryString(params);
-    console.log(queryString);
     return get<Art[]>(`http://localhost:8000/arts?${queryString}`);
 };
 
 export const getAvailableArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
   const queryString = toQueryString(params);
-  console.log(queryString);
   return get<Art[]>(`http://localhost:8000/arts/public/all?${queryString}`);
 }
 

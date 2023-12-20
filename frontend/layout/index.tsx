@@ -14,7 +14,11 @@ import {
   Menu,
   useTheme,
   Button,
-  MenuItem
+  Drawer,
+  MenuItem,
+  Typography,
+  Stack,
+  Box
 } from "@mui/material";
 import {styled} from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -32,12 +36,13 @@ import {
 } from "@/store/snackbar";
 
 import { DomainImage } from "@/components/shared";
-import { useNoticationCount } from "@/store/notificationcount";
-
-import { userAtom } from "@/store/user";
 import { BACKEND_URL } from "@/routes";
 import { useRouter } from "next/router";
 import { AuthError } from "@/api/crude";
+
+import { getNotifications, readNotifications } from "@/api/notfications";
+import { NotificationModel } from "@/api/api_types";
+import { format } from "path";
 
 export interface LayoutProps {
   show: boolean | undefined;
@@ -61,7 +66,6 @@ export default function Layout(props : LayoutProps) {
   const [message, ___] = useAtom(snackbarMessage);
 
   const snackbar = useSnackbar();
-  const [notificationCount] = useNoticationCount(2500);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -73,7 +77,6 @@ export default function Layout(props : LayoutProps) {
   };  
 
   const [profileImgSrc, setProfileImgSrc] = React.useState<string>("");
-  const [user] = useAtom(userAtom);
   React.useEffect(() => {
       const fetchMe = async () => {
         try {
@@ -98,8 +101,58 @@ export default function Layout(props : LayoutProps) {
       }
 
       fetchMe();
-  }, [user]);
+  }, []);
 
+  const [notifications, setNotifications] = React.useState<NotificationModel[]>([]);
+  const unreadNotificationCount = notifications.filter(notif => notif.read === false).length;
+  
+  const [openNotifs, setOpenNotifs] = React.useState<boolean>(false);
+  const fetchNotifications = async () => {
+    try {
+      const res = await getNotifications();
+      const notifications = res.data;
+      if (notifications) 
+        setNotifications(notifications);
+    } catch (err) {
+      if (err instanceof AuthError) {
+        snackbar("error", "Session does not exist");
+        router.replace("/login")
+        return;
+      }
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        snackbar("error", "Incorrect username or password");
+        router.replace("/login");
+      } else {
+        snackbar("error", "an error occured. See console for more details");
+        console.error(err);
+      }       
+    }
+  }
+
+  const handleNotifClose = async () => {
+    setOpenNotifs(false);
+    try {
+      await readNotifications();
+    } catch (err) {
+      if (err instanceof AuthError) {
+        snackbar("error", "Session does not exist");
+        router.replace("/login")
+        return;
+      }
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        snackbar("error", "Incorrect username or password");
+        router.replace("/login");
+      } else {
+        snackbar("error", "an error occured. See console for more details");
+        console.error(err);
+      }       
+    }
+  }
+
+  React.useEffect(() => {
+    const fetcherInterval = setInterval(fetchNotifications, 2500);
+    return () => clearInterval(fetcherInterval);
+  }, []);
 
   return (
     <>
@@ -108,6 +161,19 @@ export default function Layout(props : LayoutProps) {
           {message}
         </Alert>
       </Snackbar>
+      <Drawer 
+        anchor="right"
+        open={openNotifs}
+        onClose={handleNotifClose}
+      >
+
+        <Stack direction={"column"} width={300}>
+          <Typography variant="h5" textAlign="center">Notifications</Typography>
+          {
+            notifications.reverse().map(notif => <Notification {...notif} />)
+          }
+        </Stack>
+      </Drawer>
       {
         props.show &&
       <AppBar position="static" color="primary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
@@ -132,9 +198,10 @@ export default function Layout(props : LayoutProps) {
                 </IconButton>
               </Link>
               <IconButton
+                onClick={()=>setOpenNotifs(true)}
                 size="small"  
               >
-                <Badge badgeContent={notificationCount} color="secondary">
+                <Badge badgeContent={unreadNotificationCount} color="secondary">
                   <NotificationsIcon  
                     fontSize="large"
                     style={{
@@ -181,5 +248,38 @@ export default function Layout(props : LayoutProps) {
     </PageContainer>
     </>
   )
-
 }
+
+
+function Notification(props : NotificationModel) {
+
+  const formatDate = (dateString: string): string => {
+    const timestamp = Date.parse(dateString);
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+    const day = date.getDate().toString().padStart(2, "0");
+
+    return `${year}/${month}/${day}`;
+  };
+
+  const theme = useTheme();
+  return (
+    <Box sx={{
+      margin: "0.5rem",
+      borderRadius: 5,
+      padding: 2,
+      border: "1px dashed black",
+      backgroundColor: props.read ? "none" : theme.palette.primary.main
+    }}>
+      <Typography>
+        {props.content}
+      </Typography>
+      <Typography variant="body2">
+        {formatDate(props.created_at)}
+      </Typography>
+    </Box>
+  )
+
+}   

@@ -89,7 +89,7 @@ export type Bid = {
 export type NotificationModel = {
     notification_id: number;
     content: string;
-    created_at: Date;
+    created_at: string;
     read: boolean;
     user_id: number;
 };

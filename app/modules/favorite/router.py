@@ -4,8 +4,10 @@ from modules.user.auth import get_current_user
 
 from db.insert import insert
 from db.delete import delete
+from db.retrieve import retrieve
 
 from modules.favorite.model import FavoriteModel, CreateFavorite
+from modules.post.model import PostModel
 
 router = APIRouter(prefix="/favorite", tags=['favorite'])
 
@@ -26,5 +28,20 @@ def un_favorite(request_data: CreateFavorite, user: dict[str, Any] = Depends(get
         collector_id=user['collector_id'],
         post_id=request_data.post_id
     )
-    
     return {"message": message, "success": success}
+
+@router.get('/')
+def get_favorite_post(user: dict[str, Any] = Depends(get_current_user)):
+    
+    filters = {
+        "tables": [
+            FavoriteModel,
+            PostModel
+        ],
+        "single": False,
+        f"table__{FavoriteModel.get_table_name()}__collector_id": user['user_id']
+    }
+
+    success, count, message, items = retrieve(**filters)    
+    return {"data": items, "success": success, "message": message, "count": count}
+

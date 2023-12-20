@@ -135,7 +135,7 @@ const AuctionPage: React.FC = () => {
         sx={{ position: "relative", height: "100%" }}
       >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h4" color="#fff">
+          <Typography variant="h4" sx={{color: theme.palette.primary.main}}>
             {art?.title}
           </Typography>
           <div>
@@ -151,37 +151,39 @@ const AuctionPage: React.FC = () => {
           </div>
         </div>
         <DomainDivider color={theme.palette.primary.main} />
-        <Typography variant="h4" color="#fff">
+        <Typography variant="h4" sx={{color: theme.palette.primary.main}}>
           TL {art?.price}
         </Typography>
 
         <div style={{ display: "flex" }}>
           <Typography
             variant="h5"
-            color="#fff"
+            sx={{color: theme.palette.primary.main}}
             style={{ paddingRight: "10px" }}
           >
-            Auction
+            Auction Status
           </Typography>
           <Chip
             label={auction?.active ? "Active" : "Inactive"}
             color={auction?.active ? "primary" : "secondary"}
+            
           />
         </div>
         <DomainDivider color={theme.palette.primary.main} />
 
-        <Typography variant="body1" color="#fff">
+        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           Staring date: {formatDate(auction?.start_time as any)}
         </Typography>
-        <Typography variant="body1" color="#fff">
+        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           End date: {formatDate(auction?.end_time as any)}
         </Typography>
-        <Typography variant="body1" color="#fff">
+        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           Bid count: {bidCount}
         </Typography>
-        <Typography variant="body1" color="#fff">
+        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           Highest bid: {bidCount}
         </Typography>
+        <DomainDivider color={theme.palette.primary.main} />
 
         <Bids bids={bids} onAcceptBid={onSelectBid} />
       </Stack>
