@@ -7,6 +7,8 @@ from modules.auction.model import AuctionModel
 from modules.favorite.model import FavoriteModel
 from modules.art.model import ArtModel
 from modules.user.model import UserModel
+from modules.artist.model import ArtistModel
+
 from modules.collector.model import CollectorModel
 
 class BidTrigger(Trigger):
@@ -18,11 +20,21 @@ class BidTrigger(Trigger):
         RETURNS TRIGGER AS $$
         DECLARE
             auctionEndTime TIMESTAMPTZ;
+            auctionActive BOOLEAN;
         BEGIN
             -- Get the end_time of the auction
             SELECT end_time INTO auctionEndTime
             FROM Auction
             WHERE auction_id = NEW.auction_id;
+            
+            SELECT active INTO auctionActive
+            FROM Auction
+            WHERE auction_id = NEW.auction_id;
+
+
+            IF NOT auctionActive THEN
+                RAISE EXCEPTION 'Cannot create bid if the auction is not active.';
+            END IF;
 
             -- Check if the current time is after the auction's end_time
             IF CURRENT_TIMESTAMP > auctionEndTime THEN
@@ -114,6 +126,7 @@ class BidTrigger(Trigger):
         DECLARE
             artTitle VARCHAR(128);
             bidderName VARCHAR(128);
+            artistId INT;
         BEGIN
             -- Get the title of the art associated with the auction
             SELECT {PostModel.get_table_name()}.title INTO artTitle
@@ -126,12 +139,22 @@ class BidTrigger(Trigger):
             FROM {UserModel.get_table_name()}
             NATURAL JOIN {CollectorModel.get_table_name()}
             WHERE {CollectorModel.get_table_name()}.{CollectorModel.get_identifier()} = NEW.{CollectorModel.get_identifier()};
+            
+            SELECT {AuctionModel.get_table_name()}.artist_id INTO artistId
+            FROM {AuctionModel.get_table_name()}
+            NATURAL JOIN {BidModel.get_table_name()}
+            WHERE {BidModel.get_table_name()}.{BidModel.get_identifier()} = NEW.{BidModel.get_identifier()};
 
             -- Notify the user who made the new bid
             INSERT INTO {NotificationModel.get_table_name()}(content, {UserModel.get_identifier()})
             SELECT 'You made a new bid on "' || artTitle || '"',
                 (SELECT {UserModel.get_identifier()} FROM {CollectorModel.get_table_name()} 
                 WHERE {CollectorModel.get_identifier()} = NEW.{CollectorModel.get_identifier()})
+                WHERE NEW.{BidModel.get_identifier()} IS NOT NULL;
+                
+            -- Notify the auction's artist
+            INSERT INTO {NotificationModel.get_table_name()}(content, {UserModel.get_identifier()})
+            SELECT 'New bid made on "' || artTitle || '" by collector ' || bidderName, artistId
                 WHERE NEW.{BidModel.get_identifier()} IS NOT NULL;
 
             -- Notify all other users who have made a bid in the same auction

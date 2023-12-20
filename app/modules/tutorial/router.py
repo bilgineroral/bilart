@@ -117,3 +117,16 @@ def update_art(request_data: UpdateTutorial):
     )
     
     return {"message": message, "success": success, "data": dict(post)}
+
+
+from modules.report.router import create_report
+from modules.report.model import CreateReport, ReportRequest
+
+
+@router.post("/report/{tutorial_id}")
+def report_tutorial(tutorial_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=TutorialModel.get_table_name(),
+        entity_id=tutorial_id,
+        content=request.content
+    ), user)

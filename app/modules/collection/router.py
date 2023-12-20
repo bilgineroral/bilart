@@ -1,3 +1,5 @@
+from modules.report.router import create_report
+from modules.report.model import CreateReport, ReportRequest
 from typing import Any
 from fastapi import APIRouter, Depends
 from modules.user.auth import get_current_user
@@ -13,6 +15,7 @@ from modules.collection.model import CollectionModel, CreateCollection
 
 router = APIRouter(prefix="/collections", tags=['collections'])
 
+
 @router.get("/{collection_id}")
 def get_collection(
     collection_id: int
@@ -24,6 +27,7 @@ def get_collection(
     )
 
     return {"data": items[0], "success": success, "message": message}
+
 
 """ @router.get("/{collection_id}")
 def get_collection(
@@ -51,6 +55,7 @@ def get_collection(
         except Exception as e:
             print(e)
             raise HTTPException(status_code=500, detail=str(e)) """
+
 
 @router.get("/")
 def get_collections(
@@ -86,7 +91,7 @@ def delete_collections(collection_id: int, user: dict[str, Any] = Depends(get_cu
         collection_id=collection_id,
         collector_id=user['collector_id']
     )
-    
+
     success, message = delete(
         table=CollectionModel.get_table_name(),
         collection_id=collection_id
@@ -102,7 +107,7 @@ def update_collections(collection_id: int, request_data: CreateCollection, user:
         collection_id=collection_id,
         collector_id=user['collector_id']
     )
-    
+
     success, message, data = update(
         table=CollectionModel.get_table_name(),
         model={
@@ -112,3 +117,12 @@ def update_collections(collection_id: int, request_data: CreateCollection, user:
         collection_id=collection_id
     )
     return {"message": message, "success": success, "data": data}
+
+
+@router.post("/report/{collection_id}")
+def report_collection(collection_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=CollectionModel.get_table_name(),
+        entity_id=collection_id,
+        content=request.content
+    ), user)

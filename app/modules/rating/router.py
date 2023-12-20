@@ -119,3 +119,16 @@ def artist_average_rating(artist_id: int):
     )
 
     return {"message": message, "count": count, "success": success, "data": result}
+
+
+from modules.report.router import create_report
+from modules.report.model import CreateReport, ReportRequest
+
+
+@router.post("/report/{rating_id}")
+def report_rating(rating_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=RatingModel.get_table_name(),
+        entity_id=rating_id,
+        content=request.content
+    ), user)

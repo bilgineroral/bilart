@@ -73,3 +73,12 @@ export const getUsers = async (params: UserQueryParams): Promise<ApiReuslt<User[
 export const createNewUser = async (data: User): Promise<ApiReuslt<User>> => {
     return publicPost<User, User>(`http://localhost:8000/users/register`, data);
 };
+
+type Privileges = {
+    privileges: string;
+}
+
+
+export const changePrivileges = async (user_id: number, data: Privileges): Promise<ApiReuslt<Privileges>> => {
+    return post<Privileges, Privileges>(`http://localhost:8000/users/${user_id}/change_privileges`, data);
+}

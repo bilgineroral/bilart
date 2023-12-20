@@ -1,4 +1,5 @@
 import { get, post, put, deleteItem, toQueryString } from "./crude";
+import { ApiReuslt, Rating } from "./api_types";
 
 type CreateRatingData = {
   score: number;
