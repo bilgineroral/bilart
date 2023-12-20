@@ -125,7 +125,9 @@ const AuctionPage: React.FC = () => {
     try {
       const update : UpdateAuctionData = {
         active: !(auction?.active),
+        // @ts-ignore
         start_time: auction!.start_time,
+        // @ts-ignore
         end_time: auction!.end_time
       }
       await updateAuction(Number(auctionId), update);

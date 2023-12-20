@@ -40,7 +40,7 @@ export default function ArtHomePage() {
   return (
     <Stack direction="column" gap={2} sx={{height:"100%"}}>
       <PostActionsBar 
-        title={"My Arts"}
+        title={"My Created Arts"}
         actions={[]}
       />
       <DomainDivider color="#fff" />

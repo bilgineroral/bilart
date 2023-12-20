@@ -233,7 +233,7 @@ export default function Layout(props: LayoutProps) {
                   <Link href="/art">
                     <MenuItem onClick={handleClose}>My Posts</MenuItem>
                   </Link>
-                  <Link href="/collections">
+                  <Link href="/collection">
                     <MenuItem onClick={handleClose}>My Collections</MenuItem>
                   </Link>
                 </Menu>
