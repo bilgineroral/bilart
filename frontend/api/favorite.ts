@@ -1,5 +1,6 @@
 import { post, deleteItem, get } from "./crude";
-import type {ApiReuslt} from "./api_types";
+import type { ApiReuslt } from "./api_types";
+import type { Art } from "./api_types";
 
 type CreateFavoriteData = {
   post_id: number;
@@ -29,6 +30,10 @@ export type FavoritePost = {
   description: string;
 }
 
-export const getFavoritePosts = async(): Promise<ApiReuslt<FavoritePost[]>> => {
+export const getFavoritePosts = async (): Promise<ApiReuslt<FavoritePost[]>> => {
   return await get<FavoritePost[]>("http://localhost:8000/favorite");
+}
+
+export const getFavoriteArts = async (): Promise<ApiReuslt<Art[]>> => {
+  return await get<Art[]>("http://localhost:8000/favorite/arts");
 }

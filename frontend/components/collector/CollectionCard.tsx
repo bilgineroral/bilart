@@ -1,65 +1,57 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import Button from '@mui/material/Button';
-import CardMedia from '@mui/material/CardMedia';
-import Link from 'next/link';
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Chip, Divider, Typography } from "@mui/material";
+import LinkIcon from '@mui/icons-material/Link';
+import Link from "next/link";
+import { Collection } from "@/api/api_types";
+import { getArts } from "@/api/art";
+import { useEffect, useState } from "react";
 
-var cardStyle = {
-    background : "#28B5A4",
-    display: 'block',
-    width: '25vw',
-    height: '25vw'
+
+interface CollectionCardProps {
+    collection: Collection;
 }
 
-var mediaStyle = {
-    display: 'block',
-    width: '25vw',
-    height: '20vw'
-}
-  
-var viewButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "white",
-    fontFamily: "Josefin Slab",
-    fontWeight: "Bold",
-    display: 'block',
-    width: '10vw',
-    height: '3vw'
-}
+export default function CollectionCard({ collection }: CollectionCardProps) {
 
-var deleteButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "red",
-    fontStyle: "italic",
-    fontFamily: "Josefin Slab",
-    fontWeight: "Italic",
-    display: 'block',
-    width: '12vw',
-    height: '3vw'
-}
+    const [artsCount, setArtsCount] = useState<any>(0);
+    useEffect(() => {
+        const fetchArts = async () => {
+            try {
+                const resp = await getArts({ collection: collection.collection_id });
+                console.log(resp);
+                setArtsCount(resp.count);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchArts();
+    }, []);
 
-export function CollectionCard() {
-  return (
-    <div style={{margin: '15%'}}>
-        <Card style={cardStyle}>
-            <CardMedia
-                component="img"
-                alt="Image"
-                style={mediaStyle}
-                image='/app-logo.svg'
-            />
-
-            <CardActions>
-                <Button style={deleteButtonStyle}>Delete Collection</Button>
-    
-                <Link href="collector/collection"> {/* ADD PARAMETER PASSING */}
-                    <Button style={viewButtonStyle}>View Collection</Button>
-                </Link>
-            </CardActions>
-        </Card>
-    </div>
-  );
+    return (
+        <Link href={`/collections/${collection.collection_id}`}>
+            <Card sx={{
+                width: "100%", minHeight: '100%', display: 'flex',
+                flexDirection: 'column', maxHeight: '500px', maxWidth: '400px'
+            }}>
+                <CardMedia
+                    sx={{ width: "100%", aspectRatio: "1/1" }}
+                    image={`/app-logo.svg`}
+                    title="Collection"
+                />
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                        {collection.name}
+                    </Typography>
+                </CardContent>
+                <Box sx={{ marginTop: 'auto' }}>
+                    <Divider />
+                    <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Link href={`/art/${"artId"}`}>
+                            <Button size="small" startIcon={<LinkIcon />}>Open</Button>
+                        </Link>
+                        <Chip label={artsCount}></Chip>
+                    </CardActions>
+                </Box>
+            </Card>
+        </Link>
+    )
 }

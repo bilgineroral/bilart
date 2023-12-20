@@ -3,8 +3,6 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from db.tables import JoinModel
 
-
-
 from db.delete import delete
 from db.update import update
 from db.retrieve import retrieve, get_from_table

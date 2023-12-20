@@ -20,7 +20,7 @@ import {
   Stack,
   Box
 } from "@mui/material";
-import {styled} from "@mui/system";
+import { styled } from "@mui/system";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import HomeIcon from '@mui/icons-material/Home';
 import { getMe } from "@/api/user";
@@ -46,18 +46,18 @@ import { format } from "path";
 
 export interface LayoutProps {
   show: boolean | undefined;
-  children : React.ReactNode
+  children: React.ReactNode
 }
 
-const PageContainer = styled("div")(({theme}) => ({
-  backgroundColor : theme.palette.background.default,
-  flexGrow : 1,
-  position : "relative",
+const PageContainer = styled("div")(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  flexGrow: 1,
+  position: "relative",
   overflowY: "scroll",
   padding: "2rem"
 }))
 
-export default function Layout(props : LayoutProps) {
+export default function Layout(props: LayoutProps) {
   const router = useRouter();
   const theme = useTheme();
 
@@ -74,44 +74,44 @@ export default function Layout(props : LayoutProps) {
   };
   const handleClose = () => {
     setAnchorEl(null);
-  };  
+  };
 
   const [profileImgSrc, setProfileImgSrc] = React.useState<string>("");
   React.useEffect(() => {
-      const fetchMe = async () => {
-        try {
-          const me = await getMe();
-          console.info("Current User");
-          console.info(me.data);
-          setProfileImgSrc(`${BACKEND_URL}/${me.data?.profile_image}`);
-        } catch (err) {
-          if (err instanceof AuthError) {
-            snackbar("error", "Session does not exist");
-            router.replace("/login")
-            return;
-          }
-          if (err instanceof AxiosError && err.response?.status === 401) {
-            snackbar("error", "Incorrect username or password");
-            router.replace("/login");
-          } else {
-            snackbar("error", "an error occured. See console for more details");
-            console.error(err);
-          }  
+    const fetchMe = async () => {
+      try {
+        const me = await getMe();
+        console.info("Current User");
+        console.info(me.data);
+        setProfileImgSrc(`${BACKEND_URL}/${me.data?.profile_image}`);
+      } catch (err) {
+        if (err instanceof AuthError) {
+          snackbar("error", "Session does not exist");
+          router.replace("/login")
+          return;
+        }
+        if (err instanceof AxiosError && err.response?.status === 401) {
+          snackbar("error", "Incorrect username or password");
+          router.replace("/login");
+        } else {
+          snackbar("error", "an error occured. See console for more details");
+          console.error(err);
         }
       }
+    }
 
-      fetchMe();
+    fetchMe();
   }, []);
 
   const [notifications, setNotifications] = React.useState<NotificationModel[]>([]);
   const unreadNotificationCount = notifications.filter(notif => notif.read === false).length;
-  
+
   const [openNotifs, setOpenNotifs] = React.useState<boolean>(false);
   const fetchNotifications = async () => {
     try {
       const res = await getNotifications();
       const notifications = res.data;
-      if (notifications) 
+      if (notifications)
         setNotifications(notifications);
     } catch (err) {
       if (err instanceof AuthError) {
@@ -125,7 +125,7 @@ export default function Layout(props : LayoutProps) {
       } else {
         snackbar("error", "an error occured. See console for more details");
         console.error(err);
-      }       
+      }
     }
   }
 
@@ -145,12 +145,12 @@ export default function Layout(props : LayoutProps) {
       } else {
         snackbar("error", "an error occured. See console for more details");
         console.error(err);
-      }       
+      }
     }
   }
 
   React.useEffect(() => {
-    const fetcherInterval = setInterval(fetchNotifications, 500);
+    const fetcherInterval = setInterval(fetchNotifications, 20000);
     return () => clearInterval(fetcherInterval);
   }, []);
 
@@ -161,7 +161,7 @@ export default function Layout(props : LayoutProps) {
           {message}
         </Alert>
       </Snackbar>
-      <Drawer 
+      <Drawer
         anchor="right"
         open={openNotifs}
         onClose={handleNotifClose}
@@ -176,82 +176,84 @@ export default function Layout(props : LayoutProps) {
       </Drawer>
       {
         props.show &&
-      <AppBar position="static" color="primary" sx={{height : "fit-content", padding : "0.25rem 0.5rem"}}>
-        <Grid container sx={{width : "100%"}} spacing={1}>
-          <Grid item xs={1} sx={{display : "flex", alignItems : "center"}}>
-          <DomainImage 
-            alt="bil art"
-            src="/app-logo.svg"
-          />
-          </Grid>
-          <Grid item xs={9} />
-          <Grid item xs={2}>
-            <div style={{display : "flex", justifyContent : "right", width: "100%", gap: 5}}>
-              <Link href="/home">
-                <IconButton size="small">
-                  <HomeIcon 
-                    fontSize="large"
-                    style={{
-                      fill: "#fff"
-                    }}
-                  />
-                </IconButton>
-              </Link>
-              <IconButton
-                onClick={()=>setOpenNotifs(true)}
-                size="small"  
-              >
-                <Badge badgeContent={unreadNotificationCount} color="secondary">
-                  <NotificationsIcon  
-                    fontSize="large"
-                    style={{
-                      fill: "#fff"
-                    }}
-                  />
-                </Badge>
-              </IconButton>
-              <Button
-                id="menu-btn" 
-                size="small"
-                onClick={handleClick}
-              >
-                <Avatar 
-                  src={profileImgSrc}
+        <AppBar position="static" color="primary" sx={{ height: "fit-content", padding: "0.25rem 0.5rem" }}>
+          <Grid container sx={{ width: "100%" }} spacing={1}>
+            <Grid item xs={1} sx={{ display: "flex", alignItems: "center" }}>
+              <Link href={'/home'}>
+                <DomainImage
+                  alt="bil art"
+                  src="/app-logo.svg"
                 />
-              </Button>
-              <Menu
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                  'aria-labelledby': 'menu- btn'
-                }}
-              >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <Link href="/art">
-                  <MenuItem onClick={handleClose}>My Arts</MenuItem>
+              </Link>
+            </Grid>
+            <Grid item xs={9} />
+            <Grid item xs={2}>
+              <div style={{ display: "flex", justifyContent: "right", width: "100%", gap: 5 }}>
+                <Link href="/home">
+                  <IconButton size="small">
+                    <HomeIcon
+                      fontSize="large"
+                      style={{
+                        fill: "#fff"
+                      }}
+                    />
+                  </IconButton>
                 </Link>
-                <Link href="/collections">
-                  <MenuItem onClick={handleClose}>My Collections</MenuItem>
-                </Link>
-                <Link href="/tutorial">
-                  <MenuItem onClick={handleClose}>My Tutorials</MenuItem>
-                </Link>
-              </Menu>
-            </div>
+                <IconButton
+                  onClick={() => setOpenNotifs(true)}
+                  size="small"
+                >
+                  <Badge badgeContent={unreadNotificationCount} color="secondary">
+                    <NotificationsIcon
+                      fontSize="large"
+                      style={{
+                        fill: "#fff"
+                      }}
+                    />
+                  </Badge>
+                </IconButton>
+                <Button
+                  id="menu-btn"
+                  size="small"
+                  onClick={handleClick}
+                >
+                  <Avatar
+                    src={profileImgSrc}
+                  />
+                </Button>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'menu- btn'
+                  }}
+                >
+                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <Link href="/art">
+                    <MenuItem onClick={handleClose}>My Arts</MenuItem>
+                  </Link>
+                  <Link href="/collections">
+                    <MenuItem onClick={handleClose}>My Collections</MenuItem>
+                  </Link>
+                  <Link href="/tutorial">
+                    <MenuItem onClick={handleClose}>My Tutorials</MenuItem>
+                  </Link>
+                </Menu>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
-      </AppBar> 
-    } 
-    <PageContainer>
-      {props.children}
-    </PageContainer>
+        </AppBar>
+      }
+      <PageContainer>
+        {props.children}
+      </PageContainer>
     </>
   )
 }
 
 
-function Notification(props : NotificationModel) {
+function Notification(props: NotificationModel) {
 
   const formatDate = (dateString: string): string => {
     const timestamp = Date.parse(dateString);

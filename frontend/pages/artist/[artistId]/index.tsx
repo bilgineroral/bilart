@@ -8,6 +8,7 @@ import { Grid } from "@mui/material";
 import { useAtom } from "jotai";
 import * as React from "react";
 import { useRouter } from 'next/router';
+import { Art } from "@/api/api_types";
 /* 
 export type Art = {
   art_id : number;

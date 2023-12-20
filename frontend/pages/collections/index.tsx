@@ -9,6 +9,8 @@ import { getCollections } from "@/api/collection";
 import { getArts } from "@/api/art";
 import { getMe } from "@/api/user";
 import { useSnackbar } from "@/store/snackbar";
+import CollectionCard from "@/components/collector/CollectionCard";
+import { getFavoriteArts } from "@/api/favorite";
 
 export default function CollectionsPage() {
 
@@ -35,7 +37,7 @@ export default function CollectionsPage() {
         };
         const fetchAllArts = async () => {
             try {
-                const resp = await getArts({ collector_id: me.collector_id });
+                const resp = await getFavoriteArts();
                 setArtsCount(resp.count);
             } catch (e: any) {
                 snackbar("error", e.message);
@@ -56,7 +58,7 @@ export default function CollectionsPage() {
                 console.log(e);
             }
         }
-
+        fetchCollections();
     }, [collections.length]);
 
     return (
@@ -99,37 +101,11 @@ export default function CollectionsPage() {
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}> {
 
-                    collections.map((collection: any) => {
-                        <Card sx={{
-                            width: "100%", minHeight: '100%', display: 'flex',
-                            flexDirection: 'column', maxHeight: '500px', maxWidth: '400px'
-                        }}>
-                            <CardMedia
-                                sx={{ width: "100%", aspectRatio: "1/1" }}
-                                style={{
-
-                                }}
-                                image={`/app-logo.svg`}
-                                title="art"
-                            />
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="div">
-                                    {"title"}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" overflow={'auto'} maxHeight={'100px'}>
-                                    {"description"}
-                                </Typography>
-                            </CardContent>
-                            <Box sx={{ marginTop: 'auto' }}>
-                                <Divider />
-                                <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Link href={`/art/${"artId"}`}>
-                                        <Button size="small" startIcon={<LinkIcon />}>Open</Button>
-                                    </Link>
-                                </CardActions>
-                            </Box>
-                        </Card>
-                    })
+                    collections.map((collection: any, index: any) => (
+                        <CollectionCard
+                            key={index}
+                            collection={collection} />
+                    ))
                 }
                 </Grid>
             </Grid>
@@ -150,10 +126,10 @@ export default function CollectionsPage() {
 
 export async function getStaticProps() {
     return {
-      props : {
-        navbar : true,
-        fallback : true
-      }
+        props: {
+            navbar: true,
+            fallback: true
+        }
     }
-  }
-  
+}
+
