@@ -1,3 +1,5 @@
+from modules.report.model import CreateReport, ReportRequest
+from modules.report.router import create_report
 import os
 from typing import Any
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
@@ -7,7 +9,7 @@ from db.update import update
 from db.retrieve import retrieve
 from db.insert import insert
 
-from modules.user.model import UserModel, UpdateUser
+from modules.user.model import UserModel, UpdateUser, UpdatePrivileges
 from modules.user.auth import get_current_user
 from modules.admin.model import AdminModel
 from modules.collector.model import CollectorModel
@@ -25,6 +27,7 @@ def get_me(
 ):
     return {"message": "your current profile", "success": True, "data": user}
 
+
 @router.delete("/me")
 def delete_user(user: dict[str, Any] = Depends(get_current_user)):
     success, message = delete(
@@ -36,6 +39,9 @@ def delete_user(user: dict[str, Any] = Depends(get_current_user)):
 
 @router.put("/me")
 def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_current_user)):
+    if user['privileges'] != 'A' and (request_data.privileges in ['A', 'M']):
+        raise HTTPException(status_code=401, detail="Not authorized")
+
     success, message, updated_user = update(
         table=UserModel.get_table_name(),
         model={
@@ -46,10 +52,10 @@ def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_cur
             'phone': request_data.phone,
             'password_hash': request_data.password
         },
-        identifier= UserModel.get_identifier(),
+        identifier=UserModel.get_identifier(),
         user_id=user['user_id']
     )
-    
+
     success, message, artist = update(
         table=ArtistModel.get_table_name(),
         model={
@@ -59,7 +65,7 @@ def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_cur
         identifier=ArtistModel.get_identifier(),
         artist_id=user['artist_id']
     )
-    
+
     success, message, admin = update(
         table=AdminModel.get_table_name(),
         model={
@@ -68,11 +74,12 @@ def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_cur
         identifier=AdminModel.get_identifier(),
         admin_id=user['admin_id']
     )
-    
+
     updated_user.update(artist)
     updated_user.update(admin)
 
     return {"message": message, "success": success, "data": updated_user}
+
 
 @router.get("/{user_id}")
 def get_user_id(
@@ -118,24 +125,24 @@ def get_users(
     created_at: str | None = None
 ):
     filters = {
-        "tables":[UserModel, CollectorModel, ArtistModel, AdminModel],
-        "single":False,
-        f"table__{UserModel.get_table_name()}__username":username,
-        f"table__{UserModel.get_table_name()}__first_name":first_name,
-        f"table__{UserModel.get_table_name()}__last_name":last_name,
-        f"table__{UserModel.get_table_name()}__email":email,
-        f"table__{UserModel.get_table_name()}__created_at":created_at,
-        f"table__{UserModel.get_table_name()}__search__first_name":search__first_name,
-        f"table__{UserModel.get_table_name()}__search__email":search__email,
-        f"table__{UserModel.get_table_name()}__search__last_name":search__last_name,
-        f"table__{UserModel.get_table_name()}__search__username":search__username,
-        f"table__{ArtistModel.get_table_name()}__bio":bio,
-        f"table__{ArtistModel.get_table_name()}__link":link,
-        f"table__{ArtistModel.get_table_name()}__search__bio":search__bio,
-        f"table__{AdminModel.get_table_name()}__privledge":privledge,
-        f"table__{CollectorModel.get_table_name()}__rank":rank,
+        "tables": [UserModel, CollectorModel, ArtistModel, AdminModel],
+        "single": False,
+        f"table__{UserModel.get_table_name()}__username": username,
+        f"table__{UserModel.get_table_name()}__first_name": first_name,
+        f"table__{UserModel.get_table_name()}__last_name": last_name,
+        f"table__{UserModel.get_table_name()}__email": email,
+        f"table__{UserModel.get_table_name()}__created_at": created_at,
+        f"table__{UserModel.get_table_name()}__search__first_name": search__first_name,
+        f"table__{UserModel.get_table_name()}__search__email": search__email,
+        f"table__{UserModel.get_table_name()}__search__last_name": search__last_name,
+        f"table__{UserModel.get_table_name()}__search__username": search__username,
+        f"table__{ArtistModel.get_table_name()}__bio": bio,
+        f"table__{ArtistModel.get_table_name()}__link": link,
+        f"table__{ArtistModel.get_table_name()}__search__bio": search__bio,
+        f"table__{AdminModel.get_table_name()}__privledge": privledge,
+        f"table__{CollectorModel.get_table_name()}__rank": rank,
     }
-    
+
     success, count, message, items = retrieve(**filters)
 
     return {"data": items, "success": success, "message": message, "count": count}
@@ -147,10 +154,12 @@ def create_new_user(request_data: UserModel):
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
 
+
 @router.post("/profile-image")
-async def upload_profile_picture(image : UploadFile = File(...),
-                           user: dict[str, Any] = Depends(get_current_user)
-                           ):
+async def upload_profile_picture(image: UploadFile = File(...),
+                                 user: dict[str, Any] = Depends(
+                                     get_current_user)
+                                 ):
     file_mgr = FileManager(f"{FILEPATH}profile_images/")
     content = await file_mgr.save(image)
     if content is None:
@@ -166,3 +175,32 @@ async def upload_profile_picture(image : UploadFile = File(...),
     )
 
     return {"message": message, "success": success, "data": dict(user)}
+
+
+@router.post("/report/{user_id}")
+def report_user(user_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=UserModel.get_table_name(),
+        entity_id=user_id,
+        content=request.content
+    ), user)
+
+
+@router.post("/{user_id}/change_privileges")
+def change_privileges(user_id: int, request: UpdatePrivileges, user: dict[str, Any] = Depends(get_current_user)):
+    condition_a = user['privileges'] not in ['A'] and request.privileges in ['A']
+    condition_b = user['privileges'] not in ['A', 'M'] and request.privileges in ['A', 'M', 'N']
+    
+    if condition_a or condition_b:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    success, message, admin = update(
+        table=AdminModel.get_table_name(),
+        model={
+            'privileges': request.privileges
+        },
+        identifier=AdminModel.get_identifier(),
+        admin_id=user_id
+    )
+
+    return {"data": admin, "success": success, "message": message}

@@ -1,3 +1,5 @@
+from modules.report.router import create_report
+from modules.report.model import CreateReport, ReportRequest
 from typing import Any
 from fastapi import APIRouter, Depends
 from modules.post.model import PostModel
@@ -11,12 +13,13 @@ from db.insert import insert
 from modules.auction.model import AuctionModel, UpdateAuction
 from modules.user.auth import get_current_user
 
-import pytz 
+import pytz
 from datetime import datetime
 
-utc=pytz.UTC
+utc = pytz.UTC
 
 router = APIRouter(prefix="/auctions", tags=['auctions'])
+
 
 @router.get("/{auction_id}")
 def get_auction(
@@ -27,7 +30,7 @@ def get_auction(
         single=True,
         auction_id=auction_id
     )
-    
+
     if items[0]['end_time'] < utc.localize(datetime.now()):
         _, _, items[0] = update(
             table=AuctionModel.get_table_name(),
@@ -39,6 +42,7 @@ def get_auction(
         )
 
     return {"data": items[0], "success": success, "message": message}
+
 
 @router.get("/")
 def get_auctions(
@@ -63,7 +67,7 @@ def get_auctions(
         active=active,
         art_id=art_id
     )
-    
+
     for i in range(len(items)):
         if items[i]['end_time'] < utc.localize(datetime.now()):
             _, _, items[i] = update(
@@ -86,11 +90,12 @@ def create_new_auction(request_data: AuctionModel, user: dict[str, Any] = Depend
         f'table__{ArtModel.get_table_name()}__art_id':  request_data.art_id,
         f'table__{PostModel.get_table_name()}__artist_id': user['artist_id'],
     }
-    
+
     retrieve(**filters)
-    
+
     success, message, data = insert(request_data)
     return {"message": message, "success": success, "data": data}
+
 
 @router.delete("/{auction_id}")
 def delete_auction(auction_id: int, user: dict[str, Any] = Depends(get_current_user)):
@@ -100,9 +105,9 @@ def delete_auction(auction_id: int, user: dict[str, Any] = Depends(get_current_u
         f'table__{PostModel.get_identifier()}__artist_id': user['artist_id'],
         f'table__{AuctionModel.get_identifier()}__auction_id': auction_id,
     }
-    
+
     retrieve(**filters)
-    
+
     success, message = delete(
         table=AuctionModel.get_table_name(),
         auction_id=auction_id
@@ -118,9 +123,9 @@ def update_auction(auction_id: int, request_data: UpdateAuction, user: dict[str,
         f'table__{PostModel.get_identifier()}__artist_id': user['artist_id'],
         f'table__{AuctionModel.get_identifier()}__auction_id': auction_id,
     }
-    
+
     retrieve(**filters)
-    
+
     success, message, data = update(
         table=AuctionModel.get_table_name(),
         model={
@@ -132,3 +137,12 @@ def update_auction(auction_id: int, request_data: UpdateAuction, user: dict[str,
         auction_id=auction_id
     )
     return {"message": message, "success": success, "data": data}
+
+
+@router.post("/report/{auction_id}")
+def report_auction(auction_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=AuctionModel.get_table_name(),
+        entity_id=auction_id,
+        content=request.content
+    ), user)

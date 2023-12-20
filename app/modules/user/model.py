@@ -64,4 +64,7 @@ class UpdateUser(BaseModel):
     bio: str | None = None
     link: str | None = None
     privileges: str | None = None
-    
+
+
+class UpdatePrivileges(BaseModel):
+    privileges: str

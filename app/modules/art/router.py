@@ -1,10 +1,12 @@
+from modules.report.model import CreateReport, ReportRequest
+from modules.report.router import create_report
 from enum import Enum
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from modules.collection.model import CollectionModel
 from modules.tag__post.model import TagPostModel
 from modules.art__collection.model import ArtCollectionModel
-from  modules.favorite.model import FavoriteModel
+from modules.favorite.model import FavoriteModel
 
 from db.delete import delete
 from db.update import update
@@ -19,15 +21,14 @@ import dotenv
 from pathlib import Path
 from file_manager import FileManager
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv.load_dotenv(BASE_DIR / ".env")
 
 FILEPATH = os.getenv("FILEPATH")
 
 
-
 router = APIRouter(prefix="/arts", tags=['arts'])
+
 
 @router.get('/available')
 def get_available_arts(
@@ -46,7 +47,7 @@ def get_available_arts(
     success, count, message, items = retrieve(**filters)
 
     return {"message": message, "success": success, "data": items, "count": count}
-    
+
 
 @router.get("/{art_id}")
 def get_art(
@@ -64,15 +65,15 @@ def get_art(
 class ArtDateOrder(Enum):
     asc = "asc"
     desc = f"desc"
-    
+
     @staticmethod
     def get_asc():
         return f"{PostModel.get_table_name()}.created_at ASC"
-    
+
     @staticmethod
     def get_desc():
         return f"{PostModel.get_table_name()}.created_at DESC"
-    
+
     @staticmethod
     def get_val(val: str):
         return ArtDateOrder.get_desc() if val == "desc" else ArtDateOrder.get_asc()
@@ -81,15 +82,15 @@ class ArtDateOrder(Enum):
 class PriceOrder(Enum):
     asc = "asc"
     desc = f"desc"
-    
+
     @staticmethod
     def get_asc():
         return f"{ArtModel.get_table_name()}.price ASC"
-    
+
     @staticmethod
     def get_desc():
         return f"{ArtModel.get_table_name()}.price DESC"
-    
+
     @staticmethod
     def get_val(val: str):
         return PriceOrder.get_desc() if val == "desc" else PriceOrder.get_asc()
@@ -113,8 +114,8 @@ def get_arts(
 ):
     filters = {
         "tables": [
-            ArtModel, 
-            PostModel, 
+            ArtModel,
+            PostModel,
             TagPostModel if tag_name else None,
             ArtCollectionModel if collection else None,
             FavoriteModel if favoriting_collector else None
@@ -141,23 +142,23 @@ def get_arts(
 
 
 @router.post("/")
-async def create_new_art( title: str = Form(...),
-                    description: str = Form(...),
-                    price: float = Form(...),
-                    image: UploadFile = File(...),
-                    user: dict[str, Any] = Depends(get_current_user)):
-    
+async def create_new_art(title: str = Form(...),
+                         description: str = Form(...),
+                         price: float = Form(...),
+                         image: UploadFile = File(...),
+                         user: dict[str, Any] = Depends(get_current_user)):
+
     success, message, post = insert(
         PostModel(
-            artist_id=user['artist_id'],  
-            description=description, 
+            artist_id=user['artist_id'],
+            description=description,
             title=title
         )
     )
 
     file_mgr = FileManager(f"{FILEPATH}post_images/")
     content = await file_mgr.save(image)
-    
+
     if content is None:
         raise HTTPException(status_code=500, detail="Image upload failed")
 
@@ -168,7 +169,7 @@ async def create_new_art( title: str = Form(...),
             post_id=post['post_id']
         )
     )
-    
+
     return {"message": message, "success": success, "data": dict(post, **art)}
 
 
@@ -189,9 +190,9 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
         single=True,
         art_id=art_id
     )
-    
+
     art = art[0]
-    
+
     success, message, post = update(
         table=PostModel.get_table_name(),
         model={
@@ -202,5 +203,14 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
         post_id=art['post_id'],
         artist_id=user['artist_id']
     )
-    
+
     return {"message": message, "success": success, "data": dict(post, **art)}
+
+
+@router.post("/report/{art_id}")
+def report_art(art_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=ArtModel.get_table_name(),
+        entity_id=art_id,
+        content=request.content
+    ), user)

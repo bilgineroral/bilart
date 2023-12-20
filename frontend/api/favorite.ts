@@ -1,4 +1,5 @@
 import { post, deleteItem } from "./crude";
+import { ApiReuslt } from "./api_types";
 
 type CreateFavoriteData = {
   post_id: number;

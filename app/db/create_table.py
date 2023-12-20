@@ -3,11 +3,6 @@ from typing import Tuple
 from fastapi import HTTPException
 from db.db import PgDatabase
 from modules.modules import create_functions
-from modules.art.model import ArtModel
-from modules.art__collection.model import ArtCollectionModel
-from modules.collection.model import CollectionModel
-from modules.post.model import PostModel
-from modules.tag__post.model import TagPostModel
 from modules.modules import create_functions, trigger_functions
 
 
