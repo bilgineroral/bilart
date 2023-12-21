@@ -3,12 +3,14 @@ from pydantic import BaseModel
 
 from db.model import Model
 from modules.art.model import ArtModel
+from modules.artist.model import ArtistModel
 
 class AuctionModel(Model):
     start_time: str
     end_time: str
     active: bool = False
     art_id: int
+    artist_id: int
     
     @staticmethod
     def get_table_name() -> str:
@@ -23,12 +25,20 @@ class AuctionModel(Model):
                 end_time TIMESTAMPTZ NOT NULL,
                 active BOOLEAN NOT NULL DEFAULT True,
                 {ArtModel.get_identifier()} INT NOT NULL,
+                {ArtistModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT end_time_after_start_time CHECK (end_time > start_time),
                 CONSTRAINT fk_art
                     FOREIGN KEY({ArtModel.get_identifier()})
                         REFERENCES {ArtModel.get_table_name()}({ArtModel.get_identifier()})
-                        ON DELETE CASCADE
-            );
+                        ON DELETE CASCADE,
+                CONSTRAINT fk_artist
+                    FOREIGN KEY({ArtistModel.get_identifier()})
+                        REFERENCES {ArtistModel.get_table_name()}({ArtistModel.get_identifier()})
+                        ON DELETE CASCADE);
+                
+                CREATE UNIQUE INDEX idx_unique_active_auction
+                ON {AuctionModel.get_table_name()} ({ArtModel.get_identifier()}, {ArtistModel.get_identifier()})
+                WHERE active;
             """
     
     @staticmethod

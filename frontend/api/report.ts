@@ -1,9 +1,9 @@
 import { ApiReuslt, ReportModel } from "./api_types";
 import { get, post, toQueryString } from "./crude";
 
-type CreateReportData = {
+export type CreateReportData = {
   content: string;
-  entity_name: string;
+  entity_name: "Art";
   entity_id: number;
 };
 

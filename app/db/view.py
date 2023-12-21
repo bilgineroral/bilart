@@ -4,7 +4,7 @@ from typing_extensions import Protocol
 
 class ViewProtocal(Protocol):
     @staticmethod
-    def get_name() -> str:
+    def get_table_name() -> str:
         ...
     
     @staticmethod
@@ -14,7 +14,7 @@ class ViewProtocal(Protocol):
 
 class View(ABC):
     @staticmethod
-    def get_name() -> str:
+    def get_table_name() -> str:
         ...
     
     @staticmethod

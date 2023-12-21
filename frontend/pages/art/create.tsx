@@ -32,6 +32,7 @@ import { NewArtData, UpdateArtData, createNewArt, updateArt, getArt } from "@/ap
 import { useSnackbar } from "@/store/snackbar";
 import { TagPostModel, TagQueryParams, addTagToPost, deleteTagFromPost, getTags } from "@/api/tags";
 import { BACKEND_URL } from "@/routes";
+import { Unarchive } from "@mui/icons-material";
 
 export default function CreateArt() {
 
@@ -76,12 +77,15 @@ export default function CreateArt() {
     }
 
     fetchInitData();
-    getTags({})
-    .then(res => {
-      setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
-    });
   }, [art_id]);
 
+  React.useEffect(() => {
+    getTags({})
+    .then(res => {
+      console.log(res);
+      setTags(Object.entries(res.data!).map(([key, value]) => value.tag_name));
+    });
+  }, []);
 
 
   const handleOnSave = async () => {
@@ -130,6 +134,7 @@ export default function CreateArt() {
       description: description
     }
     const unAppliedTags = originalAssignedTagsRef.current.filter(tag => !assignedTags.includes(tag));
+    console.log(unAppliedTags);
     const newAppliedTags = assignedTags.filter(tag => !originalAssignedTagsRef.current.includes(tag));
     try {
       const updateRes = await updateArt(Number(art_id), updatedArt);
@@ -160,7 +165,7 @@ export default function CreateArt() {
   }
 
   const handleOnCancel = React.useCallback(() => {
-    router.replace("/artist");
+    router.replace("/art");
   }, []);
 
 

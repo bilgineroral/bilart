@@ -49,12 +49,13 @@ def retrieve(
     join_tables: list[JoinModel] = [],
     single: bool = False,
     order_by: list[str | None] = [],
-    view: ViewProtocal | None = None,
+    # view: ViewProtocal | None = None,
     **kwargs
 ):
     return get_from_table(
-        view.get_name() if view is not None else natural_join_models(
-            tables) if not join_tables else join_models(join_tables),
+        # view.get_name() if view is not None else natural_join_models(
+        #     tables) if not join_tables else join_models(join_tables),
+        natural_join_models(tables) if not join_tables else join_models(join_tables),
         params_to_where_clause(**kwargs),
         ", ".join([order for order in order_by if order]),
         single=single

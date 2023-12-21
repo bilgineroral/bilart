@@ -97,7 +97,7 @@ def art_average_rating(art_id: int):
         FROM Art A
         INNER JOIN Post P ON A.post_id = P.post_id
         INNER JOIN Rating R ON P.post_id = R.post_id""",
-        where_clasue=f"""WHERE A.art_id = {art_id}""",
+        where_clasue=f"""A.art_id = {art_id}""",
         order_by_clasue="",
         select_function="SELECT AVG(R.score) AS average_rating"
     )

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
-import type {Tag, Art, Auction, Rating} from "@/api/api_types";
+import type {Tag, Art, Auction, Rating, User} from "@/api/api_types";
 import {
   Grid,
   Stack,
@@ -11,8 +11,10 @@ import {
   Typography,
   ButtonGroup,
   Button,
-  Paper,
   IconButton,
+  TextField,
+  Paper,
+  Avatar
 } from "@mui/material";
 import {
   DomainDivider,
@@ -23,13 +25,15 @@ import { useSnackbar } from "@/store/snackbar";
 import { ArtQueryParams, getArt, getArts } from "@/api/art";
 import { getAuctions } from "@/api/auction";
 import { getTags } from "@/api/tags";
-import { getRatings } from "@/api/rating";
+import { CreateRatingData, createNewRating, getArtRatingAverage, getRatings } from "@/api/rating";
 import {favorite, getFavoritePosts, unFavorite} from "@/api/favorite"; 
 
 import { AxiosError } from "axios";
 import { AuthError } from "@/api/crude";
 import AuctionModal from "@/components/auction/AuctionModal";
-import { getMe } from "@/api/user";
+import { getMe, getUserById } from "@/api/user";
+import { BACKEND_URL } from "@/routes";
+import ReportModal from "@/components/shared/ReportModal";
 
 
 export default function ArtPage() {
@@ -45,88 +49,103 @@ export default function ArtPage() {
   const [comments, setComments] = React.useState<Rating[]>([]);
 
 
+  const[avgArtRating, setavgArtRating] = React.useState<number>(0);
+  const fetchAvgRating = async(art : Art) => {
+    try {
+        const res = await getArtRatingAverage(art.art_id);
+        res.data && res.data.at(0) && setavgArtRating(+(res.data.at(0)!.average_rating.toFixed(2)));
+    } catch (err) {
+      snackbar("error", "failed to get average art rating");
+      console.log("error");
+      console.error(err);
+    }
+  }
+
+
   const [isFavorited, setIsFavorited] = React.useState<boolean>(false);
-  React.useEffect(() => {
-    const fetchArtInfo = async () : Promise<Art | null> => {
-      try {
-        const data = await getArt(Number(artId));
-        console.log(data);
+  const fetchArtInfo = async () : Promise<Art | null> => {
+    try {
+      const data = await getArt(Number(artId));
+      console.log(data);
+      setArtInfo(data.data);
+      if ("data" in data) {
         setArtInfo(data.data);
-        if ("data" in data) {
-          setArtInfo(data.data);
-          return data.data;
-        } else {
-          snackbar("error", "failed to fetch art");
-          return null;
-        }
-      } catch (err) {
-        if (err instanceof AuthError) {
-          snackbar("error", "Session does not exist");
-          router.replace("/login")
-        }
-        if (err instanceof AxiosError && err.response?.status === 401) {
-          snackbar("error", "Incorrect username or password");
-          router.replace("/login");
-        } else {
-          snackbar("error", "an error occured. See console for more details");
-          console.error(err);
-        }
+        return data.data;
+      } else {
+        snackbar("error", "failed to fetch art");
+        return null;
       }
-      return null;
-    };
+    } catch (err) {
+      if (err instanceof AuthError) {
+        snackbar("error", "Session does not exist");
+        router.replace("/login")
+      }
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        snackbar("error", "Incorrect username or password");
+        router.replace("/login");
+      } else {
+        snackbar("error", "an error occured. See console for more details");
+        console.error(err);
+      }
+    }
+    return null;
+  };
 
-    const fetchAuctions = async (art: Art) => {
-      try {
-        const data = await getAuctions({ art_id: Number(art.art_id) });
-        console.log(data);
-        if (data.data != null) {
-          setAuctions(data.data);
-        } else {
-          snackbar("error", "failed to fetched");
-        }
-      } catch (err) {
-        console.log(err);
+  const fetchAuctions = async (art: Art) => {
+    try {
+      const data = await getAuctions({ art_id: Number(art.art_id) });
+      console.log(data);
+      if (data.data != null) {
+        setAuctions(data.data);
+      } else {
         snackbar("error", "failed to fetched");
       }
-    };
-    const fetchTags = async (art: Art) => {
-      try {
-        const data = await getTags({ post_id: art.post_id });
-        console.info(data);
-        console.log(data);
-        if (data.data != null) {
-          setTags(data.data);
-        } else {
-          snackbar("error", "failed to fetched");
-        }
-      } catch (err) {
-        console.log(err);
+    } catch (err) {
+      console.log(err);
+      snackbar("error", "failed to fetched");
+    }
+  };
+  const fetchTags = async (art: Art) => {
+    try {
+      const data = await getTags({ post_id: art.post_id });
+      console.info(data);
+      console.log(data);
+      if (data.data != null) {
+        setTags(data.data);
+      } else {
         snackbar("error", "failed to fetched");
       }
-    };
+    } catch (err) {
+      console.log(err);
+      snackbar("error", "failed to fetched");
+    }
+  };
 
-    const fetchComments = async (art: Art) => {
-      try {
-        const data = await getRatings({ post_id: art.post_id });
-        if ( data.data != null) {
-          setComments(data.data);
-        } else {
-          snackbar("error", "failed to fetched");
-        }
-      } catch (err) {
-        console.log(err);
+  const fetchComments = async (art: Art) => {
+    try {
+      const data = await getRatings({ post_id: art.post_id });
+      if ( data.data != null) {
+        setComments(data.data);
+      } else {
         snackbar("error", "failed to fetched");
       }
-    };
+    } catch (err) {
+      console.log(err);
+      snackbar("error", "failed to fetched");
+    }
+  };
 
-    const fetch = async () => {
-      const art = await fetchArtInfo();
-      if (art != null) {
-        fetchAuctions(art);
-        fetchTags(art);
-        fetchComments(art);
-      }
-    };
+  const fetch = async () => {
+    const art = await fetchArtInfo();
+    if (art != null) {
+      fetchAuctions(art);
+      fetchTags(art);
+      fetchComments(art);
+      fetchAvgRating(art);
+    }
+  };
+
+  React.useEffect(() => {
     if (artId) 
       fetch();
   }, [artId]);
@@ -187,8 +206,43 @@ export default function ArtPage() {
     }
   }
 
+  const [ratingComment, setRatingComment] = React.useState<string>("");
+  const [ratingScore, setRatingScore] =React.useState<string>("");
+
+  const handleRatingSubmit = async () => {
+    try {
+      const data : CreateRatingData = {
+        score: Number(ratingScore),
+        comment: ratingComment,
+        post_id: artInfo!.post_id
+      }    
+      const res = await createNewRating(data);
+      console.log('rating response');
+      console.log(res);
+      await Promise.allSettled([
+        fetchComments(artInfo!),
+        fetchAvgRating(artInfo!)
+      ]);
+      snackbar("success", "your rating was submitted");
+    } catch (err) {
+      snackbar("error", "an error occured with rating");
+      console.error(err);
+    }
+  }
+
+  const [reportModal, setReportModal] = React.useState<boolean>(false);
+
   return (
     <>
+     {
+      artInfo && 
+        <ReportModal 
+          entity_id={artInfo!.art_id}
+          entity_name="Art"
+          open={reportModal}
+          onClose={() => setReportModal(false)}
+        />
+     }
       <Stack direction="column" gap={2} sx={{ height: "100%" }}>
         <Grid container gap={0.5} justifyContent="space-between">
           <Grid item xs={4}>
@@ -229,6 +283,9 @@ export default function ArtPage() {
                   )}
                 </div>
               </div>
+              <Typography color={theme.palette.primary.main}>
+                Average Rating: {avgArtRating}
+              </Typography>
               <DomainDivider color={theme.palette.primary.main} />
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="h4" sx={{color: theme.palette.primary.main}}>
@@ -249,6 +306,9 @@ export default function ArtPage() {
                 <Button sx={{ color: "#fff" }} onClick={handleArtFavorite}>
                   {isFavorited? "Remove From Favorites" : "Add To Favorites"}
                 </Button>
+                <Button sx={{color: "#fff"}} onClick={() => setReportModal(true)}>
+                  Report
+                </Button>
               </ButtonGroup>
             </Stack>
           </Grid>
@@ -264,28 +324,28 @@ export default function ArtPage() {
               React.Children.toArray(
                 auctions.map((data, index) => (
                   <Grid item xs={2}>
-                    <Paper sx={{ padding: "0.25rem 1rem" }}>
-                      <Typography>
+                    <Paper sx={{ padding: "0.25rem 1rem", backgroundColor: data.active ? theme.palette.primary.main : theme.palette.primary.light }}>
+                      <Typography color="#fff">
                         Auction {index + 1}
                         <Link href={`/public/auction/${data.auction_id}`}>
                           <IconButton>
-                            <LinkIcon fontSize="small" style={{fill: theme.palette.primary.main}} />
+                            <LinkIcon fontSize="small" style={{fill: theme.palette.secondary.main}} />
                           </IconButton>
                         </Link>
                       </Typography>
                       <DomainDivider color="black" />{" "}
                       {data.start_time != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Starting: {formatDate(data.start_time as any)}
                         </Typography>
                       ) : null}
                       {data.start_time != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Ending: {formatDate(data.end_time as any)}
                         </Typography>
                       ) : null}
                       {data.active != null ? (
-                        <Typography variant="body2" color="grey">
+                        <Typography variant="body2" color="#ffffff99">
                           Active: {data.active ? "True" : "False"}
                         </Typography>
                       ) : null}
@@ -306,8 +366,29 @@ export default function ArtPage() {
         <Typography variant="h4" sx={{color: theme.palette.primary.main}}>
           Comments
         </Typography>
-        <Ratings ratings={comments} />
+        <Stack direction="row" gap={2}>
+          <TextField 
+            label="Your Comment"
+            placeholder="Enter Your Comment"
+            value={ratingComment}
+            onChange={(e) => setRatingComment(e.target.value)}
+            sx={{flexGrow: 1}}
+          />
+          <TextField 
+            label="Your Score"
+            placeholder="Enter Your Score"
+            value={ratingScore}
+            type='number'
+            onChange={(e) => setRatingScore(e.target.value)}
+            sx={{flexGrow: 1}}
+          />
+          <Button variant="contained" onClick={handleRatingSubmit}>
+            Submit Your Rating
+          </Button>
+        </Stack>
+        <Ratings ratings={comments} art={artInfo} />
       </Stack>
+
     </>
   );
 }
@@ -329,50 +410,62 @@ export async function getStaticProps() {
 
 type RatingsProps = {
   ratings: Rating[];
+  art: Art | null;
 };
 
-const Ratings: React.FC<RatingsProps> = ({ ratings }) => {
+const Ratings: React.FC<RatingsProps> = ({ ratings, art }) => {
+  
+  const [artist, setArtist] = React.useState<User | null>(null);
+  React.useEffect(() => {
+    const fetchArtist = async () => {
+      try {
+        const artist = await getUserById(art!.artist_id);
+        if (artist.data)
+          setArtist(artist.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (art) 
+      fetchArtist();
+  }, [art, ratings]);
+  
   return (
-    <div style={{ padding: "20px", borderRadius: "10px" }}>
-      {ratings.map((rating) => (
-        <div
-          key={rating.rating_id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "white",
-            padding: "10px",
-            margin: "10px 0",
-            borderRadius: "5px",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {rating.profile_image && (
-              <img
-                src={rating.profile_image}
-                alt={`${rating.username}'s profile`}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  marginRight: "15px",
-                }}
+    <Stack direction="column" gap={2}>
+      {
+        ratings.map((rating) => (
+        <Paper key={rating.user_id}>
+          <Stack direction="row" sx={{ padding: "0.5rem"}} justifyContent="space-between" alignItems="center" gap={2}>
+            <div style={{display: "flex", justifyContent: "left", alignItems: "center", gap: 4}}>
+              <Avatar 
+                  src={`${BACKEND_URL}/${rating.profile_image}`}
               />
-            )}
-            <div>
-              <div style={{ fontWeight: "bold" }}>{rating.username}</div>
-              <div style={{ color: "#999" }}>{rating.comment}</div>
+              <Typography>
+                {rating.username}
+              </Typography>
             </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {"★".repeat(rating.score)}
-            {"☆".repeat(5 - rating.score)}
-          </div>
-        </div>
-      ))}
-    </div>
-    
+            {
+              rating.user_id === artist?.user_id &&
+              <Chip color="secondary" label={<Typography sx={{color: "white"}}>Artist</Typography>} />
+            }
+            <TextField
+              sx={{flexGrow : 1}}
+              size="small" 
+              disabled
+              value={rating.comment}
+            />
+            {
+              rating.user_id !== artist?.user_id &&
+              <div style={{ display: "flex", alignItems: "center"}}>
+                {"★".repeat(rating.score)}
+                {"☆".repeat(5 - rating.score)}
+              </div>
+            }
+          </Stack>
+        </Paper>
+      ))
+    }
+    <div style={{width: "100%", height: 100}} />
+    </Stack>
   );
 };

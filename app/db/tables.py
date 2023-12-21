@@ -50,6 +50,7 @@ def params_to_where_clause(**kwargs):
 
 
 def natural_join_models(models: list[ModelProtocal]) -> str:
+    print(models)
     return " NATURAL JOIN ".join([model.get_table_name() for model in models if model is not None])
 
 
