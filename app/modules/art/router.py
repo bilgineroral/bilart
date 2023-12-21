@@ -203,3 +203,12 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
     )
 
     return {"message": message, "success": success, "data": dict(post, **art)}
+
+
+@router.post("/report/{art_id}")
+def report_art(art_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=ArtModel.get_table_name(),
+        entity_id=art_id,
+        content=request.content
+    ), user)
