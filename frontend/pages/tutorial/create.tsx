@@ -156,7 +156,7 @@ export default function CreateArt() {
   }
 
   const handleOnCancel = React.useCallback(() => {
-    router.replace("/artist");
+    router.replace("/home");
   }, []);
 
   const handleOnChangeTags = (_ : any , newValues : string[]) => {

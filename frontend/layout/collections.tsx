@@ -19,12 +19,12 @@ export default function CollectionsLayout({children}: {children: React.ReactNode
         <Button  onClick={routeToAllArts}
           variant={active === "collection" ? "contained":"outlined"}
         >
-          Arts Bought
+          Collections
         </Button>
         <Button onClick={routeToGroups}
           variant={active === "groups" ? "contained":"outlined"}
         >
-          Collections
+          Arts bought
         </Button>
       </ButtonGroup>
       {children}

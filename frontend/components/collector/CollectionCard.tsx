@@ -55,7 +55,7 @@ export default function CollectionCard({ collection }: CollectionCardProps) {
                 width: "100%", height: '100%', display: 'flex',
                 flexDirection: 'column', maxHeight: '520px', maxWidth: '400px'
             }}>
-                <Link href={`/collections/${collection.collection_id}`}>
+                <Link href={`/collection/${collection.collection_id}`}>
                     <CardMedia
                         sx={{ width: "100%", aspectRatio: "1/1" }}
                         image={`/app-logo.svg`}
@@ -73,13 +73,13 @@ export default function CollectionCard({ collection }: CollectionCardProps) {
                     <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Button onClick={() => {
-                                router.push(`/collections/${collection.collection_id}`)
+                                router.push(`/collection/${collection.collection_id}`)
                             }}>
                                 <LinkIcon style={{ marginRight: '5px' }} />
                                 Open
                             </Button>
                             <Button onClick={() => {
-                                router.push(`/collections/${collection.collection_id}/edit`)
+                                router.push(`/collection/${collection.collection_id}/edit`)
                             }}>
                                 <BorderColor style={{ marginRight: '5px' }} />
                                 Edit
