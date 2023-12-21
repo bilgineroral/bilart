@@ -54,26 +54,26 @@ export default function HomePage() {
     };
 
     const fetchArts = async () => {
-      try {
-          console.log("sort= ", sort);
-          console.log("tag= ", tag);
-          const resp = await getAvailableArts({
-              date_order: sort == "da" ? "asc" :
-                  sort == "dd" ? "desc" : null,
-              price_order: sort == "pa" ? "asc" :
-                  sort == "pd" ? "desc" : null,
-              tag_name: tag || null,
-              search__title: searchTitle.trim().length !== 0? searchTitle : undefined
-          });
-          if (resp.success && resp.data != null) {
-            console.log(resp.data)
-              setArts(resp.data);
-          } else {
-              snackbar("error", "Couldn't fetch arts");
-          }
-      } catch (err) {
-          console.log(err);
-      }
+        try {
+            console.log("sort= ", sort);
+            console.log("tag= ", tag);
+            const resp = await getAvailableArts({
+                date_order: sort == "da" ? "asc" :
+                    sort == "dd" ? "desc" : null,
+                price_order: sort == "pa" ? "asc" :
+                    sort == "pd" ? "desc" : null,
+                tag_name: tag || null,
+                search__title: searchTitle.trim().length !== 0 ? searchTitle : undefined
+            });
+            if (resp.success && resp.data != null) {
+                console.log(resp.data)
+                setArts(resp.data);
+            } else {
+                snackbar("error", "Couldn't fetch arts");
+            }
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     const fetchTags = async () => {
@@ -94,117 +94,119 @@ export default function HomePage() {
         fetchTags();
     }, [arts.length, sort, tag]);
 
-    const searchTitleDebouncRef = React.useRef<number|null>(null);
+    const searchTitleDebouncRef = React.useRef<number | null>(null);
     React.useEffect(() => {
-      if(searchTitleDebouncRef.current) clearTimeout(searchTitleDebouncRef.current);
-      searchTitleDebouncRef.current = window.setTimeout(fetchArts, 200);
-    },[searchTitle])
+        if (searchTitleDebouncRef.current) clearTimeout(searchTitleDebouncRef.current);
+        searchTitleDebouncRef.current = window.setTimeout(fetchArts, 200);
+    }, [searchTitle])
 
     return (
         <div style={{ alignContent: 'center' }}>
             <Stack direction="row" sx={{ marginBottom: '20px' }} justifyContent="space-between">
                 <div>
-                  <TextField 
-                    label="Search By Title"
-                    placeholder="Search By Title"
-                    value={searchTitle}
-                    onChange={(e) => setSearchTitle(e.target.value)}
-                    size="small"
-                  />
+                    <TextField
+                        label="Search By Title"
+                        placeholder="Search By Title"
+                        value={searchTitle}
+                        onChange={(e) => setSearchTitle(e.target.value)}
+                        size="small"
+                    />
                 </div>
-                <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: 2}}>
-                  <Tooltip title="Sort art works" >
-                      <Button variant="contained" endIcon={<Tune />} onClick={handleClick} style={{ minWidth: 150 }}>
-                          Sort
-                      </Button>
-                  </Tooltip>
-                  <Menu
-                      anchorEl={anchorEl}
-                      id="options-menu"
-                      open={anchorEl ? true : false}
-                      onClose={() => setAnchorEl(null)}
-                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  >
-                      <MenuItem onClick={() => handleCloseSort('da')}>
-                          <ListItemIcon>
-                              <ArrowUpward fontSize="small" />
-                          </ListItemIcon>
-                          Date ascending
-                      </MenuItem>
-                      <MenuItem onClick={() => handleCloseSort("dd")}>
-                          <ListItemIcon>
-                              <ArrowDownward fontSize="small" />
-                          </ListItemIcon>
-                          Date descending
-                      </MenuItem>
-                      <MenuItem onClick={() => handleCloseSort("pa")}>
-                          <ListItemIcon>
-                              <ArrowUpward fontSize="small" />
-                          </ListItemIcon>
-                          Price ascending
-                      </MenuItem>
-                      <MenuItem onClick={() => handleCloseSort("pd")}>
-                          <ListItemIcon>
-                              <ArrowDownward fontSize="small" />
-                          </ListItemIcon>
-                          Price descending
-                      </MenuItem>
-                  </Menu>
-                  <Tooltip title="Filter by tags">
-                      <Button variant="contained" endIcon={<Sell />} onClick={handleClickTag} style={{ minWidth: 150 }}>
-                          Tags
-                      </Button>
-                  </Tooltip>
-                  <Menu
-                      anchorEl={anchorEl2}
-                      id="tags-menu"
-                      open={Boolean(anchorEl2)}
-                      onClose={() => setAnchorEl2(null)}
-                      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                  >
-                      <MenuItem onClick={() => handleCloseTag(null)}>
-                          <em>None</em>
-                      </MenuItem>
-                      {
-                          tags.map((tag: any, index: any) => (
-                              <MenuItem key={index} value={tag.tag_name} onClick={() => handleCloseTag(tag.tag_name)}>
-                                  {tag.tag_name}
-                              </MenuItem>
-                          ))
-                      }
-                  </Menu>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2 }}>
+                    <Tooltip title="Sort art works" >
+                        <Button variant="contained" endIcon={<Tune />} onClick={handleClick} style={{ minWidth: 150 }}>
+                            Sort
+                        </Button>
+                    </Tooltip>
+                    <Menu
+                        anchorEl={anchorEl}
+                        id="options-menu"
+                        open={anchorEl ? true : false}
+                        onClose={() => setAnchorEl(null)}
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    >
+                        <MenuItem onClick={() => handleCloseSort('da')}>
+                            <ListItemIcon>
+                                <ArrowUpward fontSize="small" />
+                            </ListItemIcon>
+                            Date ascending
+                        </MenuItem>
+                        <MenuItem onClick={() => handleCloseSort("dd")}>
+                            <ListItemIcon>
+                                <ArrowDownward fontSize="small" />
+                            </ListItemIcon>
+                            Date descending
+                        </MenuItem>
+                        <MenuItem onClick={() => handleCloseSort("pa")}>
+                            <ListItemIcon>
+                                <ArrowUpward fontSize="small" />
+                            </ListItemIcon>
+                            Price ascending
+                        </MenuItem>
+                        <MenuItem onClick={() => handleCloseSort("pd")}>
+                            <ListItemIcon>
+                                <ArrowDownward fontSize="small" />
+                            </ListItemIcon>
+                            Price descending
+                        </MenuItem>
+                    </Menu>
+                    <Tooltip title="Filter by tags">
+                        <Button variant="contained" endIcon={<Sell />} onClick={handleClickTag} style={{ minWidth: 150 }}>
+                            Tags
+                        </Button>
+                    </Tooltip>
+                    <Menu
+                        anchorEl={anchorEl2}
+                        id="tags-menu"
+                        open={Boolean(anchorEl2)}
+                        onClose={() => setAnchorEl2(null)}
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    >
+                        <MenuItem onClick={() => handleCloseTag(null)}>
+                            <em>None</em>
+                        </MenuItem>
+                        {
+                            tags.map((tag: any, index: any) => (
+                                <MenuItem key={index} value={tag.tag_name} onClick={() => handleCloseTag(tag.tag_name)}>
+                                    {tag.tag_name}
+                                </MenuItem>
+                            ))
+                        }
+                    </Menu>
 
                 </div>
             </Stack>
             <Grid container spacing={2}>
                 {
                     React.Children.toArray(
-                      arts.map((art, index) => {
-                        return (
-                          <Grid item xs={3}>
-                            <ArtCard
-                                key={art.art_id}
-                                artId={art.art_id}
-                                title={art.title ?? ""}
-                                content={art.content ?? ""}
-                                description={art.description ?? ""}
-                                view="public"
-                                search={true}
-                                searchTitle={searchTitle}
-                              />
-                          </Grid>
-                            
-                        )
-                    })
-                  )
+                        arts.map((art, index) => {
+                            return (
+                                <Grid item xs={3}>
+                                    <ArtCard
+                                        key={art.art_id}
+                                        artId={art.art_id}
+                                        title={art.title ?? ""}
+                                        content={art.content ?? ""}
+                                        description={art.description ?? ""}
+                                        view="public"
+                                        search={true}
+                                        searchTitle={searchTitle}
+                                    />
+                                </Grid>
+
+                            )
+                        })
+                    )
                 }
             </Grid>
             <Box mt={3} sx={{ position: 'fixed', bottom: 50, right: 75 }}>
                 <Fab variant="extended">
-                    <AddToPhotos sx={{ mr: 1 }} />
-                    Create post
+                    <Link href="/art/create">
+                        <AddToPhotos sx={{ mr: 1 }} />
+                        Create artwork
+                    </  Link>
                 </Fab>
             </Box>
         </div>
@@ -212,7 +214,7 @@ export default function HomePage() {
 }
 
 HomePage.getLayout = (page: React.ReactNode) => {
-  return <HomeLayout>{page}</HomeLayout>
+    return <HomeLayout>{page}</HomeLayout>
 }
 
 

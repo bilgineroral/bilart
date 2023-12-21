@@ -77,6 +77,7 @@ export default function Layout(props: LayoutProps) {
   };
 
   const [profileImgSrc, setProfileImgSrc] = React.useState<string>("");
+  const [meId, setMeId] = React.useState<number>(1);
   React.useEffect(() => {
     const fetchMe = async () => {
       try {
@@ -84,6 +85,7 @@ export default function Layout(props: LayoutProps) {
         console.info("Current User");
         console.info(me.data);
         setProfileImgSrc(`${BACKEND_URL}/${me.data?.profile_image}`);
+        setMeId(me.data?.user_id ?? 1);
       } catch (err) {
         if (err instanceof AuthError) {
           snackbar("error", "Session does not exist");
@@ -236,7 +238,9 @@ export default function Layout(props: LayoutProps) {
                     'aria-labelledby': 'menu- btn'
                   }}
                 >
-                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <Link href={`/profile/${meId}`}>
+                    <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  </Link>
                   <Link href="/art">
                     <MenuItem onClick={handleClose}>My Posts</MenuItem>
                   </Link>

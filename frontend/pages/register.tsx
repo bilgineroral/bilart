@@ -89,7 +89,10 @@ export default function RegisterPage() {
       snackbar("success", "Account was registered");
       router.replace("/login");      
     })
-    .catch(err => console.error(err))
+    .catch(err => {
+      console.error(err);
+      snackbar("error", "An error occured. Please try again later.");
+    })
   }
 
   return (
@@ -190,6 +193,7 @@ export default function RegisterPage() {
           <Grid item xs={12}>
             <FilledInputField 
               disabled={registering}
+              type="password"
               placeholder="Password"
               label="Password"
               fullWidth

@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useAtom } from "jotai";
 import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
-import { ArrowUpward, ArrowDownward, Tune, Sell, Collections, Search } from "@mui/icons-material";
+import { ArrowUpward, ArrowDownward, Tune, Sell, Collections, Search, School } from "@mui/icons-material";
 import Link from "next/link";
 import { Art } from "@/api/api_types";
 import HomeLayout from "@/layout/home";
@@ -42,7 +42,7 @@ export default function TutorialsHomePage() {
   };
 
 
-  const fetchTutorials = async() => {
+  const fetchTutorials = async () => {
     try {
       const res = await getTutorials({
         tag_name: tag || undefined,
@@ -61,16 +61,16 @@ export default function TutorialsHomePage() {
 
   const fetchTags = async () => {
     try {
-        const resp = await getTags({});
-        if (resp.success && resp.data != null) {
-            setTags(resp.data);
-        } else {
-            snackbar("error", "Couldn't fetch tags");
-        }
+      const resp = await getTags({});
+      if (resp.success && resp.data != null) {
+        setTags(resp.data);
+      } else {
+        snackbar("error", "Couldn't fetch tags");
+      }
     } catch (err) {
-        console.log(err);
+      console.log(err);
     }
-}
+  }
 
 
   React.useEffect(() => {
@@ -78,17 +78,17 @@ export default function TutorialsHomePage() {
     fetchTags();
   }, [tutorials.length, tag])
 
-  const searchTitleDebouncRef = React.useRef<number|null>(null);
+  const searchTitleDebouncRef = React.useRef<number | null>(null);
   React.useEffect(() => {
-    if(searchTitleDebouncRef.current) clearTimeout(searchTitleDebouncRef.current);
+    if (searchTitleDebouncRef.current) clearTimeout(searchTitleDebouncRef.current);
     searchTitleDebouncRef.current = window.setTimeout(fetchTutorials, 200);
-  },[searchTitle])
+  }, [searchTitle])
 
   return (
     <div style={{ alignContent: 'center' }}>
-    <Stack direction="row" sx={{ marginBottom: '20px' }} justifyContent="space-between">
+      <Stack direction="row" sx={{ marginBottom: '20px' }} justifyContent="space-between">
         <div>
-          <TextField 
+          <TextField
             label="Search By Title"
             placeholder="Search By Title"
             value={searchTitle}
@@ -96,56 +96,64 @@ export default function TutorialsHomePage() {
             size="small"
           />
         </div>
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: 2}}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 2 }}>
           <Tooltip title="Filter by tags">
-              <Button variant="contained" endIcon={<Sell />} onClick={handleClickTag} style={{ minWidth: 150 }}>
-                  Tags
-              </Button>
+            <Button variant="contained" endIcon={<Sell />} onClick={handleClickTag} style={{ minWidth: 150 }}>
+              Tags
+            </Button>
           </Tooltip>
           <Menu
-              anchorEl={anchorEl2}
-              id="tags-menu"
-              open={Boolean(anchorEl2)}
-              onClose={() => setAnchorEl2(null)}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            anchorEl={anchorEl2}
+            id="tags-menu"
+            open={Boolean(anchorEl2)}
+            onClose={() => setAnchorEl2(null)}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
-              <MenuItem onClick={() => handleCloseTag(null)}>
-                  <em>None</em>
-              </MenuItem>
-              {
-                  tags.map((tag: any, index: any) => (
-                      <MenuItem key={index} value={tag.tag_name} onClick={() => handleCloseTag(tag.tag_name)}>
-                          {tag.tag_name}
-                      </MenuItem>
-                  ))
-              }
+            <MenuItem onClick={() => handleCloseTag(null)}>
+              <em>None</em>
+            </MenuItem>
+            {
+              tags.map((tag: any, index: any) => (
+                <MenuItem key={index} value={tag.tag_name} onClick={() => handleCloseTag(tag.tag_name)}>
+                  {tag.tag_name}
+                </MenuItem>
+              ))
+            }
           </Menu>
 
         </div>
-    </Stack>
-    <Grid container spacing={2}>
+      </Stack>
+      <Grid container spacing={2}>
         {
-            React.Children.toArray(
-              tutorials.map((tutorial, index) => {
-                return (
-                  <Grid item xs={3} key={tutorial.post_id}>
-                    <TutorialCard 
-                      title={tutorial.title!}
-                      description={tutorial.description!}
-                      content={tutorial.media!}
-                      tutorialId={tutorial.tutorial_id}
-                      search={true}
-                      searchTitle={searchTitle}
-                      view="public"
-                    />
-                  </Grid>
-                    
-                )
+          React.Children.toArray(
+            tutorials.map((tutorial, index) => {
+              return (
+                <Grid item xs={3} key={tutorial.post_id}>
+                  <TutorialCard
+                    title={tutorial.title!}
+                    description={tutorial.description!}
+                    content={tutorial.media!}
+                    tutorialId={tutorial.tutorial_id}
+                    search={true}
+                    searchTitle={searchTitle}
+                    view="public"
+                  />
+                </Grid>
+
+              )
             })
           )
         }
-    </Grid>
+      </Grid>
+      <Box mt={3} sx={{ position: 'fixed', bottom: 50, right: 75 }}>
+        <Fab variant="extended">
+          <Link href="/tutorial/create">
+            <School sx={{ mr: 1 }} />
+            Create tutorial
+          </  Link>
+        </Fab>
+      </Box>
     </div>
   )
 
@@ -157,9 +165,9 @@ TutorialsHomePage.getLayout = (page: React.ReactNode) => {
 
 export async function getStaticProps() {
   return {
-      props: {
-          navbar: true,
-          fallback: true
-      }
+    props: {
+      navbar: true,
+      fallback: true
+    }
   }
 } 

@@ -107,7 +107,7 @@ export default function CreateArt() {
           console.log(categorize);
           addTagToPost(categorize);
         })
-        router.replace("/art");
+        router.replace("/home");
       }catch (err) {
         if (err instanceof AuthError) {
           snackbar("error", "Session does not exist");
@@ -124,7 +124,7 @@ export default function CreateArt() {
       }
       
     } else {
-      snackbar("error", "please upload an image for your art")
+      snackbar("error", "Please upload an image for your art.")
     }
   };
 
@@ -165,7 +165,7 @@ export default function CreateArt() {
   }
 
   const handleOnCancel = React.useCallback(() => {
-    router.replace("/art");
+    router.replace("/home");
   }, []);
 
 
