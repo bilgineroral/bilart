@@ -33,6 +33,7 @@ import { AuthError } from "@/api/crude";
 import AuctionModal from "@/components/auction/AuctionModal";
 import { getMe, getUserById } from "@/api/user";
 import { BACKEND_URL } from "@/routes";
+import ReportModal from "@/components/shared/ReportModal";
 
 
 export default function ArtPage() {
@@ -229,8 +230,19 @@ export default function ArtPage() {
     }
   }
 
+  const [reportModal, setReportModal] = React.useState<boolean>(false);
+
   return (
     <>
+     {
+      artInfo && 
+        <ReportModal 
+          entity_id={artInfo!.art_id}
+          entity_name="Art"
+          open={reportModal}
+          onClose={() => setReportModal(false)}
+        />
+     }
       <Stack direction="column" gap={2} sx={{ height: "100%" }}>
         <Grid container gap={0.5} justifyContent="space-between">
           <Grid item xs={4}>
@@ -293,6 +305,9 @@ export default function ArtPage() {
               >
                 <Button sx={{ color: "#fff" }} onClick={handleArtFavorite}>
                   {isFavorited? "Remove From Favorites" : "Add To Favorites"}
+                </Button>
+                <Button sx={{color: "#fff"}} onClick={() => setReportModal(true)}>
+                  Report
                 </Button>
               </ButtonGroup>
             </Stack>
