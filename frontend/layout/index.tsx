@@ -149,6 +149,13 @@ export default function Layout(props: LayoutProps) {
     }
   }
 
+  const handleSignOut = () => {
+    localStorage.removeItem("username");
+    localStorage.removeItem("bilart-me");
+    localStorage.removeItem("password");
+    router.replace("/login");
+  }
+
   // React.useEffect(() => {
   //   const fetcherInterval = setInterval(fetchNotifications, 500);
   //   return () => clearInterval(fetcherInterval);
@@ -236,6 +243,7 @@ export default function Layout(props: LayoutProps) {
                   <Link href="/collection">
                     <MenuItem onClick={handleClose}>My Collections</MenuItem>
                   </Link>
+                  <MenuItem onClick={handleSignOut}>Sign out</MenuItem>
                 </Menu>
               </div>
             </Grid>

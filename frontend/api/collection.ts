@@ -40,7 +40,7 @@ type ArtCollection = {
 }
 
 export const addToCollection = async (data: ArtCollection): Promise<ApiReuslt<ArtCollection>> => {
-    return post<ArtCollection, ArtCollection>(`http://localhost:8000/collect/`, data);
+    return post<ArtCollection, ArtCollection>(`http://localhost:8000/collect`, data);
 }
 
 export const deleteFromCollection = async (data: ArtCollection): Promise<ApiReuslt<ArtCollection>> => {
