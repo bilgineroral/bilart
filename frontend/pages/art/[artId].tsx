@@ -399,7 +399,7 @@ const Ratings: React.FC<RatingsProps> = ({ ratings }) => {
       }
     };
     fetchMe();
-  }, []);
+  }, [ratings]);
   
   return (
     <Stack direction="column" gap={2}>
