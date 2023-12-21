@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from modules.report.view import ReportView
 from db.tables import JoinModel
-from modules.user.model import UserModel
+from modules.user.view import UserView
 
 from db.model import ModelProtocal
 from modules.user.auth import get_current_user
@@ -36,7 +36,7 @@ def get_report(
     success, _, message, reports = retrieve(
         join_tables=[
             JoinModel(ReportModel, 'user_id'),
-            JoinModel(UserModel, 'user_id'),
+            JoinModel(UserView, 'user_id'),
         ],
         single=True,
         report_id=report_id
@@ -108,7 +108,7 @@ def get_reports(
     filters = {
         "join_tables": [
             JoinModel(ReportModel, 'user_id'),
-            JoinModel(UserModel, 'user_id'),
+            JoinModel(UserView, 'user_id'),
         ],
         "single": False,
         f"table__{ReportModel.get_table_name()}__content": content,

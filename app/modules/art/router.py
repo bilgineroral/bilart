@@ -152,7 +152,7 @@ class PriceViewOrder(Enum):
         return PriceViewOrder.get_desc() if val == "desc" else PriceViewOrder.get_asc()
 
 @router.get("/available")
-def get_arts(
+def get_availbile(
     content: str | None = None,
     created_at: str | None = None,
     artist_id: int | None = None,
