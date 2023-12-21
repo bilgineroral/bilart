@@ -13,6 +13,7 @@ import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 import { ArrowUpward, ArrowDownward, Tune, Sell, Collections } from "@mui/icons-material";
 import Link from "next/link";
 import { Art } from "@/api/api_types";
+import { AddToPhotos } from "@mui/icons-material";
 
 
 export default function Home() {
@@ -56,7 +57,7 @@ export default function Home() {
                 console.log("sort= ", sort);
                 console.log("tag= ", tag);
 
-                
+
                 const resp = await getAvailableArts({
                     date_order: sort == "da" ? "asc" :
                         sort == "dd" ? "desc" : null,
@@ -100,7 +101,7 @@ export default function Home() {
                     content={art.content ?? ""}
                     description={art.description ?? ""}
                     view="public"
-                  />
+                />
             )
         });
         return artcards;
@@ -186,6 +187,12 @@ export default function Home() {
                     )
                 }
             </Grid>
+            <Box mt={3} sx={{ position: 'fixed', bottom: 50, right: 75 }}>
+                <Fab variant="extended">
+                    <AddToPhotos sx={{ mr: 1 }} />
+                    Create post
+                </Fab>
+            </Box>
         </div>
     )
 }

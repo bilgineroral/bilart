@@ -113,6 +113,7 @@ def get_arts(
         f"table__{PostModel.get_table_name()}__title": title,
         f"table__{PostModel.get_table_name()}__search__title": search__title,
         f"table__{PostModel.get_table_name()}__description": description,
+        f"table__{ArtCollectionModel.get_table_name()}__collection_id": collection,
         f"table__{PostModel.get_table_name()}__search__description": search__description,
         f"table__{TagPostModel.get_table_name()}__tag_name": tag_name,
         f"table__{FavoriteModel.get_table_name()}__collector_id": favoriting_collector,

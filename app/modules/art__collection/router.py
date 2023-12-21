@@ -17,10 +17,10 @@ router = APIRouter(prefix="/collect", tags=['collect'])
 
 @router.post('/')
 def collect(art_collection: ArtCollectionModel, user: dict[str, Any] = Depends(get_current_user)):    
+
     retrieve(
         tables=[ArtModel],
         single=True,
-        collector_id=user['collector_id'],
         art_id=art_collection.art_id
     )
     
@@ -30,7 +30,8 @@ def collect(art_collection: ArtCollectionModel, user: dict[str, Any] = Depends(g
         collector_id=user['collector_id'],
         collection_id=art_collection.collection_id
     )
-    
+    print("COLLECT")
+    print(art_collection)
     success, message, data = insert(art_collection, return_row=False)
     
     return {"message": message, "success": success, "data": True}
