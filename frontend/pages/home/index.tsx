@@ -13,9 +13,10 @@ import { accountTypeAtom, useToggleAccountType } from "@/store/accounttype";
 import { ArrowUpward, ArrowDownward, Tune, Sell, Collections, Search } from "@mui/icons-material";
 import Link from "next/link";
 import { Art } from "@/api/api_types";
+import HomeLayout from "@/layout/home";
 
 
-export default function Home() {
+export default function HomePage() {
 
     const snackbar = useSnackbar();
 
@@ -97,24 +98,6 @@ export default function Home() {
       if(searchTitleDebouncRef.current) clearTimeout(searchTitleDebouncRef.current);
       searchTitleDebouncRef.current = window.setTimeout(fetchArts, 200);
     },[searchTitle])
-
-    const ArtCards = React.useMemo(() => {
-        const artcards = arts.map((art, index) => {
-            return (
-                <ArtCard
-                    key={index}
-                    artId={art.art_id}
-                    title={art.title ?? ""}
-                    content={art.content ?? ""}
-                    description={art.description ?? ""}
-                    view="public"
-                  />
-            )
-        });
-        return artcards;
-    }, [arts]);
-
-
 
     return (
         <div style={{ alignContent: 'center' }}>
@@ -219,6 +202,10 @@ export default function Home() {
             </Grid>
         </div>
     )
+}
+
+HomePage.getLayout = (page: React.ReactNode) => {
+  return <HomeLayout>{page}</HomeLayout>
 }
 
 

@@ -14,11 +14,26 @@ interface TutorialCardProps {
   content: string; 
   description: string; 
   tutorialId: number;
+  search? : boolean;
+  searchTitle?: string;
+  view?: "public" | "private"
 }
 
-export function TutorialCard({title, content, description, tutorialId} : TutorialCardProps) {
+export function TutorialCard({title, content, description, tutorialId, search, searchTitle, view} : TutorialCardProps) {
   
   const theme = useTheme();
+  let searchedTitle = <Typography gutterBottom variant="h5" component="div" color="white">{title}</Typography>;
+  if (search && searchTitle?.trim().length !== 0) {
+    const index = title.indexOf(searchTitle!);
+    if (index !== -1) {
+      searchedTitle = 
+        <Typography gutterBottom variant="h5" component="div" color="white">
+          {title.substring(0, index)}
+          <span style={{color: theme.palette.secondary.main}}>{searchTitle}</span>
+          {title.substring(index+searchTitle!.length)}
+        </Typography>
+    }
+  }
 
   return (
     <Card sx={{ width: "100%", backgroundColor: theme.palette.primary.light }}>
@@ -33,15 +48,13 @@ export function TutorialCard({title, content, description, tutorialId} : Tutoria
         
       </CardMedia>
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div" color="white">
-          {title}
-        </Typography>
+        {searchedTitle}
         <Typography variant="body2" color="white">
           {description}
         </Typography>
       </CardContent>
       <CardActions>
-        <Link href={`/tutorial/${tutorialId}`}>
+        <Link href={view && view === "public" ? `/public/tutorial/${tutorialId}` : `/tutorial/${tutorialId}`}>
           <Button size="small" startIcon={<LinkIcon style={{fill : theme.palette.primary.main}}/>}>Open</Button>       
         </Link>
       </CardActions>
