@@ -15,6 +15,7 @@ import { useSnackbar } from "@/store/snackbar";
 import { TutorialQueryParams, getTutorials } from "@/api/tutorial";
 import { AddTutorialCard } from "@/components/tutorial/AddTutorialCard";
 import { TutorialCard } from "@/components/tutorial/TutorialCard";
+import PostsLayout from "@/layout/posts";
 
 function TutorialsPage() {
 
@@ -82,6 +83,10 @@ function TutorialsPage() {
       </Grid>
     </Stack>
   )
+}
+
+TutorialsPage.getLayout = (page: React.ReactNode) => {
+  return <PostsLayout>{page}</PostsLayout>
 }
 
 export async function getStaticProps() {

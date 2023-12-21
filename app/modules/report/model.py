@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 from db.model import Model
 
 from modules.user.model import UserModel
@@ -44,7 +45,11 @@ class ReportModel(Model):
         return "report_id"
     
 
-class CreateReport(Model):
+class CreateReport(BaseModel):
     entity_name: str
     entity_id: int
+    content: str
+    
+    
+class ReportRequest(BaseModel):
     content: str

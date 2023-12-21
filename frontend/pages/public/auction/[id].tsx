@@ -208,9 +208,6 @@ const AuctionPage: React.FC = () => {
         <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
           Bid count: {bidCount}
         </Typography>
-        <Typography variant="body1" sx={{color: theme.palette.primary.main}}>
-          Highest bid: {bidCount}
-        </Typography>
         <DomainDivider color={theme.palette.primary.main} />
         
         <TextField 

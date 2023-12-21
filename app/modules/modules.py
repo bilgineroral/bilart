@@ -1,3 +1,6 @@
+from modules.user.view import UserView
+from modules.report.view import ReportView
+from modules.art.views import ArtView
 from typing import Type
 from db.model import ModelProtocal
 
@@ -62,3 +65,10 @@ models.sort(key=lambda x: x.get_create_order())
 create_functions = [model.create_table() for model in models]
 
 routers = [model.get_router() for model in models]
+
+
+view_functions: list[str] = [
+    ArtView.create_view(),
+    ReportView.create_view(),
+    UserView.create_view()
+]

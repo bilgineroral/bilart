@@ -195,13 +195,6 @@ export default function ArtPage() {
               <Typography variant="h5" color="#fff">Description</Typography>
               <Typography variant="h6" color="#fff">{tutorialInfo?.description}</Typography>
             </Box>
-            <ButtonGroup
-              variant="contained"
-              sx={{ alignSelf: "flex-end" }}
-            >
-              <Button sx={{ color: "#fff" }} onClick={handleTutorialDelete}>Delete</Button>
-              <Link href={`/tutorial/create?edit=true&tutorial_id=${tutorialInfo?.tutorial_id}`}><Button sx={{ color: "#fff" }}>Edit</Button></Link>
-            </ButtonGroup>
           </Stack>
         </Grid>
       </Grid>
