@@ -30,8 +30,6 @@ def collect(art_collection: ArtCollectionModel, user: dict[str, Any] = Depends(g
         collector_id=user['collector_id'],
         collection_id=art_collection.collection_id
     )
-    print("COLLECT")
-    print(art_collection)
     success, message, data = insert(art_collection, return_row=False)
     
     return {"message": message, "success": success, "data": True}

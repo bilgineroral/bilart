@@ -19,8 +19,6 @@ def get_current_user(
     username = credentials.username
     password = hash_password(credentials.password)
     
-    print(password)
-    
     try:
         _, _, _, users = retrieve(
             tables=[UserModel, CollectorModel, ArtistModel, AdminModel],

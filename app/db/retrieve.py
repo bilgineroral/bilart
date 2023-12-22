@@ -37,7 +37,6 @@ def get_from_table(
                     raise HTTPException(
                         status_code=400, detail=f"More than one object returned:{count}")
                 elif count == 0:
-                    print("here")
                     raise HTTPException(
                         status_code=404, detail=f"Object not found")
             columns: list[str] = [desc[0] for desc in db.cursor.description]

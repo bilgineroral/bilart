@@ -7,7 +7,6 @@ from db.db import PgDatabase
 
 # insert data into any table
 def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
-    print(kwargs)
     query = f"""DELETE FROM {table_name} WHERE {params_to_where_clause(**kwargs)};"""
     try:
         with open("./all_sql.txt", "w") as f:

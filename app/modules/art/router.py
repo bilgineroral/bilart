@@ -30,12 +30,6 @@ FILEPATH = os.getenv("FILEPATH")
 
 router = APIRouter(prefix="/arts", tags=['arts'])
 
-""" "tables": [
-            PostModel,
-            ArtModel
-        ],
-        f"table__{PostModel.get_table_name()}__ne__artist_id": user['artist_id'],
-        f"table__{ArtModel.get_table_name()}__collector_id": [None], """
 
 class ArtDateOrder(Enum):
     asc = "asc"
@@ -88,8 +82,6 @@ def get_arts(
     date_order: ArtDateOrder | None = None,
     price_order: PriceOrder | None = None
 ):
-    print(f"date_order: {date_order}")
-    print(f"price_order: {price_order}")
     filters = {
         "tables": [
             ArtModel,
@@ -166,8 +158,6 @@ def get_availbile(
     price_order: PriceViewOrder | None = None,
     user: dict[str, Any] = Depends(get_current_user)
 ):
-    print(f"date_order: {date_order}")
-    print(f"price_order: {price_order}")
     filters = {
         "tables": [
             ArtView,
