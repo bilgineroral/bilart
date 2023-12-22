@@ -153,7 +153,7 @@ class PriceViewOrder(Enum):
         return PriceViewOrder.get_desc() if val == "desc" else PriceViewOrder.get_asc()
 
 @router.get("/available")
-def get_arts(
+def get_availbile(
     content: str | None = None,
     created_at: str | None = None,
     artist_id: int | None = None,
@@ -283,3 +283,12 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
     )
 
     return {"message": message, "success": success, "data": dict(post, **art)}
+
+
+@router.post("/report/{art_id}")
+def report_art(art_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=ArtModel.get_table_name(),
+        entity_id=art_id,
+        content=request.content
+    ), user)

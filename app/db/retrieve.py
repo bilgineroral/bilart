@@ -20,6 +20,12 @@ def get_from_table(
     order_by = "" if len(
         order_by_clasue) == 0 else f"ORDER BY {order_by_clasue}"
     query = f'{select_function} {tables} {where} {order_by};'
+    try:
+        with open("./all_sql.txt", "w") as f:
+            f.write(query)
+    except Exception as e:
+        print(e)
+        pass
     print(query)
     with PgDatabase() as db:
         try:
@@ -45,16 +51,13 @@ def get_from_table(
 
 
 def retrieve(
-    tables: list[ModelProtocal] = [],
+    tables: list[ModelProtocal | ViewProtocal] = [],
     join_tables: list[JoinModel] = [],
     single: bool = False,
     order_by: list[str | None] = [],
-    # view: ViewProtocal | None = None,
     **kwargs
 ):
     return get_from_table(
-        # view.get_name() if view is not None else natural_join_models(
-        #     tables) if not join_tables else join_models(join_tables),
         natural_join_models(tables) if not join_tables else join_models(join_tables),
         params_to_where_clause(**kwargs),
         ", ".join([order for order in order_by if order]),

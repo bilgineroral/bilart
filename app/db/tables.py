@@ -1,3 +1,4 @@
+from db.view import ViewProtocal
 from db.model import ModelProtocal
 
 
@@ -10,6 +11,8 @@ def params_to_where_clause(**kwargs):
         if v is None: continue
         elif isinstance(v, list) and v[0] is None:
             markNull = True
+        
+        v = escape_sql_string(v)
         
         if "table__" in k:
             splited = k.split("__")
@@ -49,13 +52,13 @@ def params_to_where_clause(**kwargs):
     return " AND ".join(params)
 
 
-def natural_join_models(models: list[ModelProtocal]) -> str:
+def natural_join_models(models: list[ModelProtocal | ViewProtocal]) -> str:
     print(models)
     return " NATURAL JOIN ".join([model.get_table_name() for model in models if model is not None])
 
 
 class JoinModel:
-    def __init__(self, model: ModelProtocal, on: str, join_type: str = "INNER JOIN") -> None:
+    def __init__(self, model: ModelProtocal | ViewProtocal, on: str, join_type: str = "INNER JOIN") -> None:
         self.model = model
         self.on = on
         self.join_type = join_type
@@ -74,3 +77,17 @@ def join_models(models: list[JoinModel]) -> str:
         result += f" {prev.join_type} {curr.model.get_table_name()} ON {prev.model.get_table_name()}.{prev.on} = {curr.model.get_table_name()}.{prev.on}"
     
     return result
+
+def escape_sql_string(value):
+    if type(value) != str:
+        return value
+    
+    escape_characters = {
+        "'": "''",  # Escapes single quotes
+        "\"": "\\\"",  # Escapes double quotes
+        "\\": "\\\\",  # Escapes backslashes
+        "\0": "\\0",  # Escapes NULL characters
+    }
+    for char, escaped_char in escape_characters.items():
+        value = value.replace(char, escaped_char)
+    return value

@@ -1,5 +1,6 @@
 from typing import Any
 from fastapi import APIRouter, Depends
+from db.tables import JoinModel
 
 from db.delete import delete
 from db.update import update
@@ -9,7 +10,7 @@ from db.insert import insert
 from modules.rating.model import RatingModel, CreateRating, UpdateRating
 from modules.user.auth import get_current_user
 from modules.collector.model import CollectorModel
-from modules.user.model import UserModel
+from modules.user.view import UserView
 
 
 router = APIRouter(prefix="/ratings", tags=['ratings'])
@@ -38,7 +39,11 @@ def get_ratings(
     collector_id: int | None = None
 ):
     filters = {
-        'tables': [RatingModel, CollectorModel, UserModel],
+        'tables': [RatingModel, UserView],
+        'join_tables': [
+            JoinModel(RatingModel, 'collector_id'),
+            JoinModel(UserView, 'collector_id')
+        ],
         'single': False,
         f'table__{RatingModel.get_table_name()}__score': score,
         f'table__{RatingModel.get_table_name()}__gt__score': gt__score,

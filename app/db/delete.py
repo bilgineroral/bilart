@@ -9,6 +9,12 @@ from db.db import PgDatabase
 def delete_data_from_table(table_name: str, **kwargs) -> Tuple[bool, str]:
     print(kwargs)
     query = f"""DELETE FROM {table_name} WHERE {params_to_where_clause(**kwargs)};"""
+    try:
+        with open("./all_sql.txt", "w") as f:
+            f.write(query)
+    except Exception as e:
+        print(e)
+        pass
     print(query)
     with PgDatabase() as db:
         try:
