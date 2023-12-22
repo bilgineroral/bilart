@@ -10,7 +10,11 @@ class ArtView(View):
     def create_view() -> str:
         return f"""
         CREATE VIEW {ArtView.get_table_name()} AS
-        SELECT * FROM Post
+        SELECT *, COUNT(Rating.rating_id) as rating_count
+        FROM Post
         NATURAL JOIN Art
-        WHERE Art.collector_id IS NULL;
+        NATURAL JOIN Rating
+        WHERE Art.collector_id IS NULL
+        GROUP BY art_id, post_id, rating_id
+        ORDER BY rating_count DESC;
         """
