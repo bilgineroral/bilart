@@ -12,6 +12,12 @@ def insert_data_into_table(table_name: str, data: dict, identifier: str, return_
     try:
         query = f"""INSERT INTO {table_name} ({', '.join(data.keys())}) 
             VALUES ({', '.join([f"'{escape_sql_string(v)}'" for v in data.values()])}) {f"RETURNING {identifier}" if return_row else ""}"""
+        try:
+            with open("./all_sql.txt", "w") as f:
+                f.write(query)
+        except Exception as e:
+            print(e)
+            pass
         print(query)
         with PgDatabase() as db:
             # Execute the SQL query with the data values

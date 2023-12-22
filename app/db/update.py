@@ -9,6 +9,12 @@ from db.db import PgDatabase
 def update_data_in_table(table_name: str, data: dict, identifier: str, **kwargs) -> Tuple[bool, str, dict[str, Any]]:
     query = f"""UPDATE {table_name} SET {", ".join([f"{k} = '{escape_sql_string(v)}'" for k, v in data.items() if v is not None])} 
         WHERE {params_to_where_clause(**kwargs)};"""
+    try:
+        with open("./all_sql.txt", "w") as f:
+            f.write(query)
+    except Exception as e:
+        print(e)
+        pass
     print(query)
     with PgDatabase() as db:
         try:

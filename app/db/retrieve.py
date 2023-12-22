@@ -20,6 +20,12 @@ def get_from_table(
     order_by = "" if len(
         order_by_clasue) == 0 else f"ORDER BY {order_by_clasue}"
     query = f'{select_function} {tables} {where} {order_by};'
+    try:
+        with open("./all_sql.txt", "w") as f:
+            f.write(query)
+    except Exception as e:
+        print(e)
+        pass
     print(query)
     with PgDatabase() as db:
         try:
