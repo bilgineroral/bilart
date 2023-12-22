@@ -159,10 +159,20 @@ export default function ArtPage() {
   };
 
   const handleArtDelete= async() => {
-    // try {
-    //   await deleteArt(Number(artId));
-    //   snackbar("success", "art deleted");
-    // }
+    try {
+      if (artInfo) {
+        const res = await deleteArt(artInfo?.post_id);
+        if ("status_code" in res && res.status_code === 403) {
+          snackbar("error", "art already sold");
+          return;
+        }
+        snackbar("success", "art deleted");
+        router.replace("/art");
+      }
+    } catch (err){
+      snackbar("error","failed to delete");
+      console.error(err);
+    }
   }
 
   const handleAuctionCreate = async (startDate: string, endDate: string) => {

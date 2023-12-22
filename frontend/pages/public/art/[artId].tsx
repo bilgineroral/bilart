@@ -55,7 +55,6 @@ export default function ArtPage() {
         const res = await getArtRatingAverage(art.art_id);
         res.data && res.data.at(0) && setavgArtRating(+(res.data.at(0)!.average_rating.toFixed(2)));
     } catch (err) {
-      snackbar("error", "failed to get average art rating");
       console.log("error");
       console.error(err);
     }

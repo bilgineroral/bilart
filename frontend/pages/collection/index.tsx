@@ -102,12 +102,11 @@ export default function CollectionPage() {
     <>
       <Stack direction="column" gap={2} sx={{ height: "100%" }}>
         <PostActionsBar
-          title={"Arts I Bought"}
+          title={"My Collections"}
           actions={[]}
         />
       </Stack>
       <div>
-        <Typography variant="h2" marginBottom={'20px'}>My Collections</Typography>
         <Grid container spacing={4}>
           <Grid item xs={6} sm={4} md={3}>
             <Link href={'/collection/favorites'} style={{ maxHeight: '500px', maxWidth: '400px' }}>

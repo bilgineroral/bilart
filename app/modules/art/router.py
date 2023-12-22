@@ -237,14 +237,28 @@ def get_art(
 
     return {"data": items[0], "success": success, "message": message}
 
-@router.delete("/{art_id}")
-def delete_art(art_id: int, user: dict[str, Any] = Depends(get_current_user)):
+@router.delete("/{post_id}")
+def delete_art(post_id: int, user : dict[str, Any] = Depends(get_current_user)):
+    filters = {
+        "tables": [ArtModel, PostModel],
+        "single": True,
+        f"table__{PostModel.get_table_name()}__artist_id": user["artist_id"]
+    }
+    
+    _, _, _, art = retrieve(
+        **filters
+    )
+
+    selected = art[0]
+    if selected['collector_id'] is not None:
+        return HTTPException(status_code=403, detail="art already sold")
+
     success, message = delete(
-        table=ArtModel.get_table_name(),
-        art_id=art_id,
+        table=PostModel.get_table_name(),
+        post_id=post_id,
         artist_id=user['artist_id']
     )
-    return {"message": message, "success": success}
+    return {"message": message, "success": success, "data": art}
 
 
 @router.put("/{art_id}")

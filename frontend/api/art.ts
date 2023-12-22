@@ -62,8 +62,8 @@ export const updateArt = async (artId: number, data: UpdateArtData): Promise<Api
 };
 
 
-export const deleteArt = async (artId: number): Promise<ApiReuslt<null>> => {
-    return await deleteItem(`http://localhost:8000/arts/${artId}`, null);
+export const deleteArt = async (postId: number): Promise<ApiReuslt<null>> => {
+    return await deleteItem(`http://localhost:8000/arts/${postId}`, null);
 };
 
 

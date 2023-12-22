@@ -219,7 +219,7 @@ const AuctionPage: React.FC = () => {
         </Typography>
         <DomainDivider color={theme.palette.primary.main} />
 
-        <Bids bidUsers={bidUsers} onAcceptBid={onSelectBid} />
+        <Bids bidUsers={bidUsers} onAcceptBid={onSelectBid} auctionStatus={auctionStatus} />
       </Stack>
     </Stack>
   );
@@ -245,9 +245,10 @@ export default AuctionPage;
 type BidsProps = {
   bidUsers: BidUser[];
   onAcceptBid: (bid: Bid) => void;
+  auctionStatus: boolean;
 };
 
-const Bids: React.FC<BidsProps> = ({ bidUsers, onAcceptBid}) => {
+const Bids: React.FC<BidsProps> = ({ bidUsers, onAcceptBid, auctionStatus}) => {
   
   const theme = useTheme();
   
@@ -271,7 +272,7 @@ const Bids: React.FC<BidsProps> = ({ bidUsers, onAcceptBid}) => {
                 (index == 0 && (<Chip label={<Typography color="#fff">Highest</Typography>} style={{marginLeft: "10px"}} color="secondary" />))
             }
           </Typography>
-          <BidCheckmark bid={bid} onAcceptBid={onAcceptBid} />
+          <BidCheckmark bid={bid} onAcceptBid={onAcceptBid} auctionStatus={auctionStatus} />
         </Stack>
       ))
     }
@@ -281,13 +282,19 @@ const Bids: React.FC<BidsProps> = ({ bidUsers, onAcceptBid}) => {
 
 type BidCheckmarkProbs = {
   bid: Bid;
-  onAcceptBid: (bid: Bid) => void
+  onAcceptBid: (bid: Bid) => void;
+  auctionStatus: boolean;
 };
 
-const BidCheckmark: React.FC<BidCheckmarkProbs> = ({ bid, onAcceptBid }) => {
+const BidCheckmark: React.FC<BidCheckmarkProbs> = ({ bid, onAcceptBid, auctionStatus}) => {
   const [checked, setChecked] = React.useState(false);
+  const snackbar = useSnackbar();
 
   const handleCheck = async (bid: Bid) => {
+    if (auctionStatus === false) {
+      snackbar("error", "auction inactive");
+      return;
+    }
     const data = await acceptPayment(bid.bid_id);
     if (data.success) {
       setChecked(true);

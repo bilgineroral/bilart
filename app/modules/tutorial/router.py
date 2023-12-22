@@ -8,6 +8,7 @@ from db.insert import insert
 from fastapi import File, Form, UploadFile
 from modules.tutorial.model import TutorialModel, UpdateTutorial
 from modules.post.model import PostModel
+from modules.tag__post.model import TagPostModel
 from modules.user.auth import get_current_user
 import os
 import dotenv
@@ -19,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 dotenv.load_dotenv(BASE_DIR / ".env")
 
 FILEPATH = os.getenv("FILEPATH")
-
 
 
 router = APIRouter(prefix="/tutorials", tags=['tutorials'])
@@ -47,9 +47,10 @@ def get_arts(
     description: str | None = None,
     search__title: str | None = None,
     search__description: str | None = None,
+    tag_name: str | None = None
 ):
     filters = {
-        "tables": [TutorialModel, PostModel],
+        "tables": [TutorialModel, PostModel, TagPostModel if tag_name else None],
         "single": False,
         f"table__{TutorialModel.get_table_name()}__media": media,
         f"table__{PostModel.get_table_name()}__created_at": created_at,
@@ -58,6 +59,7 @@ def get_arts(
         f"table__{PostModel.get_table_name()}__search__title": search__title,
         f"table__{PostModel.get_table_name()}__description": description,
         f"table__{PostModel.get_table_name()}__search__description": search__description,
+        f"table__{TagPostModel.get_table_name()}__tag_name": tag_name,
     }
 
     success, count, message, items = retrieve(**filters)

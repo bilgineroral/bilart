@@ -12,15 +12,20 @@ class TagPostModel(Model):
     @staticmethod
     def get_table_name() -> str:
         return "Tag_MM_Post"
+# REFERENCES {PostModel.get_table_name()}(post_id)
 
     @staticmethod
     def create_table() -> str:
         return f"""
             CREATE TABLE {TagPostModel.get_table_name()} (
                 {TagModel.get_identifier()} VARCHAR(255) REFERENCES {TagModel.get_table_name()}(tag_name),
-                {PostModel.get_identifier()} SERIAL REFERENCES {PostModel.get_table_name()}(post_id),
+                {PostModel.get_identifier()} INT NOT NULL,
                 CONSTRAINT {TagPostModel.get_identifier()} 
-                    UNIQUE ({TagModel.get_identifier()}, {PostModel.get_identifier()})
+                  UNIQUE ({TagModel.get_identifier()}, {PostModel.get_identifier()}),
+                CONSTRAINT fk_post
+                  FOREIGN KEY({PostModel.get_identifier()})
+                  REFERENCES {PostModel.get_table_name()}({PostModel.get_identifier()})
+                  ON DELETE CASCADE
             );
             """
 
