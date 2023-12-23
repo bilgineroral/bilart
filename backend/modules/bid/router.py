@@ -114,7 +114,6 @@ def accept_payment(bid_id: int, user: dict[str, Any] = Depends(get_current_user)
         INNER JOIN Post P ON A.post_id = P.post_id
         """, f"B.bid_id = {bid_id} AND P.artist_id = {user['artist_id']}", order_by_clasue="", single=True)
 
-    print(data)
     success, message, data = update(
         table=BidModel.get_table_name(),
         model={

@@ -30,12 +30,6 @@ FILEPATH = os.getenv("FILEPATH")
 
 router = APIRouter(prefix="/arts", tags=['arts'])
 
-""" "tables": [
-            PostModel,
-            ArtModel
-        ],
-        f"table__{PostModel.get_table_name()}__ne__artist_id": user['artist_id'],
-        f"table__{ArtModel.get_table_name()}__collector_id": [None], """
 
 class ArtDateOrder(Enum):
     asc = "asc"
@@ -88,8 +82,6 @@ def get_arts(
     date_order: ArtDateOrder | None = None,
     price_order: PriceOrder | None = None
 ):
-    print(f"date_order: {date_order}")
-    print(f"price_order: {price_order}")
     filters = {
         "tables": [
             ArtModel,
@@ -153,7 +145,7 @@ class PriceViewOrder(Enum):
         return PriceViewOrder.get_desc() if val == "desc" else PriceViewOrder.get_asc()
 
 @router.get("/available")
-def get_arts(
+def get_availbile(
     content: str | None = None,
     created_at: str | None = None,
     artist_id: int | None = None,
@@ -166,8 +158,6 @@ def get_arts(
     price_order: PriceViewOrder | None = None,
     user: dict[str, Any] = Depends(get_current_user)
 ):
-    print(f"date_order: {date_order}")
-    print(f"price_order: {price_order}")
     filters = {
         "tables": [
             ArtView,
@@ -283,3 +273,12 @@ def update_art(art_id: int, request_data: UpdateArt, user: dict[str, Any] = Depe
     )
 
     return {"message": message, "success": success, "data": dict(post, **art)}
+
+
+@router.post("/report/{art_id}")
+def report_art(art_id: int, request: ReportRequest, user: dict[str, Any] = Depends(get_current_user)):
+    return create_report(CreateReport(
+        entity_name=ArtModel.get_table_name(),
+        entity_id=art_id,
+        content=request.content
+    ), user)

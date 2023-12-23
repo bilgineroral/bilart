@@ -5,11 +5,19 @@ from fastapi import HTTPException
 from db.model import Model
 from db.db import PgDatabase
 
+from db.tables import escape_sql_string
+
 # insert data into any table
 def insert_data_into_table(table_name: str, data: dict, identifier: str, return_row: bool = True) -> Tuple[bool, str, dict[str, Any] | None]:
     try:
         query = f"""INSERT INTO {table_name} ({', '.join(data.keys())}) 
-            VALUES ({', '.join([f"'{v}'" for v in data.values()])}) {f"RETURNING {identifier}" if return_row else ""}"""
+            VALUES ({', '.join([f"'{escape_sql_string(v)}'" for v in data.values()])}) {f"RETURNING {identifier}" if return_row else ""}"""
+        try:
+            with open("./all_sql.txt", "w") as f:
+                f.write(query)
+        except Exception as e:
+            print(e)
+            pass
         print(query)
         with PgDatabase() as db:
             # Execute the SQL query with the data values

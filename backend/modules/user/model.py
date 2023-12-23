@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from db.model import Model
+from modules.user.hash import hash_password
 
 
 class UserModel(Model):
@@ -21,7 +22,7 @@ class UserModel(Model):
     
     def to_dict(self) -> dict[str, Any]:
         data = super().to_dict()
-        data['password_hash'] = data.pop('password') # TODO: hash password
+        data['password_hash'] =  hash_password(data.pop('password'))
         return data
     
     @staticmethod

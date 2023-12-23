@@ -35,7 +35,6 @@ def read_notifications(user: dict[str, Any] = Depends(get_current_user)):
     success, count, message, items = retrieve(**filters)
     
     for item in items:
-        print("here")
         update(
             table=NotificationModel.get_table_name(),
             model={

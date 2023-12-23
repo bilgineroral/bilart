@@ -29,34 +29,6 @@ def get_collection(
     return {"data": items[0], "success": success, "message": message}
 
 
-""" @router.get("/{collection_id}")
-def get_collection(
-    collection_id: int,
-    tag: list[str] | None = None,
-):
-    with PgDatabase() as db:
-        try:
-            db.cursor.execute(
-                SELECT * FROM collection_view
-                WHERE collection_id = {collection_id} AND tag_name = {tag}
-            )
-            data: list[Tuple] = db.cursor.fetchall()
-            count = len(data)
-            if single:
-                if count > 1:
-                    raise HTTPException(status_code=400, detail=f"More than one object returned:{count}")
-                elif count == 0:
-                    print("here")
-                    raise HTTPException(status_code=404, detail=f"Object not found")
-            columns: list[str] = [desc[0] for desc in db.cursor.description]
-            return True, count, "Data retrieved successfully", [dict(zip(columns, row)) for row in data]
-        except HTTPException as e:
-            raise e
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=500, detail=str(e)) """
-
-
 @router.get("/")
 def get_collections(
     name: str | None = None,

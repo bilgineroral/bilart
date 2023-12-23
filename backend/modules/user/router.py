@@ -78,6 +78,7 @@ def update_user(request_data: UpdateUser, user: dict[str, Any] = Depends(get_cur
 
     updated_user.update(artist)
     updated_user.update(admin)
+    del updated_user['password_hash']
 
     return {"message": message, "success": success, "data": updated_user}
 
@@ -87,7 +88,7 @@ def get_user_id(
     user_id: int,
 ):
     success, _, message, items = retrieve(
-        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
+        tables=[UserView],
         single=True,
         user_id=user_id,
     )
@@ -100,7 +101,7 @@ def get_user_username(
     username: str,
 ):
     success, _, message, items = retrieve(
-        tables=[UserModel, CollectorModel, ArtistModel, AdminModel],
+        tables=[UserView],
         single=True,
         username=username,
     )
@@ -123,11 +124,10 @@ def get_users(
     search__last_name: str | None = None,
     search__email: str | None = None,
     search__bio: str | None = None,
-    created_at: str | None = None,
-    all: bool | None = None
+    created_at: str | None = None
 ):
     filters = {
-        "tables": [UserModel, CollectorModel, ArtistModel, AdminModel],
+        "tables": [UserView],
         "single": False,
         f"table__{UserModel.get_table_name()}__username": username,
         f"table__{UserModel.get_table_name()}__first_name": first_name,
@@ -143,7 +143,6 @@ def get_users(
         f"table__{ArtistModel.get_table_name()}__search__bio": search__bio,
         f"table__{AdminModel.get_table_name()}__privledge": privledge,
         f"table__{CollectorModel.get_table_name()}__rank": rank,
-        "view": UserView if all else None
     }
 
     success, count, message, items = retrieve(**filters)
@@ -153,8 +152,8 @@ def get_users(
 
 @router.post("/register")
 def create_new_user(request_data: UserModel):
-    print(request_data)
     success, message, data = insert(request_data)
+    del data['password_hash']
     return {"message": message, "success": success, "data": data}
 
 

@@ -28,6 +28,5 @@ def read_root():
 @app.post("/create_tables")
 def create_tables():
     result, message = util_create_tables()
-    print(message)
     return {"result": result, "message": message}
 

@@ -10,12 +10,14 @@ from modules.user.model import UserModel
 from modules.admin.model import AdminModel
 from modules.collector.model import CollectorModel
 from modules.artist.model import ArtistModel
+from modules.user.hash import hash_password
+
 
 def get_current_user(
     credentials: HTTPBasicCredentials = Depends(security)
 ) -> dict[str, Any]:
     username = credentials.username
-    password = credentials.password
+    password = hash_password(credentials.password)
     
     try:
         _, _, _, users = retrieve(
@@ -24,7 +26,7 @@ def get_current_user(
             username=username,
             password_hash=password
         )
-        
+        del users[0]['password_hash']
         return users[0]
     except HTTPException as e:
         try:
@@ -34,7 +36,7 @@ def get_current_user(
                 email=username,
                 password_hash=password
             )
-            
+            del users[0]['password_hash']
             return users[0]
         except Exception as e:
             print(e)
