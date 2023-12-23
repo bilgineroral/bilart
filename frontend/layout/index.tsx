@@ -158,10 +158,10 @@ export default function Layout(props: LayoutProps) {
     router.replace("/login");
   }
 
-  // React.useEffect(() => {
-  //   const fetcherInterval = setInterval(fetchNotifications, 500);
-  //   return () => clearInterval(fetcherInterval);
-  // }, []);
+  React.useEffect(() => {
+    const fetcherInterval = setInterval(fetchNotifications, 500);
+    return () => clearInterval(fetcherInterval);
+  }, []);
 
   return (
     <>
