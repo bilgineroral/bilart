@@ -53,6 +53,15 @@ export const post = async <T, U>(
   return response.data;
 };
 
+export const publicPost = async<T, U>(
+  url: string,
+  data: T
+): Promise<ApiReuslt<U>> => {
+  const response = await axios.post<ApiReuslt<U>>(url, data);
+  return response.data;
+
+}
+
 export const postFormData = async <T>(
   url: string,
   data: FormData

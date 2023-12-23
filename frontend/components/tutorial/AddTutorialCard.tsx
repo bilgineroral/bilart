@@ -13,14 +13,14 @@ export function AddTutorialCard() {
   const theme = useTheme();
   
   return (
-    <Card sx={{ width: "100%", backgroundColor : "#ffffff22" }}>
+    <Card sx={{ width: "100%", backgroundColor : theme.palette.primary.light }}>
       <CardMedia
         sx={{ width: "100%", aspectRatio: "1/1" }}
         image={"/new.png"}
         title="art"
       />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant="h5" component="div" color="white">
           Create New Tutorial
         </Typography>
         <Typography variant="body2" color="text.secondary">

@@ -1,4 +1,4 @@
-import {get, post, put, deleteItem, toQueryString, setCredentials, cleanCredentials} from "./crude";
+import {get, post, put, deleteItem, toQueryString, setCredentials, cleanCredentials, publicPost} from "./crude";
 import type {User, ApiReuslt} from "./api_types";
 
 export const getMe = async (): Promise<ApiReuslt<User>> => {
@@ -62,6 +62,7 @@ type UserQueryParams = {
     search__email?: string;
     search__bio?: string;
     created_at?: string;
+    all?: boolean;
 };
 
 export const getUsers = async (params: UserQueryParams): Promise<ApiReuslt<User[]>> => {
@@ -71,7 +72,7 @@ export const getUsers = async (params: UserQueryParams): Promise<ApiReuslt<User[
 
 
 export const createNewUser = async (data: User): Promise<ApiReuslt<User>> => {
-    return post<User, User>(`http://localhost:8000/users/register`, data);
+    return publicPost<User, User>(`http://localhost:8000/users/register`, data);
 };
 
 type Privileges = {

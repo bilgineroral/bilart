@@ -27,6 +27,7 @@ export type NewAuctionData = {
     end_time: string;
     active: boolean;
     art_id: number;
+    artist_id: number;
 };
 
 export const createNewAuction = async (data: NewAuctionData): Promise<ApiReuslt<Auction>> => {
@@ -34,7 +35,7 @@ export const createNewAuction = async (data: NewAuctionData): Promise<ApiReuslt<
 };
 
 
-type UpdateAuctionData = {
+export type UpdateAuctionData = {
     start_time?: string;
     end_time?: string;
     active?: boolean;

@@ -9,9 +9,10 @@ import { Grid, Stack } from "@mui/material";
 import { AddArtCard } from "@/components/artist/AddArtCard";
 
 import { DomainDivider, PostActionsBar } from "@/components/shared";
+import PostsLayout from "@/layout/posts";
 
 
-export default function ArtistHomePage() {
+export default function ArtHomePage() {
 
   const snackbar = useSnackbar();
   const [arts, setArt] = React.useState<Art[]>([]);
@@ -39,7 +40,7 @@ export default function ArtistHomePage() {
   return (
     <Stack direction="column" gap={2} sx={{height:"100%"}}>
       <PostActionsBar 
-        title={"My Arts"}
+        title={"My Created Arts"}
         actions={[]}
       />
       <DomainDivider color="#fff" />
@@ -65,6 +66,10 @@ export default function ArtistHomePage() {
 
     </Stack>
   )
+}
+
+ArtHomePage.getLayout = (page: React.ReactNode) => {
+  return <PostsLayout>{page}</PostsLayout>
 }
 
 export async function getStaticProps()  {

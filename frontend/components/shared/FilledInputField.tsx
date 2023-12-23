@@ -15,6 +15,7 @@ interface FilledInputFieldStyles {
 
 export interface FilledInputFieldProps extends Omit<TextFieldProps, 'variant'>, FilledInputFieldStyles {
   value : string;
+  type? : string;
   onChange : (e :  React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => any;
 }
 
@@ -42,6 +43,7 @@ export function FilledInputField(props : FilledInputFieldProps) {
 
   return (
     <FilledTextField
+      type={props.type || "text"}
       error={props.error || false}
       required={props.required || false}
       placeholder={props.placeholder}

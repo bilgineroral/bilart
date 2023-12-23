@@ -25,7 +25,7 @@ const AdminPage: React.FC = () => {
   React.useEffect(() => {
     const fetchReports = async () => {
       try {
-        const data = await getReports({});
+        const data = await getReports({all: true});
         console.log(data);
         if (data.success && data.data != null) {
           setReports(data.data);
@@ -39,7 +39,7 @@ const AdminPage: React.FC = () => {
 
     const fetchUsers = async () => {
       try {
-        const data = await getUsers({});
+        const data = await getUsers({all: true});
         console.log(data);
         if (data.success && data.data != null) {
           setUsers(data.data);
@@ -256,14 +256,6 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
     },
   };
 
-  const getPrivilegeText = (privilege: string) => {
-    const mapping: { [key: string]: string } = {
-      N: "None",
-      M: "Moderator",
-      A: "Admin",
-    };
-    return mapping[privilege] || "Unknown";
-  };
 
   const defaultImage =
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";

@@ -11,20 +11,25 @@ export type ArtQueryParams = {
     artist_id?: number;
     title?: string;
     description?: string;
-    search__title?: string;
+    search__title?: string | null;
     search__description?: string;
     collector_id?: number;
-    tag_name?: string;
+    tag_name?: string | null; // null means no tag
     collection?: number;
     favoriting_collector?: number;
-    date_order?: "asc" | "desc";
-    price_order?: "asc" | "desc";
+    date_order?: "asc" | "desc" | null; // null means no order
+    price_order?: "asc" | "desc" | null; // null means no order
 };
 
 export const getArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
     const queryString = toQueryString(params);
     return get<Art[]>(`http://localhost:8000/arts?${queryString}`);
 };
+
+export const getAvailableArts = async (params: ArtQueryParams): Promise<ApiReuslt<Art[]>> => {
+  const queryString = toQueryString(params);
+  return get<Art[]>(`http://localhost:8000/arts/available?${queryString}`);
+}
 
 export type NewArtData = {
     title: string;
@@ -57,8 +62,8 @@ export const updateArt = async (artId: number, data: UpdateArtData): Promise<Api
 };
 
 
-export const deleteArt = async (artId: number): Promise<ApiReuslt<null>> => {
-    return await deleteItem(`http://localhost:8000/arts/${artId}`, null);
+export const deleteArt = async (postId: number): Promise<ApiReuslt<null>> => {
+    return await deleteItem(`http://localhost:8000/arts/${postId}`, null);
 };
 
 

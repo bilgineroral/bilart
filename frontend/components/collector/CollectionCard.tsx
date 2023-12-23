@@ -1,65 +1,119 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import Button from '@mui/material/Button';
-import CardMedia from '@mui/material/CardMedia';
-import Link from 'next/link';
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Chip, Divider, Typography } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
-var cardStyle = {
-    background : "#28B5A4",
-    display: 'block',
-    width: '25vw',
-    height: '25vw'
+import LinkIcon from '@mui/icons-material/Link';
+import Link from "next/link";
+import { Clear, BorderColor } from "@mui/icons-material";
+import { Collection } from "@/api/api_types";
+import { getArts } from "@/api/art";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { deleteCollection } from "@/api/collection";
+import { useSnackbar } from "@/store/snackbar";
+
+interface CollectionCardProps {
+    collection: Collection;
 }
 
-var mediaStyle = {
-    display: 'block',
-    width: '25vw',
-    height: '20vw'
-}
-  
-var viewButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "white",
-    fontFamily: "Josefin Slab",
-    fontWeight: "Bold",
-    display: 'block',
-    width: '10vw',
-    height: '3vw'
-}
+export default function CollectionCard({ collection }: CollectionCardProps) {
 
-var deleteButtonStyle = {
-    margin: "1vw",
-    background : "#91E3DE",
-    color: "red",
-    fontStyle: "italic",
-    fontFamily: "Josefin Slab",
-    fontWeight: "Italic",
-    display: 'block',
-    width: '12vw',
-    height: '3vw'
-}
+    const [open, setOpen] = useState(false);
+    const snackbar = useSnackbar();
 
-export function CollectionCard() {
-  return (
-    <div style={{margin: '15%'}}>
-        <Card style={cardStyle}>
-            <CardMedia
-                component="img"
-                alt="Image"
-                style={mediaStyle}
-                image='/app-logo.svg'
-            />
+    const handleDelete = () => {
+        try {
+            deleteCollection( collection.collection_id );
+            setOpen(false);
+            router.reload();
+        }
+        catch (e) {
+            snackbar("error", "Failed to delete collection");
+            console.log(e);
+        }
+        setOpen(false);
+    };
 
-            <CardActions>
-                <Button style={deleteButtonStyle}>Delete Collection</Button>
-    
-                <Link href="collector/collection"> {/* ADD PARAMETER PASSING */}
-                    <Button style={viewButtonStyle}>View Collection</Button>
+    const router = useRouter();
+    const [artsCount, setArtsCount] = useState<any>(0);
+    useEffect(() => {
+        const fetchArts = async () => {
+            try {
+                const resp = await getArts({ collection: collection.collection_id });
+                console.log(resp);
+                setArtsCount(resp.count);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        fetchArts();
+    }, []);
+
+    return (
+
+        <div>
+            <Card sx={{
+                width: "100%", height: '100%', display: 'flex',
+                flexDirection: 'column', maxHeight: '520px', maxWidth: '400px'
+            }}>
+                <Link href={`/collection/${collection.collection_id}`}>
+                    <CardMedia
+                        sx={{ width: "100%", aspectRatio: "1/1" }}
+                        image={`/app-logo.svg`}
+                        title="Collection"
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {collection.name}
+                        </Typography>
+                    </CardContent>
                 </Link>
-            </CardActions>
-        </Card>
-    </div>
-  );
+
+                <Box sx={{ marginTop: 'auto' }}>
+                    <Divider />
+                    <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Box>
+                            <Button onClick={() => {
+                                router.push(`/collection/${collection.collection_id}`)
+                            }}>
+                                <LinkIcon style={{ marginRight: '5px' }} />
+                                Open
+                            </Button>
+                            <Button onClick={() => {
+                                router.push(`/collection/${collection.collection_id}/edit`)
+                            }}>
+                                <BorderColor style={{ marginRight: '5px' }} />
+                                Edit
+                            </Button>
+                            <Button onClick={() => setOpen(true)}>
+                                <Clear style={{ marginRight: '5px' }} />
+                                Delete
+                            </Button>
+                        </Box>
+                        <Chip label={artsCount}></Chip>
+                    </CardActions>
+                </Box>
+            </Card>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+            >
+                <DialogTitle>
+                    {"Delete collection?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this collection?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleDelete}>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    )
 }

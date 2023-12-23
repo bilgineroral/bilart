@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
-import type {Tag, Art, Auction, Rating, Tutorial} from "@/api/api_types";
+import type {Tag, Art, Auction, Rating, Tutorial, User} from "@/api/api_types";
 import {
   Grid,
   Stack,
@@ -10,18 +10,21 @@ import {
   Typography,
   ButtonGroup,
   Button,
-  Chip
+  Chip,
+  Paper,
+  TextField,
+  Avatar
 } from "@mui/material";
-
+import { BACKEND_URL } from "@/routes";
 import {
   DomainDivider,
   DomainImage,
 } from "@/components/shared";
 
 import { useSnackbar } from "@/store/snackbar";
-import { getRatings } from "@/api/rating";
+import { CreateRatingData, createNewRating, getRatings } from "@/api/rating";
 import { getTags } from "@/api/tags";
-
+import { getMe } from "@/api/user";
 import { AxiosError } from "axios";
 import { AuthError } from "@/api/crude";
 import { deleteTutorial, getTutorial } from "@/api/tutorial";
@@ -38,71 +41,73 @@ export default function ArtPage() {
   const [comments, setComments] = React.useState<Rating[]>([]);
   const [tags, setTags] = React.useState<Tag[]>([]);
 
+  const fetchTutorialInfo = async () : Promise<Tutorial | null> => {
+    try {
+      const data = await getTutorial(Number(tutorialId));
+      if ("data" in data) {
+        setTutorialInfo(data.data);
+        return data.data;
+      } else {
+        snackbar("error", "failed to fetch art");
+        return null;
+      }
+    } catch (err) {
+      if (err instanceof AuthError) {
+        snackbar("error", "Session does not exist");
+        router.replace("/login")
+      }
+      if (err instanceof AxiosError && err.response?.status === 401) {
+        snackbar("error", "Incorrect username or password");
+        router.replace("/login");
+      } else {
+        snackbar("error", "an error occured. See console for more details");
+        console.error(err);
+      }
+    }
+    return null;
+  };
+
+  const fetchTags = async (tutorial: Tutorial) => {
+    try {
+      const data = await getTags({ post_id: tutorial.post_id });
+      console.info(data);
+      console.log(data);
+      if (data.data != null) {
+        setTags(data.data);
+      } else {
+        snackbar("error", "failed to fetched");
+      }
+    } catch (err) {
+      console.log(err);
+      snackbar("error", "failed to fetched");
+    }
+  };
+
+
+  const fetchComments = async (tutorial : Tutorial) => {
+    try {
+      const data = await getRatings({ post_id: tutorial.post_id });
+      if ( data.data != null) {
+        setComments(data.data);
+      } else {
+        snackbar("error", "failed to fetched");
+      }
+    } catch (err) {
+      console.log(err);
+      snackbar("error", "failed to fetched");
+    }
+  };
+
+  const fetch = async () => {
+    const tutorial = await fetchTutorialInfo();
+    if (tutorial !== null) {
+      fetchComments(tutorial);
+      fetchTags(tutorial);
+    }
+  };
+
   React.useEffect(() => {
-    const fetchTutorialInfo = async () : Promise<Tutorial | null> => {
-      try {
-        const data = await getTutorial(Number(tutorialId));
-        if ("data" in data) {
-          setTutorialInfo(data.data);
-          return data.data;
-        } else {
-          snackbar("error", "failed to fetch art");
-          return null;
-        }
-      } catch (err) {
-        if (err instanceof AuthError) {
-          snackbar("error", "Session does not exist");
-          router.replace("/login")
-        }
-        if (err instanceof AxiosError && err.response?.status === 401) {
-          snackbar("error", "Incorrect username or password");
-          router.replace("/login");
-        } else {
-          snackbar("error", "an error occured. See console for more details");
-          console.error(err);
-        }
-      }
-      return null;
-    };
 
-    const fetchTags = async (tutorial: Tutorial) => {
-      try {
-        const data = await getTags({ post_id: tutorial.post_id });
-        console.info(data);
-        console.log(data);
-        if (data.data != null) {
-          setTags(data.data);
-        } else {
-          snackbar("error", "failed to fetched");
-        }
-      } catch (err) {
-        console.log(err);
-        snackbar("error", "failed to fetched");
-      }
-    };
-
-
-    const fetchComments = async (tutorial : Tutorial) => {
-      try {
-        const data = await getRatings({ post_id: tutorial.post_id });
-        if ( data.data != null) {
-          setComments(data.data);
-        } else {
-          snackbar("error", "failed to fetched");
-        }
-      } catch (err) {
-        console.log(err);
-        snackbar("error", "failed to fetched");
-      }
-    };
-
-    const fetch = async () => {
-      const tutorial = await fetchTutorialInfo();
-      if (tutorial !== null) {
-        fetchComments(tutorial);
-        fetchTags(tutorial);
-      }
-    };
     if (tutorialId) 
       fetch();
   }, [tutorialId]);
@@ -127,6 +132,22 @@ export default function ArtPage() {
       console.log(err);
     }
   }
+
+  const [discussionComment, setDiscussionComment] = React.useState<string>("");
+  const handleDiscussionSubmit = async() => {
+    try {
+      const data : CreateRatingData = {
+        score: 1,
+        comment: discussionComment,
+        post_id: tutorialInfo!.post_id
+      };
+      const res = await createNewRating(data);
+      fetchComments(tutorialInfo!);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
 
   return (
     <Stack direction="column" gap={2} sx={{ height: "100%" }}>
@@ -154,7 +175,7 @@ export default function ArtPage() {
             sx={{ position: "relative", height: "100%" }}
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography variant="h4" color="#fff">
+              <Typography variant="h4" color={theme.palette.primary.main}>
                 {tutorialInfo?.title}
               </Typography>
               <div>
@@ -184,9 +205,21 @@ export default function ArtPage() {
           </Stack>
         </Grid>
       </Grid>
-      <Typography variant="h4" color="#fff">
-        Comments
+      <Typography variant="h4" color={theme.palette.primary.main}>
+        Discussions
       </Typography>
+      <Stack direction="row" gap={2}>
+          <TextField 
+            label="Your Discussion"
+            placeholder="Enter Your Discussion"
+            value={discussionComment}
+            onChange={(e) => setDiscussionComment(e.target.value)}
+            sx={{flexGrow: 1}}
+          />
+          <Button variant="contained" onClick={handleDiscussionSubmit}>
+            Submit Your Discussion
+          </Button>
+        </Stack>
       <Ratings ratings={comments} />
     </Stack>
   );
@@ -212,46 +245,32 @@ type RatingsProps = {
 };
 
 const Ratings: React.FC<RatingsProps> = ({ ratings }) => {
+
   return (
-    <div style={{ padding: "20px", borderRadius: "10px" }}>
-      {ratings.map((rating) => (
-        <div
-          key={rating.rating_id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "white",
-            padding: "10px",
-            margin: "10px 0",
-            borderRadius: "5px",
-            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {rating.profile_image && (
-              <img
-                src={rating.profile_image}
-                alt={`${rating.username}'s profile`}
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "50%",
-                  marginRight: "15px",
-                }}
+    <Stack direction="column" gap={2}>
+      {
+        ratings.map((rating) => (
+        <Paper key={rating.user_id}>
+          <Stack direction="row" sx={{ padding: "0.5rem"}} justifyContent="space-between" alignItems="center" gap={2}>
+            <div style={{display: "flex", justifyContent: "left", alignItems: "center", gap: 4}}>
+              <Avatar 
+                  src={`${BACKEND_URL}/${rating.profile_image}`}
               />
-            )}
-            <div>
-              <div style={{ fontWeight: "bold" }}>{rating.username}</div>
-              <div style={{ color: "#999" }}>{rating.comment}</div>
+              <Typography>
+                {rating.username}
+              </Typography>
             </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {"★".repeat(rating.score)}
-            {"☆".repeat(5 - rating.score)}
-          </div>
-        </div>
-      ))}
-    </div>
+            <TextField
+              sx={{flexGrow : 1}}
+              size="small" 
+              disabled
+              value={rating.comment}
+            />
+          </Stack>
+        </Paper>
+      ))
+    }
+    <div style={{width: "100%", height: 100}} />
+    </Stack>
   );
 };

@@ -1,7 +1,7 @@
 import { get, post, put, deleteItem, toQueryString } from "./crude";
 import { ApiReuslt, Rating } from "./api_types";
 
-type CreateRatingData = {
+export type CreateRatingData = {
   score: number;
   comment: string;
   post_id: number;
@@ -12,6 +12,10 @@ type UpdateRatingData = {
   comment?: string;
 };
 
+type AverageRating = {
+  average_rating: number;
+}
+
 export const getRating = async (
   rating_id: number
 ): Promise<ApiReuslt<Rating>> => {
@@ -20,8 +24,8 @@ export const getRating = async (
 
 export const getArtRatingAverage = async (
   art_id: number
-): Promise<ApiReuslt<number>> => {
-  return get<number>(`http://localhost:8000/ratings/art/${art_id}`);
+): Promise<ApiReuslt<AverageRating[]>> => {
+  return get<AverageRating[]>(`http://localhost:8000/ratings/art/${art_id}`);
 };
 
 export const getArtistRatingAverage = async (
